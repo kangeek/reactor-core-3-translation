@@ -1,4 +1,4 @@
-= Reactor 3 Reference Guide
+= Reactor 3 参考文档
 Stephane Maldini <https://twitter.com/smaldini[@smaldini]>; Simon Baslé <https://twitter.com/simonbasle[@simonbasle]>
 :appversion: 3.1.4.RELEASE
 ifndef::host-github[:ext-relative: {outfilesuffix}]
