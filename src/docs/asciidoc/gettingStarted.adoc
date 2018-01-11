@@ -41,13 +41,8 @@ Reactor Core 运行于 `Java 8` 及以上版本。
 自从 `reactor-core 3.0.4`，随着 `Aluminium` 版本发布上车（release train）以来，Reactor 3
 使用了 BOM（Bill of Materials - 一种标准的 Maven artifact）。
 
-The BOM lets you group artifacts that are meant to work well together without having to
-wonder about the sometimes divergent versioning schemes of these artifacts.
-
 使用 BOM 可以管理一组良好集成的 maven artifacts，从而无需操心不同版本组件的互相依赖问题。
 
-The BOM is a list of versioned artifacts that is itself versioned, using a release train
-scheme with a codename followed by a qualifier. Here are a few examples:
 BOM 是一系列能够有版本的 artifacts，通过“发布列车”（release train）的发布方式管理，
 每趟发布列车由一个“代号+修饰词”组成，比如：
 
@@ -71,15 +66,8 @@ Elements]， 按首字母顺序依次选取。
 
 [[getting]]
 == 获取 Reactor
-As mentioned earlier, the easiest way to use Reactor in your core is to use the BOM and
-add the relevant dependencies to your project. Note that, when adding such a dependency,
-you must omit the version so that the version gets picked up from the BOM.
 前边提到，使用 Reactor的最简单方式是在你的项目中配置 BOM 以及相关依赖。注意，当你添加这样
 的依赖的时候，要省略版本（<version>）配置，从而自动使用 BOM 中指定的版本。
-
-However, if you want to force the use of a specific artifact's version, you can specify
-it when adding your dependency, as you usually would. You can also forgo the BOM entirely
-and specify dependencies by their artifact versions.
 
 当然，如果你希望使用某个版本的 artifact，仍然可以指定。甚至完全不使用 BOM，而是逐个配置
 artifact 的版本也是可以的。
