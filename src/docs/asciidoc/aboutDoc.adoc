@@ -1,7 +1,8 @@
 [[about-doc]]
 = 关于本文档
 :linkattrs:
-本节是对 Reactor参考文档 的简要概述。你并不需要从头到尾阅读该文档。每一节的内容都是独立
+本节是对 Reactor参考文档（译者加：原文一会儿“document”一会儿“guide”，不影响理解的情况下，
+翻译就一律用“文档”了哈） 的简要概述。你并不需要从头到尾阅读该文档。每一节的内容都是独立
 的，不过会有其他章节的链接。
 
 == 最新版本 & 版权说明
@@ -42,14 +43,14 @@ https://github.com/reactor/reactor-core/tree/master/src/docs/asciidoc[包括本�
 https://github.com/reactor/reactor-core/blob/master/CONTRIBUTING.md[这里]进行了解。
 
 == 如何开始阅读本文档
-* 如果你想直接写代码请参考 <<快速上手>> 。
-* 如果你对 _响应式编程（Reactive Programming）_ 比较陌生，最好从 <<响应式介绍>> 开始。
+* 如果你想直接写代码请参考 <<getting-started>> 。
+* 如果你对 _响应式编程（Reactive Programming）_ 比较陌生，最好从 <<intro-reactive>> 开始。
 * 如果你对 Reactor 的理念比较熟悉，只是在编写程序时查找合适的 operator， 请参考附录
- <<选择 operator>> 。
-* 如果你想深入了解 Reactor 的核心功能，请参考 <<核心功能>>，以便了解：
+ <<which-operator>> 。
+* 如果你想深入了解 Reactor 的核心功能，请参考 <<core-features>>，以便了解：
 ** 关于 Reactor 的响应式类型 "<<flux>>" 和 "<<mono>>"。
 ** 如何调整执行的线程环境： <<schedulers,a Scheduler>>.
-** 如何处理问题： <<处理问题>> .
-* 单测的内容主要来自 `reactor-test` 项目，参考 <<测试>>。
+** 如何处理问题： <<error.handling>> .
+* 单测的内容主要来自 `reactor-test` 项目，参考 <<testing>>。
 * <<producing>> 提供了更加丰富的创建响应式源（reactive source）的方式。
-* 其他高级主题请看参考 <<高级主题>>。
+* 其他高级主题请看参考 <<advanced>>。
