@@ -1,107 +1,76 @@
 [[intro-reactive]]
-= Introduction to Reactive Programming
-Reactor is an implementation of the Reactive Programming paradigm, which can be summed up
-as:
+= 响应式编程（Reactive Programming）简介
+Reactor 是响应式编程范式的实现，总结起来有如下几点：
 
-[quote, https://en.wikipedia.org/wiki/Reactive_programming]
-Reactive programming is an asynchronous programming paradigm concerned with data streams
-and the propagation of change. This means that it becomes possible to express static
-(e.g. arrays) or dynamic (e.g. event emitters) data streams with ease via the employed
-programming language(s).
+响应式编程是一种关注于数据流（data streams）和变化传递（propagation of change）的异步编程方式。
+这意味着它可以用既有的编程语言表达静态（如数组）或动态（如事件源）的数据流。
 
-As a first step in the direction of reactive programming, Microsoft created the Reactive
-Extensions (Rx) library in the .NET ecosystem. Then RxJava implemented reactive
-programming on the JVM.  As time went on, a standardization for Java emerged through the
-*Reactive Streams* effort, a specification that defines a set of interfaces and
-interaction rules for reactive libraries on the JVM. It will be integrated into Java 9
-(with the `Flow` class).
+在响应式编程方面，微软跨出了第一步，它在 .NET 生态中创建了响应式扩展库（Reactive Extensions
+library, Rx）。接着 RxJava 在JVM上实现了响应式编程。后来，在 JVM 平台出现了一套标准的响应式
+编程规范，它定义了一系列标准接口和交互规范。并整合到 Java 9 中（使用 `Flow` 类）。
 
-The reactive programming paradigm is often presented in object-oriented languages as an
-extension of the Observer design pattern. One can also compare the main reactive streams
-pattern with the familiar Iterator design pattern, as there is a duality to the
-`Iterable`-`Iterator` pair in all of these libraries. One major difference is that, while
-an Iterator is *pull*-based, reactive streams are *push*-based.
+响应式编程通常作为面向对象编程中的“观察者模式”（Observer design pattern）的一种扩展。
+响应式流（reactive streams）与“迭代子模式”（Iterator design pattern）也有相通之处，
+因为其中也有 `Iterable`-`Iterator` 这样的对应关系。主要的区别在于，Iterator 是基于
+“拉取”（pull）方式的，而响应式流是基于“推送”（push）方式的。
 
-Using an iterator is an imperative programming pattern, even though the method of
-accessing values is solely the responsibility of the `Iterable`. Indeed, it is up to the
-developer to choose when to access the `next()` item in the sequence. In reactive
-streams, the equivalent of the above pair is `Publisher-Subscriber`. But it is the
-`Publisher` that notifies the Subscriber of newly available values _as they come_, and
-this push aspect is the key to being reactive. Also, operations applied to pushed values
-are expressed declaratively rather than imperatively: the programmer expresses the logic
-of the computation rather than describing its exact control flow.
+使用 iterator 是一种“命令式”（imperative）编程范式，即使访问元素的方法是 `Iterable`
+的唯一职责。关键在于，什么时候执行 `next()` 获取元素取决于开发者。在响应式流中，相对应的
+角色是 `Publisher-Subscriber`，但是 _当有新的值到来的时候_ ，却反过来由发布者（Publisher）
+通知订阅者（Subscriber），这种“推送”模式是响应式的关键。此外，对推送来的数据的操作
+是通过一种声明式（declaratively）而不是命令式（imperatively）的方式表达的：开发者通过
+描述“控制流程”来定义对数据流的处理逻辑。
 
-In addition to pushing values, the error handling and completion aspects are also covered
-in a well defined manner. A `Publisher` can push new values to its `Subscriber` (by
-calling `onNext`) but can also signal an error (by calling `onError`) or completion (by
-calling `onComplete`). Both errors and completion terminate the sequence. The following
-descriptor shows the possibilities:
+除了数据推送，对错误处理（error handling）和完成（completion）信号的定义也很完善。
+一个 `Publisher` 可以推送新的值到它的 `Subscriber`（调用 `onNext` 方法），
+同样也可以推送错误（调用 `onError` 方法）和完成（调用 `onComplete` 方法）信号。
+错误和完成信号都可以终止响应式流。可以用下边的表达式描述：
 
 [source]
 onNext x 0..N [onError | onComplete]
 
-This approach is very flexible. The pattern supports use cases where there is no value,
-one value, or n values (including an infinite sequence of values, such as the continuing
-ticks of a clock).
+这种方式非常灵活，无论是有/没有值，还是 n 个值（包括有无限个值的流，比如时钟的持续读秒），都可处理。
 
-Consider why we would need such an asynchronous reactive library in the first place.
+那么我们为什么需要这样的异步响应式开发库呢？
 
-//TODO flesh out, add more preamble?
+== 阻塞是对资源的浪费
+现代应用需要应对大量的并发用户，而且即使现代硬件的处理能力飞速发展，软件性能仍然是关键因素。
 
-== Blocking Can Be Wasteful
-Modern applications can reach huge numbers of concurrent users, and, even though the
-capabilities of modern hardware have continued to improve, performance of
-modern software is still a key concern.
+广义来说我们有两种思路来提升程序性能：
 
-There are broadly two ways one can improve a program's performance:
+. *并行化（parallelize）* ：使用更多的线程和硬件资源。
+. 基于现有的资源来 *提高执行效率* 。
 
-. *parallelize*: use more threads and more hardware resources.
-. *seek more efficiency* in how current resources are used.
+通常，Java开发者使用阻塞式（blocking）编写代码。这没有问题，在出现性能瓶颈后，
+我们可以增加处理线程，线程中同样是阻塞的代码。但是这种使用资源的方式会迅速面临
+资源竞争和并发问题。
 
-Usually, Java developers write programs using blocking code. This practice
-is fine until there is a performance bottleneck, at which point the time
-comes to introduce additional threads, running similar blocking code. But this
-scaling in resource utilization can quickly introduce contention and concurrency
-problems.
+更糟糕的是，阻塞会浪费资源。具体来说，比如当一个程序面临延迟（通常是I/O方面，
+比如数据库读写请求或网络调用），所在线程需要进入 idle 状态等待数据，从而浪费资源。
 
-Worse still, blocking wastes resources. If you look closely, as soon as a
-program involves some latency (notably I/O, such as a database request or a
-network call), resources are wasted because a thread (or many threads)
-now sits idle, waiting for data.
+所以，并行化方式并非银弹。这是挖掘硬件潜力的方式，但是却带来了复杂性，而且容易造成浪费。
 
-So the parallelization approach is not a silver bullet. It is necessary in
-order to access the full power of the hardware, but it is also complex to
-reason about and susceptible to resource wasting.
+== 异步可以解决问题吗？
+第二种思路——提高执行效率——可以解决资源浪费问题。通过编写 _异步非阻塞_ 的代码，
+（任务发起异步调用后）执行过程会切换到另一个 *使用同样底层资源* 的活跃任务，然后等
+异步调用返回结果再去处理。
 
-== Asynchronicity to the Rescue?
-The second approach (mentioned earlier), seeking more efficiency, can be a solution
-to the resource wasting problem. By writing _asynchronous_, _non-blocking_ code,
-you let the execution switch to another active task *using the same underlying
-resources* and later come back to the current process when the asynchronous
-processing has finished.
+但是在 JVM 上如何编写异步代码呢？Java 提供了两种异步编程方式：
 
-But how can you produce asynchronous code on the JVM? Java offers two models of
-asynchronous programming:
+* *回调（Callbacks）* ：异步方法没有返回值，而是采用一个 `callback` 作为参数（lambda
+或匿名类），当结果出来后回调这个 `callback`。常见的例子比如 Swings 的 `EventListener`。
+* *Futures* ：异步方法 *立即* 返回一个 `Future<T>`，该异步方法要返回结果的是 `T` 类型，通过
+`Future`封装。这个结果并不是 *立刻* 可以拿到，而是等实际处理结束才可用。比如， `ExecutorService`
+执行 `Callable<T>` 任务时会返回 `Future` 对象。
 
-* *Callbacks*: Asynchronous methods do not have a return value but take an extra
-`callback` parameter (a lambda or anonymous class) that gets called when the result is
-available. A well known example is Swing's `EventListener` hierarchy.
-* *Futures*: Asynchronous methods return a `Future<T>` *immediately*. The asynchronous
-process computes a `T` value, but the `Future` object wraps access to it. The value is
-not immediately available, and the object can be polled until the value is available. For
-instance, `ExecutorService` running `Callable<T>` tasks use `Future` objects.
+这些技术够用吗？并非对于每个用例都是如此，两种方式都有局限性。
 
-Are these techniques good enough? Not for every use case, and both approaches have
-limitations.
+回调很难组合起来，因为很快就会导致代码难以理解和维护（即所谓的“回调地狱（callback hell）”）。
 
-Callbacks are hard to compose together, quickly leading to code that is difficult to read
-and maintain (known as "Callback Hell").
+考虑这样一种情景：在用户界面上显示用户的5个收藏，或者如果没有任何收藏提供5个建议。这需要3个
+服务（一个提供收藏的ID列表，第二个服务获取收藏内容，第三个提供建议内容）：
 
-Consider an example: showing the top five favorites from a user on the UI or suggestions
-if she doesn't have a favorite. This goes through three services (one gives favorite IDs,
-the second fetches favorite details, and the third offers suggestions with details):
-
-.Example of Callback Hell
+.回调地狱（Callback Hell）的例子
 [source,java]
 ----
 userService.getFavorites(userId, new Callback<List<String>>() { //<1>
@@ -142,26 +111,21 @@ userService.getFavorites(userId, new Callback<List<String>>() { //<1>
   }
 });
 ----
-<1> We have callback-based services: a `Callback` interface with a method invoked when
-the async process was successful and one invoked in case of an error.
-<2> The first service invokes its callback with the list of favorite IDs.
-<3> If the list is empty, we must go to the `suggestionService`.
-<4> The `suggestionService` gives a `List<Favorite>` to a second callback.
-<5> Since we deal with a UI, we need to ensure our consuming code will run in the UI
-thread.
-<6> We use Java 8 `Stream` to limit the number of suggestions processed to five, and we
-show them in a graphical list in the UI.
-<7> At each level, we deal with errors the same way: show them in a popup.
-<8> Back to the favorite ID level. If the service returned a full list, then we need to
-go to the `favoriteService` to get detailed `Favorite` objects. Since we want only five,
-we first stream the list of IDs to limit it to five.
-<9> Once again, a callback. This time we get a fully-fledged `Favorite` object that we
-push to the UI inside the UI thread.
+<1> 基于回调的服务使用一个匿名 `Callback` 作为参数。后者的两个方法分别在异步执行成功
+或异常时被调用。
+<2> 获取到收藏ID的list后调用第一个服务的回调方法 `onSuccess`。
+<3> 如果 list 为空， 调用 `suggestionService`。
+<4> 服务 `suggestionService` 传递 `List<Favorite>` 给第二个回调。
+<5> 既然是处理 UI，我们需要确保消费代码运行在 UI 线程。
+<6> 使用 Java 8 `Stream` 来限制建议数量为5，然后在 UI 中显示。
+<7> 在每一层，我们都以同样的方式处理错误：在一个 popup 中显示错误信息。
+<8> 回到收藏 ID 这一层，如果返回 list，我们需要使用 `favoriteService` 来获取 `Favorite`
+对象。由于只想要5个，因此使用 stream 。
+<9> 再一次回调。这次对每个ID，获取 `Favorite` 对象在 UI 线程中推送到前端显示。
 
-That is a lot of code, and it is a bit hard to follow and has repetitive parts.
-Consider its equivalent in Reactor:
+这里有不少代码，稍微有些难以阅读，并且还有重复代码，我们再来看一下用 Reactor 实现同样功能：
 
-.Example of Reactor code equivalent to callback code
+.使用 Reactor 实现以上回调方式同样功能的例子
 [source,java]
 ----
 userService.getFavorites(userId) // <1>
@@ -171,21 +135,18 @@ userService.getFavorites(userId) // <1>
            .publishOn(UiUtils.uiThreadScheduler()) // <5>
            .subscribe(uiList::show, UiUtils::errorPopup); // <6>
 ----
-<1> We start with a flow of favorite IDs.
-<2> We _asynchronously transform_ these into detailed `Favorite` objects
-(`flatMap`). We now have a flow of `Favorite`.
-<3> In case the flow of `Favorite` is empty, we switch to a fallback through the
-`suggestionService`.
-<4> We are only interested in, at most, five elements from the resulting flow.
-<5> At the end, we want to process each piece of data in the UI thread.
-<6> We trigger the flow by describing what to do with the final form of the data
-(show it in a UI list) and what to do in case of an error (show a popup).
+<1> 我们获取到收藏ID的流
+<2> 我们 _异步地转换_ 它们（ID） 为 `Favorite` 对象（使用 `flatMap`），现在我们有了
+`Favorite`流。
+<3> 一旦 `Favorite` 为空，切换到 `suggestionService`。
+<4> 我们只关注流中的最多5个元素。
+<5> 最后，我们希望在 UI 线程中进行处理。
+<6> 通过描述对数据的最终处理（在 UI 中显示）和对错误的处理（显示在 popup 中）来触发（`subscribe`）。
 
-What if you want to ensure the favorite IDs are retrieved in less than 800ms or, if it
-takes longer, get them from a cache? In the callback-based code, that is a complicated
-task. In Reactor it becomes as easy as adding a `timeout` operator in the chain:
+如果你想确保“收藏的ID”的数据在800ms内获得（如果超时，从缓存中获取）呢？在基于回调的代码中，
+会比较复杂。但 Reactor 中就很简单，在处理链中增加一个 `timeout` 的操作（operator）即可。
 
-.Example of Reactor code with timeout and fallback
+.Reactor 中增加超时控制的例子
 [source,java]
 ----
 userService.getFavorites(userId)
@@ -197,20 +158,18 @@ userService.getFavorites(userId)
            .publishOn(UiUtils.uiThreadScheduler())
            .subscribe(uiList::show, UiUtils::errorPopup);
 ----
-<1> If the part above emits nothing for more than 800ms, propagate an error.
-<2> In case of an error, fall back to the `cacheService`.
-<3> The rest of the chain is similar to the previous example.
+<1> 如果流在超时时限没有发出（emit）任何值，则发出错误（error）。
+<2> 一旦收到错误，交由 `cacheService` 处理。
+<3> 处理链后边的内容与上例类似。
 
-Futures are a bit better than callbacks, but they still do not do well at composition,
-despite the improvements brought in Java 8 by `CompletableFuture`. Orchestrating multiple
-futures together is doable but not easy. Also, `Future` has other problems: It is easy to
-end up with another blocking situation with `Future` objects by calling the `get()`
-method, and they lack support for multiple values and advanced error handling.
+Futures 比回调要好一点，但即使在 Java 8 引入了 `CompletableFuture`，它对于多个处理的组合仍不够好用。
+编排多个 Futures 是可行的，但却不易。此外，`Future` 还有一个问题：当对 `Future` 对象最终调用
+`get()` 方法时，仍然会导致阻塞，并且缺乏对多个值以及更进一步对错误的处理。
 
-Consider another example: We get a list of IDs from which we want to fetch a name and a
-statistic and combine these pair-wise, all of it asynchronously.
+考虑另外一个例子，我们首先得到 ID 的列表，然后通过它进一步获取到“对应的 name 和 statistics”
+为元素的列表，整个过程用异步方式来实现。
 
-.Example of `CompletableFuture` combination
+.`CompletableFuture` 处理组合的例子
 [source,java]
 ----
 CompletableFuture<List<String>> ids = ifhIds(); // <1>
@@ -240,26 +199,23 @@ assertThat(results).contains(
 				"Name NameNicole has stats 106",
 				"Name NameABSLAJNFOAJNFOANFANSF has stats 121");
 ----
-<1> We start off with a future that gives us a list of `id` values to process.
-<2> We want to start some deeper asynchronous processing once we get the list.
-<3> For each element in the list:
-<4> Asynchronously get the associated name.
-<5> Asynchronously get the associated task.
-<6> Combine both results.
-<7> We now have a list of futures that represent all the combination tasks. In order to
-execute these tasks, we need to convert the list to an array.
-<8> Pass the array to `CompletableFuture.allOf`, which outputs a `Future` that completes
-when all tasks have completed.
-<9> The tricky bit is that `allOf` returns `CompletableFuture<Void>`, so we
-reiterate over the list of futures, collecting their results via `join()`
-(which here doesn't block since `allOf` ensures the futures are all done).
-<10> Once the whole asynchronous pipeline has been triggered, we wait for it to
-be processed and return the list of results that we can assert.
+<1> 以一个 Future 开始，其中封装了后续将获取和处理的 ID 的 list。
+<2> 获取到 list 后边进一步对其启动异步处理任务。
+<3> 对于 list 中的每一个元素：
+<4> 异步地得到相应的 name。
+<5> 异步地得到相应的 statistics。
+<6> 将两个结果一一组合。
+<7> 我们现在有了一个 list，元素是 Future（表示组合的任务，类型是 `CompletableFuture`），为了执行这些任务，
+我们需要将这个 list（元素构成的流） 转换为数组（`List`）。
+<8> 将这个数组传递给 `CompletableFuture.allOf`，返回一个 `Future` ，当所以任务都完成了，那么这个 `Future`
+也就完成了。
+<9> 有点麻烦的地方在于 `allOf` 返回的是 `CompletableFuture<Void>`，所以我们遍历这个 Future 的`List`，
+，然后使用 `join()` 来手机它们的结果（不会导致阻塞，因为 `AllOf` 确保这些 Future 全部完成）
+<10> 一旦整个异步流水线被触发，我们等它完成处理，然后返回结果列表。
 
-Since Reactor has more combination operators out of the box, this process can be
-simplified:
+由于 Reactor 内置许多组合操作，因此以上例子可以简单地实现：
 
-.Example of Reactor code equivalent to future code
+.Reactor 实现与 Future 同样功能的代码
 [source,java]
 ----
 Flux<String> ids = ifhrIds(); // <1>
@@ -284,127 +240,99 @@ assertThat(results).containsExactly( // <8>
 		"Name NameABSLAJNFOAJNFOANFANSF has stats 121"
 );
 ----
-<1> This time, we start from an asynchronously provided sequence of `ids` (a
-`Flux<String>`).
-<2> For each element in the sequence, we asynchronously process it (inside the function
-that is the body `flatMap` call) twice.
-<3> Get the associated name.
-<4> Get the associated statistic.
-<5> Asynchronously combine the 2 values.
-<6> Aggregate the values into a `List` as they become available.
-<7> In production, we would continue working with the `Flux` asynchronously by further
-combining it or subscribing to it. Most probably, we would return the `result` `Mono`.
-Since we are in a test, we block, waiting for the processing to finish instead, and then
-directly return the aggregated list of values.
-<8> Assert the result.
+<1> 这一次，我们从一个异步方式提供的 `ids` 序列（`Flux<String>`）开始。
+<2> 对于序列中的每一个元素，我们异步地处理它（`flatMap` 方法内）两次。
+<3> 获取相应的 name。
+<4> 获取相应的 statistic.
+<5> 异步地组合两个值。
+<6> 随着序列中的元素值“到位”，它们收集一个 `List` 中。
+<7> 在生成流的环节，我们可以继续异步地操作 `Flux` 流，对其进行组合和订阅（subscribe）。
+最终我们很可能得到一个 `Mono` 。由于是测试，我们阻塞住（`block()`），等待流处理过程结束，
+然后直接返回集合。
+<8> Assert 结果。
 
-These perils of Callback and Future are similar and are what reactive programming
-addresses with the `Publisher-Subscriber` pair.
+回调或 Future 遇到的窘境是类似的，这也是响应式编程要通过 `Publisher-Suscriber` 方式来解决的。
 
-== From Imperative to Reactive Programming
-Reactive libraries such as Reactor aim to address these drawbacks of "classic"
-asynchronous approaches on the JVM while also focusing on a few additional aspects:
+== 从命令式编程到响应式编程
+类似 Reactor 这样的响应式库的目标就是要弥补上述“经典”的 JVM 异步方式所带来的不足，
+此外还会关注一下几个方面：
 
-* *Composability* and *readability*
-* Data as a *flow* manipulated with a rich vocabulary of *operators*
-* Nothing happens until you *subscribe*
-* *Backpressure* or _the ability for the consumer to signal the producer that the rate of
-emission is too high_
-* *High level* but *high value* abstraction that is _concurrency-agnostic_
+* *可编排性（Composability）* 以及 *可读性（Readability）*
+* 使用丰富的 *操作（operator）* 方式来处理形如 *流* 的数据
+* 在 *订阅（subscribe）* 之前什么都不会发生
+* *背压（backpressure）* 具体来说即 _消费者能够反向告知生产者生产内容的速度的能力_
+* *高层次* （同时也是有高价值的）的抽象，从而达到 _并发无感知_ 的效果
 
-=== Composability and Readability
-By composability, we mean the ability to orchestrate multiple asynchronous tasks, using
-results from previous tasks to feed input to subsequent ones or executing several tasks
-in a fork-join style, as well as reusing asynchronous tasks as discrete components in a
-higher-level system.
+=== 可编排性与可读性
+可编排性，指的是编排多个异步任务的能力。比如我们将前一个任务的结果传递给后一个任务作为输入，
+或者将多个任务以分解再汇总（fork-join）的形式执行，或者将异步的任务作为离散的组件在系统中
+进行重用。
 
-The ability to orchestrate tasks is tightly coupled to the readability and
-maintainability of code. As the layers of asynchronous processes increase in both number
-and complexity, being able to compose and read code becomes increasingly difficult. As we
-saw, the callback model is simple, but one of its main drawbacks is that, for complex
-processes, you need to have a callback executed from a callback, itself nested inside
-another callback, and so on. That mess is known as *Callback Hell*. As you can guess (or
-know from experience), such code is pretty hard to go back to and reason about.
+这种编排任务的能力与代码的可读性和可维护性是紧密相关的。随着异步处理任务数量和复杂度
+的提高，编写和阅读代码都变得越来越困难。就像我们刚才看到的，回调模式是简单的，但是缺点
+是在复杂的处理逻辑中，回调中会层层嵌入回调，导致 *回调地狱（Callback Hell）* 。你能猜到
+（或有过这种痛苦经历），这样的代码是难以阅读和分析的。
 
-Reactor offers rich composition options, wherein code mirrors the organization of the
-abstract process, and everything is generally kept at the same level (nesting is
-minimized).
+Reactor 提供了丰富的编排操作，从而代码直观反映了处理流程，并且所有的操作保持在同一层次
+（尽量避免了嵌套）。
 
-=== The Assembly Line Analogy
-You can think of data processed by a reactive application as moving through an assembly
-line. Reactor is both the conveyor belt and the workstations. The raw material pours from
-a source (the original `Publisher`) and ends up as a finished product ready to be pushed
-to the consumer (or `Subscriber`).
+=== 就像装配流水线
+你可以想象数据在响应式应用中的处理，就像流过一条装配流水线。Reactor 既是传送带，
+又是一个个的装配工或机器人。原材料从源头（最初的 `Publisher`）流出，最终被加工为成品，
+等待被推送到消费者（或者说 `Subscriber`）。
 
-The raw material can go through various transformations and other intermediary steps or
-be part of a larger assembly line that aggregates intermediate pieces together. If there
-is a glitch or clogging at one point (perhaps boxing the products takes a
-disproportionately long time), the afflicted workstation can signal upstream to limit the
-flow of raw material.
+原材料会经过不同的中间处理过程，或者作为半成品与其他半成品进行组装。如果某处有齿轮卡住，
+或者某件产品的包装过程花费了太久时间，相应的工位就可以向上游发出信号来限制或停止发出原材料。
 
-=== Operators
-In Reactor, operators are the workstations in our assembly analogy. Each operator adds
-behavior to a `Publisher` and wraps the previous step's `Publisher` into a new instance.
-The whole chain is thus linked, such that data originates from the first `Publisher` and
-moves down the chain, transformed by each link. Eventually, a `Subscriber` finishes the
-process. Remember that nothing happens until a `Subscriber` subscribes to a `Publisher`,
-as we see shortly.
+=== 操作（Operators）
+在 Reactor 中，operator就像装配线中的工位（操作员或装配机器人）。每一个 operator
+对 `Publisher` 进行相应的处理，然后将 `Publisher` 包装为一个新的 `Publisher`。就像一个链条，
+数据源自第一个 `Publisher`，然后顺链条而下，在每个环节进行相应的处理。最终，一个订阅者
+(`Subscriber`）终结这个过程。请记住，在订阅者（`Subscriber`）订阅（subscribe）到一个
+发布者（`Publisher`）之前，什么都不会发生。
 
-TIP: Understanding that operators create new instances can help you avoid a common
-mistake that would lead you to believe that an operator you used in your chain is not
-being applied. See this <<faq.chain,item>> in the FAQ.
+TIP: 理解了 operator 会创建新的 `Publisher` 实例这一点，能够帮助你避免一个常见的问题，
+这种问题会让你觉得处理链上的某个 operator 没有起作用。相关内容请参考 <<faq.chain,item>> 。
 
-While the Reactive Streams specification does not specify operators at all, one of the
-best added values of reactive libraries such as Reactor is the rich vocabulary of
-operators  that they provide. These cover a lot of ground, from simple transformation and
-filtering to complex orchestration and error handling.
+虽然响应式流规范（Reactive Streams specification）没有规定任何 operator， 类似 Reactor
+这样的响应式库所带来的最大附加价值之一就是提供丰富的 operator。包括基础的转换操作，
+到过滤操作，甚至复杂的编排和错误处理操作。
 
 [[reactive.subscribe]]
-=== Nothing Happens Until You `subscribe()`
-In Reactor, when you write a `Publisher` chain, data does not start pumping into it by
-default. Instead, you create an abstract description of your asynchronous process (which
-can help with reusability and composition).
+=== `subscribe()` 之前什么都不会发生
+在 Reactor 中，当你创建了一条 `Publisher` 处理链，数据还不会开始生成。事实上，你是创建了
+一种抽象的对于异步处理流程的描述（从而方便重用和组装）。
 
-By the act of *subscribing*, you tie the `Publisher` to a `Subscriber`, which triggers
-the flow of data in the whole chain. This is achieved internally by a single `request`
-signal from the `Subscriber` that is propagated upstream, all the way back to the source
-`Publisher`.
+当真正“订阅（subscrib）”的时候，你需要将 `Publisher` 关联到一个 `Subscriber` 上，然后
+才会触发整个链的流动。这时候，`Subscriber` 会向上游发送一个 `request` 信号，一直到达源头
+的 `Publisher`。
 
 [[reactive.backpressure]]
-=== Backpressure
-Propagating signals upstream is also used to implement *backpressure*, which we described
-in the assembly line analogy as a feedback signal sent up the line when a workstation
-processes more slowly than an upstream workstation.
+=== 背压（Backpressure）
+向上游传递信号这一点也被用于实现 *背压* ，就像在装配线上，某个工位的处理速度如果慢于流水线
+速度，会对上游发送反馈信号一样。
 
-The real mechanism defined by the Reactive Streams specification is pretty close to the
-analogy: a subscriber can work in _unbounded_ mode and let the source push all the data
-at its fastest achievable rate or it can use the `request` mechanism to signal the source
-that it is ready to process at most `n` elements.
+在响应式流规范中实际定义的机制同刚才的类比非常接近：订阅者可以无限接受数据并让它的源头
+“满负荷”推送所有的数据，也可以通过使用 `request` 机制来告知源头它一次最多能够处理 `n`
+个元素。
 
-Intermediate operators can also change the request in-transit. Imagine a `buffer`
-operator that groups elements in batches of 10. If the subscriber requests 1 buffer, it
-is acceptable for the source to produce 10 elements. Prefetching strategies can also be
-applied, if producing the elements before they are requested is not too costly.
+中间环节的操作也可以影响 `request`。想象一个能够将每10个元素分批打包的缓存（`buffer`）操作。
+如果订阅者请求一个元素，那么对于源头来说可以生成10个元素。此外预取策略也可以使用了，
+比如在订阅前预先生成元素。
 
-This transforms the push model into a push-pull hybrid where the downstream can pull n
-elements from upstream if they are readily available, but, if the elements are not ready,
-they get pushed by the upstream whenever they are produced.
+这样能够将“推送”模式转换为“推送+拉取”混合的模式，如果下游准备好了，可以从上游拉取 n
+个元素；但是如果上游元素还没有准备好，下游还是要等待上游的推送。
 
 [[reactive.hotCold]]
-=== Hot vs Cold
-In the Rx family of reactive libraries, one can distinguish two broad categories of
-reactive sequences: *hot* and *cold*. This distinction mainly has to do with how the
-reactive stream reacts to subscribers:
+=== 热（Hot） vs 冷（Cold）
+在 Rx 家族的响应式库中，响应式流分为“热”和“冷”两种类型，区别主要在于响应式流如何
+对订阅者进行响应：
 
-- A *Cold* sequence starts anew for each `Subscriber`, including at the source of data.
-If the source wraps an HTTP call, a new HTTP request is made for each subscription.
-- A *Hot* sequence does not start from scratch for each `Subscriber`. Rather, late
-subscribers receive signals emitted _after_ they subscribed. Note, however, that some hot
-reactive streams can cache or replay the history of emissions totally or partially. From
-a general perspective, a hot sequence can even emit when no subscriber is listening (an
-exception to the "nothing happens before you subscribe" rule).
+- 一个“冷”的序列，指对于每一个 `Subscriber`，都会收到从头开始所有的数据。如果源头
+生成了一个 HTTP 请求，对于每一个订阅都会创建一个新的 HTTP 请求。
+- 一个“热”的序列，指对于一个 `Subscriber`，只能获取从它开始
+订阅 _之后_ 发出的数据。不过注意，有些“热”的响应式流可以缓存部分或全部历史数据。
+通常意义上来说，一个“热”的响应式流，甚至在即使没有订阅者接收数据的情况下，也可以
+发出数据（这一点同 “`Subscribe()` 之前什么都不会发生”的规则有冲突）。
 
-For more information on hot vs cold in the context of Reactor, see
-<<reactor.hotCold,this reactor-specific section>>.
-
-//TODO talk about concurrency agnostic? elements of functional style?
+更多关于 Reactor 中“热”vs“冷”的内容，请参考 <<reactor.hotCold,this reactor-specific section>>。
