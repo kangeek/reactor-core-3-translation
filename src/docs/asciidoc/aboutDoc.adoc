@@ -1,65 +1,55 @@
 [[about-doc]]
-= About the Documentation
+= 关于本文档
 :linkattrs:
-This section provides a brief overview of Reactor reference documentation. You do not
-need to read this guide in a linear fashion. Each piece stands on its own, though they
-often refer to other pieces.
+本节是对 Reactor参考文档 的简要概述。你并不需要从头到尾阅读该文档。每一节的内容都是独立
+的，不过会有其他章节的链接。
 
-== Latest Version & Copyright Notice
-The Reactor reference guide is available as HTML documents. The latest copy is available
-at http://projectreactor.io/docs/core/release/reference/docs/index.html
+== 最新版本 & 版权说明
+本Reactor参考文档也提供HTML形式。最新版本见 http://projectreactor.io/docs/core/release/reference/docs/index.html
 
-Copies of this document may be made for your own use and for distribution to others,
-provided that you do not charge any fee for such copies and further provided that each
-copy contains this Copyright Notice, whether distributed in print or electronically.
+本文档的副本你可以自用，亦可分发给他人。不过无论是打印版还是电子版，请免费提供。
 
-== Contributing to the Documentation
-The reference guide is written in
-http://asciidoctor.org/docs/asciidoc-writers-guide/[Asciidoc]
-format and sources can be found at
-https://github.com/reactor/reactor-core/tree/master/src/docs/asciidoc.
+== 贡献本文档
+本参考文档用 http://asciidoctor.org/docs/asciidoc-writers-guide/[Asciidoc] 编写，
+其源码见 https://github.com/reactor/reactor-core/tree/master/src/docs/asciidoc。
+（译者加：本翻译见 https://github.com/get-set/reactor-core/tree/master-zh/src/docs/asciidoc。）
 
-If you have an improvement, we will be happy to get a pull request from you!
+如有任何补充，我们欢迎你提交 pull request。
 
-We recommend that you check out a local copy of the repository, so that you can
-generate the documentation using the `asciidoctor` gradle task and check the
-rendering. Some of the sections rely on included files, so GitHub rendering is
-not always complete.
+我们建议你将源码 checkout 到本地，这样可以使用 gradle 的 `asciidoctor` 任务检查文档渲染效果。
+有些章节会包含其他文件，Github 并不一定能够渲染出来。
 
 ifeval::["{backend}" == "html5"]
-TIP: To facilitate documentation edits, most sections have a link at the end that opens
-an edit UI directly on GitHub for the main source file for that section. These links are
-only present in the HTML5 version of this reference guide. They look like the following
-link:https://github.com/reactor/reactor-core/edit/master/src/docs/asciidoc/aboutDoc.adoc[Suggest Edit^, role="fa fa-edit"] to <<about-doc>>.
+TIP: 为了方便读者的反馈，多数章节在结尾都提供一个链接，这个链接可以打开一个 Github 上的
+编辑界面，从而可以编辑相应章节的源码。这些链接在 HTML5 的版本中能够看到，就像这样：
+link:https://github.com/reactor/reactor-core/edit/master/src/docs/asciidoc/aboutDoc.adoc[Suggest Edit^, role="fa fa-edit"] to <<about-doc>>。
 endif::[]
-== Getting Help
-There are several ways to reach out for help with Reactor.
 
-* Get in touch with the community on https://gitter.im/reactor/reactor[Gitter].
-* Ask a question on stackoverflow.com at
-http://stackoverflow.com/tags/project-reactor[`project-reactor`].
-* Report bugs in Github issues. The following repositories are closely monitored:
-http://github.com/reactor/reactor-core/issues[reactor-core] (which covers the
-essential features) and http://github.com/reactor/reactor-addons/issues[reactor-addons]
-(which covers reactor-test and adapters issues).
+== 获取帮助
+Reactor项目有多种方式希望能帮助到你：
 
-NOTE: All of Reactor is open source,
-https://github.com/reactor/reactor-core/tree/master/src/docs/asciidoc[including this
-documentation]. If you find problems with the docs or if you just want to improve them,
-please https://github.com/reactor/reactor-core/blob/master/CONTRIBUTING.md[get involved].
+* 与社区沟通： https://gitter.im/reactor/reactor[Gitter]。
+* 在 stackoverflow.com 的 http://stackoverflow.com/tags/project-reactor[`project-reactor`]
+进行提问。
+* 在 Github issues 提交 bug 。下边这几个库我们会一直关注：
+http://github.com/reactor/reactor-core/issues[reactor-core] （涉及 Reactor 的核心功能）
+以及 http://github.com/reactor/reactor-addons/issues[reactor-addons]
+（涉及 reactor-test 和 adapters issues）。
 
-== Where to Go from Here
-* Head to <<getting-started>> if you feel like jumping straight into the code.
-* If you are new to _Reactive Programming_, though, you should probably start with the
-<<intro-reactive>>.
-* If you are familiar with Reactor concepts and are just looking for the right tool
-for the job but cannot think of a relevant operator, try the <<which-operator>> Appendix.
-* In order to dig deeper into the core features of Reactor, head to <<core-features>>, to
-learn:
-** More about Reactor's reactive types in the "<<flux>>" and "<<mono>>"
-sections.
-** How to switch threading contexts using <<schedulers,a Scheduler>>.
-** How to handle errors in the <<error.handling>> section.
-* Unit testing? Yes it is possible with the `reactor-test` project! See <<testing>>.
-* <<producing>> offers a more advanced way of creating of reactive sources.
-* Other advanced topics are covered in <<advanced>>.
+NOTE: 所有 Reactor 项目都是开源的，
+https://github.com/reactor/reactor-core/tree/master/src/docs/asciidoc[包括本文档]。
+如果你发现本文档有问题，或希望补充一些内容，请参考
+https://github.com/reactor/reactor-core/blob/master/CONTRIBUTING.md[这里]进行了解。
+
+== 如何开始阅读本文档
+* 如果你想直接写代码请参考 <<快速上手>> 。
+* 如果你对 _响应式编程（Reactive Programming）_ 比较陌生，最好从 <<响应式介绍>> 开始。
+* 如果你对 Reactor 的理念比较熟悉，只是在编写程序时查找合适的 operator， 请参考附录
+ <<选择 operator>> 。
+* 如果你想深入了解 Reactor 的核心功能，请参考 <<核心功能>>，以便了解：
+** 关于 Reactor 的响应式类型 "<<flux>>" 和 "<<mono>>"。
+** 如何调整执行的线程环境： <<schedulers,a Scheduler>>.
+** 如何处理问题： <<处理问题>> .
+* 单测的内容主要来自 `reactor-test` 项目，参考 <<测试>>。
+* <<producing>> 提供了更加丰富的创建响应式源（reactive source）的方式。
+* 其他高级主题请看参考 <<高级主题>>。
