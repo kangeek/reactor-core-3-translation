@@ -1,8 +1,7 @@
 [[getting-started]]
-= Getting Started
+= 快速上手
 
-This section contains information that should help you get going with Reactor. It
-includes the following information:
+这一节的内容能够帮助你上手使用 Reactor。包括如下内容：
 
 * <<getting-started-introducing-reactor>>
 * <<prerequisites>>
@@ -10,50 +9,48 @@ includes the following information:
 * <<getting>>
 
 [[getting-started-introducing-reactor]]
-== Introducing Reactor
-//TODO flesh out, reword. could also be updated on the website
-Reactor is a fully non-blocking reactive programming foundation for the JVM, with
-efficient demand management (in the form of managing "backpressure"). It integrates
-directly with the Java 8 functional APIs, notably `CompletableFuture`, `Stream`, and
-`Duration`. It offers composable asynchronous sequence APIs `Flux` (for [N] elements) and
-`Mono` (for [0|1] elements), extensively implementing the Reactive Extensions
-specification.
+== 介绍 Reactor
 
-Reactor also supports non-blocking inter-process communication (IPC) with the
-`reactor-ipc` components. Suited for Microservices Architecture, Reactor IPC offers
-backpressure-ready network engines for HTTP (including Websockets), TCP, and UDP.
-Reactive Encoding and Decoding are fully supported.
+Reactor 是一个用于JVM的完全非阻塞的响应式编程框架，具备高效的需求管理（即对
+“背压（backpressure）”的控制）。它与 Java 8 函数式 API 直接继承，比如 `CompletableFuture`，
+`Stream`， 以及`Duration`。它提供了异步序列 API `Flux`（用于[N]个元素）和 `Mono`（用于
+[0|1]个元素），从而完整实现了“响应式扩展规范”（Reactive Extensions Specification）。
+
+Reactor 的 `reactor-ipc` 组件还支持非阻塞的进程间通信（inter-process communication, IPC）。
+Reactor IPC 为HTTP（包括 Websockets）、TCP 和 UDP 提供了支持背压的网络引擎，从而适合
+应用于微服务架构。并且完整支持响应式编解码（reactive encoding and decoding）。
 
 [[prerequisites]]
-== Prerequisites
+== 前提
 Reactor Core runs on `Java 8` and above.
+Reactor Core 运行于 `Java 8` 及以上版本。
 
-It has a transitive dependency on `org.reactive-streams:reactive-streams:1.0.2`.
+依赖于 `org.reactive-streams:reactive-streams:1.0.2`。
 
 [NOTE]
 ====
-*Android support*:
+*Andriod 支持方面*:
 
-* Reactor 3 does not officially support or target Android (consider using RxJava 2 if
-such support is a strong requirement).
-* However, it should work fine with Android SDK 26 (Android O) and above.
-* We are open to evaluating changes that benefit Android support in a best-effort
-fashion. However, we cannot make guarantees. Each decision must be made on a
-case-by-case basis.
+* Reactor 3 并不正式支持 Andorid（如果需要可以考虑使用 RxJava 2）。
+* 但是，在 Android SDK 26（Android 0）及以上版本应该没问题。
+* 我们希望能够最大程度兼顾对 Android 的支持，但是我们并不能作出保证，具体情况具体分析。
 ====
 
 [[getting-started-understanding-bom]]
-== Understanding the BOM
-Reactor 3 uses a BOM (Bill of Materials - a standard Maven artifact) model (since
-`reactor-core 3.0.4`, with the `Aluminium` release train).
-
-//TODO re-state that this is a curated list of versions as opposed to generated?
+== 了解 BOM
+自从 `reactor-core 3.0.4`，随着 `Aluminium` 版本发布上车（release train）以来，Reactor 3
+使用了 BOM（Bill of Materials - 一种标准的 Maven artifact）。
 
 The BOM lets you group artifacts that are meant to work well together without having to
 wonder about the sometimes divergent versioning schemes of these artifacts.
 
+使用 BOM 可以管理一组良好集成的 maven artifacts，从而无需操心不同版本组件的互相依赖问题。
+
 The BOM is a list of versioned artifacts that is itself versioned, using a release train
 scheme with a codename followed by a qualifier. Here are a few examples:
+BOM 是一系列能够有版本的 artifacts，通过“发布列车”（release train）的发布方式管理，
+每趟发布列车由一个“代号+修饰词”组成，比如：
+
 [verse]
 Aluminium-RELEASE
 Carbon-BUILD-SNAPSHOT
@@ -61,32 +58,35 @@ Aluminium-SR1
 Bismuth-RELEASE
 Carbon-SR32
 
-The codenames represent what would traditionally be the MAJOR.MINOR number. They (mostly)
-come from the https://en.wikipedia.org/wiki/Periodic_table#Overview[Periodic Table of
-Elements], in increasing alphabetical order.
+代号替代了传统的 主版本.次版本 的数字形式。这些代号主要来自
+https://en.wikipedia.org/wiki/Periodic_table#Overview[Periodic Table of
+Elements]， 按首字母顺序依次选取。
 
-The qualifiers are (in chronological order):
+修饰词有（按照时间顺序）：
 
 * `BUILD-SNAPSHOT`
-* `M1`..`N`: Milestones or developer previews
-* `RELEASE`: The first GA (General Availability) release in a codename series
-* `SR1`..`N`: The subsequent GA releases in a codename series (equivalent to PATCH
-number, SR stands for "Service Release").
+* `M1`..`N`: 里程碑号
+* `RELEASE`: 第一次 GA (General Availability) 发布
+* `SR1`..`N`: 后续的 GA 发布（类似于 PATCH 号或 SR（Service Release））。
 
 [[getting]]
-== Getting Reactor
+== 获取 Reactor
 As mentioned earlier, the easiest way to use Reactor in your core is to use the BOM and
 add the relevant dependencies to your project. Note that, when adding such a dependency,
 you must omit the version so that the version gets picked up from the BOM.
+前边提到，使用 Reactor的最简单方式是在你的项目中配置 BOM 以及相关依赖。注意，当你添加这样
+的依赖的时候，要省略版本（<version>）配置，从而自动使用 BOM 中指定的版本。
 
 However, if you want to force the use of a specific artifact's version, you can specify
 it when adding your dependency, as you usually would. You can also forgo the BOM entirely
 and specify dependencies by their artifact versions.
 
-=== Maven Installation
-The BOM concept is natively supported by Maven. First, you need to import the BOM by
-adding the following snippet to your `pom.xml`. If the top section
-(`dependencyManagement`) already exists in your pom, add only the contents.
+当然，如果你希望使用某个版本的 artifact，仍然可以指定。甚至完全不使用 BOM，而是逐个配置
+artifact 的版本也是可以的。
+
+=== Maven 配置
+Maven 原生支持 BOM。首先，你需要在 `pom.xml` 内通过添加下边的代码引入 BOM。如果
+(`dependencyManagement`) 已经存在，只需要添加其内容即可。
 
 [source,xml]
 ----
@@ -102,11 +102,9 @@ adding the following snippet to your `pom.xml`. If the top section
     </dependencies>
 </dependencyManagement>
 ----
-<1> Notice the `dependencyManagement` tag. This is in addition to the regular
-`dependencies` section.
+<1> 注意 `dependencyManagement` 标签用来补充通常使用的 `dependencies` 配置。
 
-Next, add your dependencies to the relevant reactor projects, as usual, except without a
-`<version>`, as shown here:
+然后，在 `dependencies` 中添加相关的 reactor 项目，省略 `<version>`，如下：
 
 [source,xml]
 ----
@@ -123,16 +121,16 @@ Next, add your dependencies to the relevant reactor projects, as usual, except w
     </dependency>
 </dependencies>
 ----
-<1> Dependency on the core library
-<2> No version tag here
-<3> `reactor-test` provides facilities to unit test reactive streams
+<1> 依赖 Core 库
+<2> 没有 version 标签
+<3> `reactor-test` 提供了对 reactive streams 的单测
 
-=== Gradle installation
-Gradle has no core support for Maven BOMs, but you can use Spring's
+=== Gradle 配置
+Gradle 没有对 Maven BOM 的支持，但是你可以使用 Spring 的
 https://github.com/spring-gradle-plugins/dependency-management-plugin[gradle-dependency-management]
-plugin.
+插件。
 
-First, apply the plugin from the Gradle Plugin Portal:
+首先，apply 插件。
 
 [source,groovy]
 ----
@@ -140,10 +138,10 @@ plugins {
     id "io.spring.dependency-management" version "1.0.1.RELEASE" <1>
 }
 ----
-<1> as of this writing, 1.0.1.RELEASE is the latest version of the plugin.
-Check for updates.
+<1> 编写本文档时，插件最新版本为 1.0.1.RELEASE，请自行使用合适的版本。
 
-Then use it to import the BOM:
+然后用它引入 BOM：
+
 [source,groovy]
 ----
 dependencyManagement {
@@ -160,13 +158,11 @@ dependencies {
      compile 'io.projectreactor:reactor-core' <1>
 }
 ----
-<1> There is no third `:` separated section for the version. It is taken from
-the BOM.
+<1> 无需第三个 `:` 添加版本号。
 
-=== Milestones and Snapshots
-Milestones and developer previews are distributed through the Spring Milestones
-repository rather than Maven Central. To add it to your build configuration
-file, use the following snippet:
+=== Milestones 和 Snapshots
+里程碑版（Milestones）和开发预览版（developer previews）通过 Spring Milestones
+repository 而不是 Maven Central 来发布。 需要添加到构建配置文件中，如：
 
 .Milestones in Maven
 [source,xml]
@@ -180,7 +176,7 @@ file, use the following snippet:
 </repositories>
 ----
 
-For Gradle, use the following snippet:
+gradle 使用下边的配置：
 
 .Milestones in Gradle
 [source,groovy]
@@ -191,7 +187,7 @@ repositories {
 }
 ----
 
-Similarly, snapshots are also available in a separate dedicated repository:
+类似的，snapshot 版也需要配置专门的库：
 
 .BUILD-SNAPSHOTs in Maven
 [source,xml]
