@@ -1,30 +1,25 @@
 [[producing]]
-= Programmatically creating a sequence
-In this section, we introduce the creation of a `Flux` or a `Mono` by
-programmatically defining its associated events (`onNext`, `onError`, and
-`onComplete`). All these methods share the fact that they expose an API to
-trigger the events that we call a *sink*. There are actually a few sink
-variants, which we'll get to shortly.
+= 可编程式地创建一个序列
+在这一小节，我们介绍如何通过定义相对应的事件（`onNext`、`onError`和`onComplete`）
+创建一个 `Flux` 或 `Mono`。所有这些方法都通过 API 来触发我们叫做 *sink（池）* 的事件。
+sink 的类型不多，我们快速过一下。
 
 [[producing.generate]]
 == Generate
-The simplest form of programmatic creation of a `Flux` is through the `generate`
-method, which takes a generator function.
+最简单的创建 `Flux` 的方式就是使用 `generate` 方法。
 
-This is for *synchronous* and *one-by-one* emissions, meaning that
-the sink is a `SynchronousSink` and that its `next()` method can only be called
-at most once per callback invocation. You can then additionally call `error(Throwable)`
-or `complete()`, but this is optional.
+这是一种 *同步地*， *逐个地* 产生值的方法，意味着 sink 是一个 `SynchronousSink`
+而且其 `next()` 方法在每次回调的时候最多只能被调用一次。你也可以调用 `error(Throwable)`
+或者 `complete()`，不过是可选的。
 
-The most useful variant is probably the one that also lets you keep a state
-that you can refer to in your sink usage to decide what to emit next. The generator
-function then becomes a `BiFunction<S, SynchronousSink<T>, S>`, with `<S>` the
-type of the state object. You have to provide a `Supplier<S>` for the initial
-state, and your generator function now returns a new state on each round.
+最有用的一种方式就是同时能够记录一个状态值（state），从而在使用 sink 发出下一个元素的时候能够
+基于这个状态值去产生元素。此时生成器（generator）方法就是一个 `BiFunction<S, SynchronousSink<T>, S>`，
+其中 `<S>` 是状态对象的类型。你需要提供一个 `Supplier<S>` 来初始化状态值，而生成器需要
+在每一“回合”生成元素后返回新的状态值（供下一回合使用）。
 
-For instance, you could use an `int` as the state:
+例如我们使用一个 `int` 作为状态值。
 
-.Example of state-based `generate`
+.基于状态值的 `generate` 示例
 [source,java]
 ----
 Flux<String> flux = Flux.generate(
@@ -35,14 +30,12 @@ Flux<String> flux = Flux.generate(
       return state + 1; // <4>
     });
 ----
-<1> We supply the initial state value of 0.
-<2> We use the state to choose what to emit (a row in the multiplication table
-of 3).
-<3> We also use it to choose when to stop.
-<4> We return a new state that we use in the next invocation (unless the
-sequence terminated in this one).
+<1> 初始化状态值（state）为0。
+<2> 我们基于状态值 state 来生成下一个值（state 乘以 3）。
+<3> 我们也可以用状态值来决定什么时候终止序列。
+<4> 返回一个新的状态值 state，用于下一次调用。
 
-The code above generates the table of 3, as the following sequence:
+上面的代码生成了“3 x”的乘法表：
 
 ----
 3 x 0 = 0
@@ -58,10 +51,10 @@ The code above generates the table of 3, as the following sequence:
 3 x 10 = 30
 ----
 
-You can also use a mutable `<S>`. The example above could for instance be
-rewritten using a single `AtomicLong` as the state, mutating it on each round:
+我们也可以使用可变（mutable）类型（译者注：如上例，原生类型及其包装类，以及String等属于不可变类型）
+的 `<S>`。上边的例子也可以用 `AtomicLong` 作为状态值，在每次生成后改变它的值。
 
-.Mutable state variant
+.可变类型的状态变量
 [source,java]
 ----
 Flux<String> flux = Flux.generate(
@@ -73,15 +66,15 @@ Flux<String> flux = Flux.generate(
       return state; // <3>
     });
 ----
-<1> This time, we generate a mutable object as the state.
-<2> We mutate the state here.
-<3> We return the *same* instance as the new state.
+<1> 这次我们初始化一个可变类型的状态值。
+<2> 改变状态值。
+<3> 返回 *同一个* 实例作为新的状态值。
 
-TIP: If your state object needs to clean up some resources, use the
-`generate(Supplier<S>, BiFunction, Consumer<S>)` variant to clean up the last
-state instance.
+TIP: 如果状态对象需要清理资源，可以使用 `generate(Supplier<S>, BiFunction, Consumer<S>)`
+这个签名方法来清理状态对象（译者注：Comsumer 在序列终止才被调用）。
 
-Here is an example of using the generate method that includes a `Consumer`:
+下面是一个在 generate 方法中增加 `Consumer` 的例子：
+
 [source, java]
 ----
 Flux<String> flux = Flux.generate(
@@ -94,33 +87,27 @@ Flux<String> flux = Flux.generate(
     }, (state) -> System.out.println("state: " + state)); // <4>
 }
 ----
-<1> Again, we generate a mutable object as the state.
-<2> We mutate the state here.
-<3> We return the *same* instance as the new state.
-<4> We see the last state value (11) as the output of this `Consumer` lambda.
+<1> 同样，初始化一个可变对象作为状态变量。
+<2> 改变状态。
+<3> 返回 *同一个* 实例作为新的状态。
+<4> 我们会看到最后一个状态值（11）会被这个 `Consumer` lambda 输出。
 
-In the case of the state containing a database connection or other resource
-that needs to be handled at the end of the process, the `Consumer` lambda could
-close the connection or  otherwise handle any tasks that should be done at the
-end of the process.
+如果 state 使用了数据库连接或者其他需要最终进行清理的资源，这个 `Consumer`
+lambda 可以用来在最后关闭连接或完成相关的其他清理任务。
 
 [[producing.create]]
 == Create
-The more advanced form of programmatic creation of a `Flux`, `create` can work
-asynchronously or synchronously and is suitable for multiple emissions per
-round.
+作为一个更高级的创建 `Flux` 的方式， `create` 方法的生成方式既可以是同步，
+也可以是异步的，并且还可以每次发出多个元素。
 
-It exposes a `FluxSink`, with its `next`, `error`, and `complete` methods.
-Contrary to `generate`, it doesn't have a state-based variant. On the other
-hand, it can trigger multiple events in the callback (even from any thread
-at a later point in time).
+该方法用到了 `FluxSink`，后者同样提供 `next`，`error` 和 `complete` 等方法。
+与 `generate` 不同的是，`create` 不需要状态值，另一方面，它可以在回调中触发
+ 多个事件（即使是在未来的某个时间）。
 
-TIP: `create` can be very useful to bridge an existing API with the reactive
-world - such as an asynchronous API based on listeners.
+TIP: `create` 有个好处就是可以将现有的 API 转为响应式，比如监听器的异步方法。
 
-Imagine that you use a listener-based API. It processes data by chunks
-and has two events: (1) a chunk of data is ready and (2) the processing is
-complete (terminal event), as represented in the `MyEventListener` interface:
+假设你有一个监听器 API，它按 chunk 处理数据，有两种事件：（1）一个 chunk
+数据准备好的事件；（2）处理结束的事件。如下：
 
 [source,java]
 ----
@@ -130,7 +117,7 @@ interface MyEventListener<T> {
 }
 ----
 
-You can use `create` to bridge this into a `Flux<T>`:
+你可以使用 `create` 方法将其转化为响应式类型 `Flux<T>`：
 
 [source,java]
 ----
@@ -150,33 +137,28 @@ Flux<String> bridge = Flux.create(sink -> {
     });
 });
 ----
-<1> Bridge to the `MyEventListener` API
-<2> Each element in a chunk becomes an element in the `Flux`.
-<3> The `processComplete` event is translated to `onComplete`.
-<4> All of this is done asynchronously whenever the `myEventProcessor` executes.
+<1> 桥接 `MyEventListener`。
+<2> 每一个 chunk 的数据转化为 `Flux` 中的一个元素。
+<3> `processComplete` 事件转换为 `onComplete`。
+<4> 所有这些都是在 `myEventProcessor` 执行时异步执行的。
 
-Additionally, since `create` can be asynchronous and manages backpressure, you
-can refine how to behave backpressure-wise, by indicating an `OverflowStrategy`:
+此外，既然 `create` 可以是异步地，并且能够控制背压，你可以通过提供一个 `OverflowStrategy`
+来定义背压行为。
 
- - `IGNORE` to Completely ignore downstream backpressure requests.
-This may yield `IllegalStateException` when queues get full downstream.
- - `ERROR` to signal an `IllegalStateException` when the downstream can't keep
- up.
- - `DROP` to drop the incoming signal if the downstream is not ready to receive
- it.
- - `LATEST` to let downstream only get the latest signals from upstream.
- - `BUFFER` (the default) to buffer all signals if the downstream can't keep up.
- (this does unbounded buffering and may lead to `OutOfMemoryError`).
+ - `IGNORE`： 完全忽略下游背压请求，这可能会在下游队列积满的时候导致
+`IllegalStateException`。
+ - `ERROR`： 当下游跟不上节奏的时候发出一个 `IllegalStateException` 的错误信号。
+ - `DROP`：当下游没有准备好接收新的元素的时候抛弃这个元素。
+ - `LATEST`：让下游只得到上游最新的元素。
+ - `BUFFER`：（默认的）缓存所有下游没有来得及处理的元素（这个不限大小的缓存可能导致 `OutOfMemoryError`）。
 
-NOTE: `Mono` also has a `create` generator. The `MonoSink` of Mono's create
-doesn't allow several emissions. It will drop all signals after the first one.
+NOTE: `Mono` 也有一个用于 `create` 的生成器（generator）—— `MonoSink`，它不能生成多个元素，
+因此会抛弃第一个元素之后的所有元素。
 
-=== Push model
-A variant of `create` is `push`, which is suitable for processing events
-from a single producer. Similar to `create`, `push` can also be asynchronous
-and can manage backpressure using any of the overflow strategies supported
-by `create`. Only one producing thread may invoke `next`, `complete`, or
-`error` at a time.
+=== 推送（push）模式
+`create` 的一个变体是 `push`，适合生成事件流。与 `create`类似，`push` 也可以是异步地，
+并且能够使用以上各种溢出策略（overflow strategies）管理背压。每次只有一个生成线程可以调用
+`next`，`complete` 或 `error`。
 
 [source,java]
 ----
@@ -200,20 +182,17 @@ Flux<String> bridge = Flux.push(sink -> {
     });
 });
 ----
-<1> Bridge to the `SingleThreadEventListener` API.
-<2> Events are pushed to the sink using `next` from a single listener thread.
-<3> `complete` event generated from the same listener thread.
-<4> `error` event also generated from the same listener thread.
+<1> 桥接 `SingleThreadEventListener` API。
+<2> 在监听器所在线程中，事件通过调用 `next` 被推送到 sink。
+<3> `complete` 事件也在同一个线程中。
+<4> `error` 事件也在同一个线程中。
 
-=== Hybrid push/pull model
-Unlike `push`, `create` may be used in `push` or `pull` mode, making it suitable
-for bridging with listener-based APIs where data may be delivered asynchronously
-at any time. An `onRequest` callback can be registered on `FluxSink` to track
-requests. The callback may be used to request more data from the source if
-required and to manage backpressure by delivering data to the sink only when
-requests are pending. This enables a hybrid push/pull model where downstream can
-pull data that is already available from upstream and upstream can push data to
-downstream when data becomes available at a later time.
+=== 推送/拉取（push/pull）混合模式
+不像 `push`，`create` 可以用于 `push` 或 `pull` 模式，因此适合桥接监听器的
+的 API，因为事件消息会随时异步地到来。回调方法 `onRequest` 可以被注册到 `FluxSink`
+以便跟踪请求。这个回调可以被用于从源头请求更多数据，或者通过在下游请求到来
+的时候传递数据给 sink 以实现背压管理。这是一种推送/拉取混合的模式，
+因为下游可以从上游拉取已经就绪的数据，上游也可以在数据就绪的时候将其推送到下游。
 
 [source,java]
 ----
@@ -234,16 +213,15 @@ Flux<String> bridge = Flux.create(sink -> {
         }
     });
 ----
-<1> Poll for messages when requests are made.
-<2> If messages are available immediately, push them to the sink.
-<3> The remaining messages that arrive asynchronously later are also delivered.
+<1> 当有请求的时候取出一个 message。
+<2> 如果有就绪的 message，就发送到 sink。
+<3> 后续异步到达的 message 也会被发送给 sink。
 
-=== Cleaning up
+=== 清理（Cleaning up）
 
-Two callbacks, `onDispose` and `onCancel`, perform any cleanup on cancellation
-or termination. `onDispose` can be used to perform cleanup when the `Flux`
-completes, errors out, or is cancelled. 'onCancel can be used to perform any
-action specific to cancellation prior to cleanup with `onDispose`.
+`onDispose` 和 `onCancel` 这两个回调用于在被取消和终止后进行清理工作。
+`onDispose` 可用于在 `Flux` 完成，有错误出现或被取消的时候执行清理。
+`onCancel` 只用于针对“取消”信号执行相关操作，会先于 `onDispose` 执行。
 
 [source,java]
 ----
@@ -253,29 +231,25 @@ Flux<String> bridge = Flux.create(sink -> {
         .onDispose(() -> channel.close())  // <2>
     });
 ----
-<1> `onCancel` is invoked for cancel signal.
-<2> `onDispose` is invoked for complete, error, or cancel.
+<1> `onCancel` 在取消时被调用。
+<2> `onDispose` 在有完成、错误和取消时被调用。
 
 == Handle
-The `handle` method is a bit different. It is present in both `Mono` and
-`Flux`.  Also, it is an instance method, meaning that it is chained on an
-existing source (as are the common operators).
+`handle` 方法有些不同，它在 `Mono` 和 `Flux` 中都有。然而，它是一个实例方法
+（instance method），意思就是它要链接在一个现有的源后使用（与其他 operators 一样）。
 
-It is close to `generate`, in the sense that it uses a `SynchronousSink` and
-only allows one-by-one emissions. However, `handle` can be used to generate an
-arbitrary value out of each source element, possibly skipping some elements. In
-this way, it can serve as a combination of `map` and `filter`. The signature of
-handle is as follows:
+它与 `generate` 比较类似，因为它也使用 `SynchronousSink`，并且只允许元素逐个发出。
+然而，`handle` 可被用于基于现有数据源中的元素生成任意值，有可能还会跳过一些元素。
+这样，可以把它当做 `map` 与 `filter` 的组合。`handle` 方法签名如下：
 
 [source,java]
 handle(BiConsumer<T, SynchronousSink<R>>)
 
-Let's consider an example. The reactive streams specification disallows `null`
-values in a sequence. What if you want to perform a `map` but you want to use
-a preexisting method as the map function, and that method sometimes returns null?
+举个例子，响应式流规范允许 `null` 这样的值出现在序列中。假如你想执行一个类似
+`map` 的操作，你想利用一个现有的具有映射功能的方法，但是它会返回 null，这时候怎么办呢？
 
-For instance, the following method can be applied safely to a source of
-integers:
+例如，下边的方法可以用于 Integer 序列，映射为字母或 null 。
+
 [source,java]
 ----
 public String alphabet(int letterNumber) {
@@ -287,9 +261,9 @@ public String alphabet(int letterNumber) {
 }
 ----
 
-We can then use `handle` to remove any nulls:
+我们可以使用 `handle` 来去掉其中的 null。
 
-.Using `handle` for a "map and eliminate nulls" scenario
+.将 `handle` 用于一个 "映射 + 过滤 null" 的场景
 [source,java]
 ----
 Flux<String> alphabet = Flux.just(-1, 30, 13, 9, 20)
@@ -301,11 +275,12 @@ Flux<String> alphabet = Flux.just(-1, 30, 13, 9, 20)
 
 alphabet.subscribe(System.out::println);
 ----
-<1> Map to letters.
-<2> If the "map function" returns null....
-<3> Filter it out by not calling `sink.next`.
+<1> 映射到字母。
+<2> 如果返回的是 null ...
+<3> 就不会调用 `sink.next` 从而过滤掉。
 
-Which will print out:
+输出如下：
+
 ----
 M
 I
