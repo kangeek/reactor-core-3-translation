@@ -1,7 +1,6 @@
-=== `subscribe` Method Examples
+=== `subscribe` 方法示例
 
-This section contains minimal examples of each of the five signatures for the `subscribe`
-method. The following code shows an example of the basic method with no arguments:
+这一小节包含了对 `subscribe` 的5个不同签名的方法的示例，如下是一个无参的基本方法的使用：
 
 [source,java]
 ----
@@ -9,12 +8,11 @@ Flux<Integer> ints = Flux.range(1, 3); <1>
 ints.subscribe(); <2>
 ----
 
-<1> Set up a `Flux` that produces three values when a subscriber attaches.
-<2> Subscribe in the simplest way.
+<1> 配置一个在订阅时会产生3个值的 `Flux`。
+<2> 最简单的订阅方式。
 
-The preceding code produces no visible output, but it does work. The `Flux` produces
-three values. If we provide a lambda, we can make the values visible. The next example
-for the `subscribe` method shows one way to make the values appear:
+第二行代码没有任何输出，但是它确实执行了。`Flux` 产生了3个值。如果我们传入一个 lambda，
+我们就可以看到这几个值，如下一个列子：
 
 [source,java]
 ----
@@ -22,10 +20,10 @@ Flux<Integer> ints = Flux.range(1, 3); <1>
 ints.subscribe(i -> System.out.println(i)); <2>
 ----
 
-<1> Set up a `Flux` that produces three values when a subscriber attaches.
-<2> Subscribe with a subscriber that will print the values.
+<1> 配置一个在订阅时会产生3个值的 `Flux`。
+<2> 订阅它并打印值。
 
-The preceding code produces the following output:
+第二行代码会输入如下内容：
 
 ----
 1
@@ -33,8 +31,7 @@ The preceding code produces the following output:
 3
 ----
 
-To demonstrate the next signature, we intentionally introduce an error, as
-shown in the following example:
+为了演示下一个方法签名，我们故意引入一个错误，如下所示：
 
 [source, java]
 ----
@@ -47,14 +44,14 @@ ints.subscribe(i -> System.out.println(i), <5>
       error -> System.err.println("Error: " + error));
 ----
 
-<1> Set up a Flux that produces four values when a subscriber attaches.
-<2> We need a map so that we can handle some values differently.
-<3> For most values, return the value.
-<4> For one value, force an error.
-<5> Subscribe with a subscriber that includes an error handler.
+<1> 配置一个在订阅时会产生4个值的 `Flux`。
+<2> 为了对元素进行处理，我们需要一个 map 操作。
+<3> 对于多数元素，返回值本身。
+<4> 对其中一个元素抛出错误。
+<5> 订阅的时候定义如何进行错误处理。
 
-We now have two lambda expressions: one for the content we expect and one for
-errors. The preceding code produces the following output:
+现在我们有两个 lambda 表达式：一个是用来处理正常数据，一个用来处理错误。
+刚才的代码输出如下：
 
 ----
 1
@@ -63,8 +60,7 @@ errors. The preceding code produces the following output:
 Error: java.lang.RuntimeException: Got to 4
 ----
 
-The next signature of the `subscribe` method includes both an error handler and
-a handler for completion events, as shown in the following example:
+下一个 `subscribe` 方法的签名既有错误处理，还有一个完成后的处理，如下：
 
 [source,java]
 ----
@@ -74,16 +70,13 @@ ints.subscribe(i -> System.out.println(i),
     () -> {System.out.println("Done");}); <2>
 ----
 
-<1> Set up a Flux that produces four values when a Subscriber attaches.
-<2> Subscribe with a Subscriber that includes a handler for completion events.
+<1> 配置一个在订阅时会产生4个值的 `Flux`。
+<2> 订阅时定义错误和完成信号的处理。
 
-Error signals and completion signals are both terminal events and are exclusive of one
-another (you never get both). To make the completion consumer work, we must take care not
-to trigger an error.
+错误和完成信号都是终止信号，并且二者只会出现其中之一。为了能够最终全部正常完成，你必须处理错误信号。
 
-The completion matcher is a pair of empty parentheses because it matches the `run`
-method in the `Runnable` interface, which has no parameters. The preceding code
-produces the following output:
+用于处理完成信号的 lambda 是一对空的括号，因为它实际上匹配的是 `Runnalbe` 接口中的 `run` 方法，
+不接受参数。刚才的代码输出如下：
 
 ----
 1
@@ -93,9 +86,7 @@ produces the following output:
 Done
 ----
 
-The last signature of the `subscribe` method includes a custom `Subscriber` (shown
-later in this section), which shows how to attach a custom `Subscriber`, as shown in the
-following example:
+最后一个 `subscribe` 方法签名包含一个自定义的 `subscriber`（下一节会介绍到）：
 
 [source,java]
 ----
@@ -108,9 +99,8 @@ ints.subscribe(i -> System.out.println(i),
 ints.subscribe(ss);
 ----
 
-In the preceding example, we provide a custom `Subscriber` as the last argument to the
-`subscribe` method. The following example shows that custom `Subscriber` object, which is
-the simplest possible implementation of a `Subscriber`:
+上面这个例子中，我们把一个自定义的 `Subscriber` 作为 `subscribe` 方法的最后一个参数。
+下边的例子是这个自定义的 `Subscriber`，这是一个对 `Subscriber` 的最简单实现：
 
 [source,java]
 ----
@@ -134,19 +124,16 @@ public class SampleSubscriber<T> extends BaseSubscriber<T> {
 }
 ----
 
-The SampleSubscriber class extends `BaseSubscriber`, which is the recommended abstract
-class for user-defined `Subscribers` in Reactor. The class offers hooks that can be
-overridden to tune the subscriber's behavior. By default, it will trigger an unbounded
-request and behave exactly like `subscribe()`. However, extending `BaseSubscriber` is
-much more useful when you want a custom request amount.
+`SampleSubscriber` 类继承自 `BaseSubscriber`，在 Reactor 中, 推荐用户扩展它来实现自定义的
+`Subscriber`。这个类提供了一些 hook 方法，我们可以通过重写它们来调整 subscriber 的行为。
+默认情况下，它会触发一个无限个数的请求，但是当你想自定义请求元素的个数的时候，扩展
+`BaseSubscriber` 就很方便了。
 
-The bare minimum implementation is to implement both `hookOnSubscribe(Subscription
-subscription)` and `hookOnNext(T value)`. In this case, the `hookOnSubscribe` method
-prints a statement to standard out and makes the first request. Then the `hookOnNext`
-method prints a statement and processes each of the remaining requests, one request
-at a time.
+扩展的时候通常至少要覆盖 `hookOnSubscribe(Subscription subscription)` 和 `hookOnNext(T value)`
+这两个方法。这个例子中， `hookOnSubscribe` 方法打印一段话到标准输出，然后进行第一次请求。
+然后 `hookOnNext` 同样进行了打印，同时逐个处理剩余请求。
 
-The `SampleSubscriber` class produces the following output:
+`SampleSubscriber` 输出如下：
 
 ----
 Subscribed
@@ -156,9 +143,8 @@ Subscribed
 4
 ----
 
-NOTE: You almost certainly want to implement the `hookOnError`, `hookOnCancel`, and
-`hookOnComplete` methods. You may also want to implement the `hookFinally` method.
-`SampleSubscribe` is the absolute minimum implementation of a `Subscriber` that performs
-bounded requests.
+NOTE: 建议你同时重写 `hookOnError`、`hookOnCancel`，以及 `hookOnComplete` 方法。
+你最好也重写 `hookFinally` 方法。`SampleSubscribe` 确实是一个最简单的实现了
+请求有限个数元素的 `Subscriber`。
 
-We return to `BaseSubscriber` later in this guide.
+本文档后边还会再讨论 `BaseSubscriber`。
