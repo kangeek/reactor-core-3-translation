@@ -1,33 +1,31 @@
-Processors are a special kind of `Publisher` that are also a `Subscriber`. That means
-that you can `subscribe` to a `Processor` (generally, they implement `Flux`), but you can
-also call methods to manually inject data into the sequence or terminate it.
+Processors 既是一种特别的发布者（`Publisher`）又是一种订阅者（`Subscriber`）。
+那意味着你可以
+订阅一个 `Processor`（通常它们会实现 `Flux`），也可以调用相关方法来手动
+插入数据到序列，或终止序列。
 
-There are several kinds of Processors, each with a few particular semantics, but before
-you start looking into these, you need to ask yourself the following question:
+Processor 有多种类型，它们都有特别的语义规则，但是在你研究它们之前，最好问一下
+自己如下几个问题：
 
-= Do I Need a Processor?
-Most of the time, you should try to avoid using a `Processor`. They are harder to use
-correctly and prone to some corner cases.
+= 我是否需要使用 Processor？
+多数情况下，你应该进行避免使用 `Processor`，它们较难正确使用，主要用于一些特殊场景下。
 
-If you think a `Processor` could be a good match for your use case, ask yourself if you
-have tried these two alternatives:
+如果你觉得 `Processor` 适合你的使用场景，请首先看一下是否尝试过以下两种替代方式：
 
-. Could an operator or combination of operators fit the bill? (See <<which-operator>>)
-. Could a <<producing,"generator">> operator work instead? (Generally, these operators
-are made to bridge APIs that are not reactive, providing a "sink" that is similar in
-concept to a `Processor` in the sense that it lets you populate the sequence with data or
-terminate it).
+. 是否有一个或多个 operator 的组合能够满足需求？（见 <<which-operator>>）
+. <<producing,"generator">> operator 是否能解决问题？（通常这些 operators
+可以用来桥接非响应式的 API，它们提供了一个“sink”，在生成数据流序列方面，
+概念上类似于 `Processor`）
 
-If, after exploring the above alternatives, you still think you need a `Processor`, read
-the <<processor-overview>> section below to learn about the different implementations.
+如果看了以上替代方案，你仍然觉得需要一个 `Processor`，阅读 <<processor-overview>>
+这一节来了解一下不同的实现吧。
 
-= Safely Produce from Multiple Threads by Using the `Sink` Facade
-Rather than directly using Reactor `Processors`, it is a good practice to obtain a `Sink`
-for the `Processor` by calling `sink()` once.
+= 使用 `Sink` 门面对象来线程安全地生成流
+比起直接使用 Reactor 的 `Processors`，更好的方式是通过调用一次 `sink()`
+来得到 `Processor` 的 `Sink`。
 
-`FluxProcessor` sinks safely gate multi-threaded producers and can be used by
-applications that generate data from multiple threads concurrently. For example, a
-thread-safe serialized sink can be created for `UnicastProcessor`:
+`FluxProcessor` 的 sink 是线程安全的“生产者（producer）”，因此能够在应用程序中
+多线程并发地生成数据。例如，一个线程安全的序列化（serialized）的 sink 能够通过
+`UnicastProcessor` 创建：
 
 [source,java]
 ----
@@ -35,154 +33,122 @@ UnicastProcessor<Integer> processor = UnicastProcessor.create();
 FluxSink<Integer> sink = processor.sink(overflowStrategy);
 ----
 
-Multiple producer threads may concurrently generate data on the following serialized
-sink:
+多个生产者线程可以并发地生成数据到以下的序列化 sink。
 
 [source,java]
 ----
 sink.next(n);
 ----
 
-Overflow from `next` behaves in two possible ways, depending on the `Processor` and its
-configuration:
+根据 `Processor` 及其配置，`next` 产生的溢出有两种可能的处理方式：
 
-* An unbounded processor handles the overflow itself by dropping or buffering.
-* A bounded processor blocks or "spins" on the `IGNORE` strategy or applies the
-`overflowStrategy` behavior specified for the `sink`.
+* 一个无限的 processor 通过丢弃或缓存自行处理溢出。
+* 一个有限的 processor 阻塞在 `IGNORE` 策略，或将 `overflowStrategy`
+应用于 `sink`。
 
 
 [[processor-overview]]
-= Overview of Available Processors
-Reactor Core comes with several flavors of `Processor`. Not all processors have the same
-semantics but are roughly split into three categories. The following list briefly
-describes the three kinds of processors:
+= 现有的 Processors 总览
+Reactor Core 内置多种 `Processor`。这些 processor 具有不同的语法，大概分为三类。
+下边简要介绍一下这三种 processor：
 
-* *direct* (`DirectProcessor` and `UnicastProcessor`): These processors can only push
-data through direct user action (calling their `Sink`'s methods directly).
-* *synchronous* (`EmitterProcessor` and `ReplayProcessor`): These processors can push data
-both through user action and by subscribing to an upstream `Publisher` and synchronously
-draining it.
-* *asynchronous* (`WorkQueueProcessor` and `TopicProcessor`): These processors can push
-data obtained from multiple upstream `Publishers`. They are more robust and are  backed
-by a `RingBuffer` data structure in order to deal with their multiple upstreams.
+* *直接的（direct）* （`DirectProcessor` 和 `UnicastProcessor`）：这些 processors 只能通过直接
+调用 `Sink` 的方法来推送数据。
+* *同步的（synchronous）* （`EmitterProcessor` 和 `ReplayProcessor`）：这些 processors 既可以
+直接调用 `Sink` 方法来推送数据，也可以通过订阅到一个上游的发布者来同步地产生数据。
+* *异步的（asynchronous）* （`WorkQueueProcessor` 和 `TopicProcessor`）：这些 processors
+可以将从多个上游发布者得到的数据推送下去。由于使用了 `RingBuffer` 的数据结构来
+缓存多个来自上游的数据，因此更加有健壮性。
 
-The asynchronous processors are the most complex to instantiate, with a lot of different
-options. Consequently, they expose a `Builder` interface. The simpler processors have
-static factory methods instead.
+异步的 processor 在实例化的时候最复杂，因为有许多不同的选项。因此它们暴露出一个 `Builder` 接口。
+而简单的 processors 有静态的工厂方法。
 
 == DirectProcessor
-A `DirectProcessor` is a processor that can dispatch signals to zero to many
-`Subscribers`. It is the simplest one to instantiate, with a single `create()` static
-factory method. On the other hand, *it has the limitation of not handling backpressure*.
-As a consequence, a `DirectProcessor` signals an `IllegalStateException` to its
-subscribers if you push N elements through it but at least one of its subscribers has
-requested less than N.
+`DirectProcessor` 可以将信号分发给零到多个订阅者（`Subscriber`）。它是最容易实例化的，使用静态方法
+`create()` 即可。另一方面，*它的不足是无法处理背压*。所以，当 `DirectProcessor` 推送的是 N
+个元素，而至少有一个订阅者的请求个数少于 N 的时候，就会发出一个 `IllegalStateException`。
 
-Once the `Processor` has terminated (usually through its `Sink` `error(Throwable)` or
-`complete()` methods being called), it lets more subscribers subscribe but replays the
-termination signal to them immediately.
+一旦 `Processor` 终止（通常通过调用它的 `Sink` 的 `error(Throwable)` 或 `complete()` 方法），
+虽然它允许更多的订阅者订阅它，但是会立即向它们重新发送终止信号。
 
 == UnicastProcessor
-A `UnicastProcessor` can deal with backpressure using an internal buffer. The trade-off
-is that it can have *at most one* `Subscriber`.
+`UnicastProcessor` 可以使用一个内置的缓存来处理背压。代价就是它最多只能有一个订阅者。
 
-A `UnicastProcessor` has a few more options, reflected by a few `create` static factory
-methods. For instance, by default it is _unbounded_: if you push any amount of
-data through it while its `Subscriber` has not yet requested data, it will buffer all of
-the data.
+`UnicastProcessor` 有多种选项，因此提供多种不同的 `create` 静态方法。例如，它默认是
+_无限的（unbounded）_ ：如果你在在订阅者还没有请求数据的情况下让它推送数据，它会缓存所有数据。
 
-This can be changed by providing a custom `Queue` implementation for the internal
-buffering in the `create` factory method. If that queue is bounded, the processor could
-reject the push of a value when the buffer is full and not enough requests from
-downstream have been received.
+可以通过提供一个自定义的 `Queue` 的具体实现传递给 `create` 工厂方法来改变默认行为。如果给出的队列是
+有限的（bounded）， 并且缓存已满，而且未收到下游的请求，processor 会拒绝推送数据。
 
-In that _bounded_ case, the processor can also be built with a callback that is invoked
-on each rejected element, allowing for cleanup of these rejected elements.
+在上边 _有限的_ 例子中，还可以在构造 processor 的时候提供一个回调方法，这个回调方法可以在每一个
+被拒绝推送的元素上调用，从而让开发者有机会清理这些元素。
 
 == EmitterProcessor
-An `EmitterProcessor` is capable of emitting to several subscribers, while honoring
-backpressure for each of its subscribers. It can also subscribe to a `Publisher` and
-relay its signals synchronously.
+`EmitterProcessor` 能够向多个订阅者发送数据，并且可以对每一个订阅者进行背压处理。它本身也可以订阅一个
+`Publisher` 并同步获得数据。
 
-Initially, when it has no subscriber, it can still accept a few data pushes up to a
-configurable `bufferSize`. After that point, if no `Subscriber` has come in and consumed
-the data, calls to `onNext` block until the processor is drained (which can only happen
-concurrently by then).
+最初如果没有订阅者，它仍然允许推送一些数据到缓存，缓存大小由 `bufferSize` 定义。
+之后如果仍然没有订阅者订阅它并消费数据，对 `onNext` 的调用会阻塞，直到有订阅者接入
+（这时只能并发地订阅了）。
 
-Thus, the first `Subscriber` to subscribe receives up to `bufferSize` elements upon
-subscribing. However, after that, the processor stops replaying signals to additional
-subscribers. These subsequent subscribers instead only receive the signals pushed through
-the processor *after* they have subscribed. The internal buffer is still used for
-backpressure purposes.
+因此第一个订阅者会收到最多 `bufferSize` 个元素。然而之后， processor 不会重新发送（replay）
+数据给后续的订阅者。这些后续接入的订阅者只能获取到它们开始订阅 *之后* 推送的数据。这个内部的
+缓存会继续用于背压的目的。
 
-By default, if all of its subscribers are cancelled (which basically means they have all
-un-subscribed), it will clear its internal buffer and stop accepting new subscribers.
-This can be tuned by the `autoCancel` parameter in the `create` static factory methods.
+默认情况下，如果所有的订阅者都取消了（基本意味着它们都不再订阅（un-subscribed）了），
+它会清空内部缓存，并且不再接受更多的订阅者。这一点可以通过 `create` 静态工厂方法的
+`autoCancel` 参数来配置。
 
 == ReplayProcessor
-A `ReplayProcessor` caches elements that are either pushed directly through its `Sink`
-or elements from an upstream `Publisher` and replays them to late subscribers.
+`ReplayProcessor` 会缓存直接通过自身的 `Sink` 推送的元素，以及来自上游发布者的元素，
+并且后来的订阅者也会收到重发（replay）的这些元素。
 
-It can be created in multiple configurations:
+可以通过多种配置方式创建它：
 
-* Caching a single element (`cacheLast`).
-* Caching a limited history (`create(int)`), unbounded history (`create()`).
-* Caching time-based replay window (`createTimeout(Duration)`).
-* Caching combination of history size and time window
-(`createSizeOrTimeout(int, Duration)`).
+* 缓存一个元素（`cacheLast`）。
+* 缓存一定个数的历史元素（`create(int)`），所有的历史元素（`create()`）。
+* 缓存基于时间窗期间内的元素（`createTimeout(Duration)`）。
+* 缓存基于历史个数和时间窗的元素（`createSizeOrTimeout(int, Duration)`）。
 
 == TopicProcessor
-A `TopicProcessor` is an asynchronous processor capable of relaying elements from
-multiple upstream `Publishers` when created in the `shared` configuration (see the
-`share(boolean)` option of the `builder()`).
+`TopicProcessor` 是一个异步的 processor，它能够重发来自多个上游发布者的元素，
+这需要在创建它的时候配置 `shared` （见 `build()` 的 `share(boolean)` 配置）。
 
-Note that the share option is mandatory if you intend to concurrently call
-`TopicProcessor`'s `onNext`, `onComplete`, or `onError` methods directly or from a
-concurrent upstream Publisher.
+注意，如果你企图在并发环境下通过并发的上游 Publisher 调用 `TopicProcessor` 的 `onNext`、
+`onComplete`，或 `onError` 方法，就必须配置 shared。
 
-Otherwise, such concurrent calls are illegal, as the processor is then fully compliant
-with the Reactive Streams specification.
+否则，并发调用就是非法的，从而 processor 是完全兼容响应式流规范的。
 
-A `TopicProcessor` is capable of fanning out to multiple `Subscribers`. It does so by
-associating a `Thread` to each `Subscriber`, which will run until an `onError` or
-`onComplete` signal is pushed through the processor or until the associated `Subscriber`
-is cancelled. The maximum number of downstream subscribers is driven by the `executor`
-builder option. Provide a bounded `ExecutorService` to limit it to a specific number.
+`TopicProcessor` 能够对多个订阅者发送数据。它通过对每一个订阅者关联一个线程来实现这一点，
+这个线程会一直执行直到 processor 发出 `onError` 或 `onComplete` 信号，或关联的订阅者被取消。
+最多可以接受的订阅者个数由构造者方法 `executor` 指定，通过提供一个有限线程数的 `ExecutorService`
+来限制这一个数。
 
-The processor is backed by a `RingBuffer` data structure that stores pushed signals. Each
-`Subscriber` thread keeps track of its associated demand and the correct indexes in the
-`RingBuffer`.
+这个 processor 基于一个 `RingBuffer` 数据结构来存储已发送的数据。每一个订阅者线程
+自行管理其相关的数据在 `RingBuffer` 中的索引。
 
-This processor also has an `autoCancel` builder option: If set to `true` (the default),
-it results in the source `Publisher`(s) being cancelled when all subscribers are
-cancelled.
+这个 processor 也有一个 `autoCancel` 构造器方法：如果设置为 `true` （默认的），那么当
+所有的订阅者取消之后，源 `Publisher`(s) 也就被取消了。
 
 == WorkQueueProcessor
-A `WorkQueueProcessor` is also an asynchronous processor capable of relaying elements
-from multiple upstream `Publishers` when created in the `shared` configuration (it shares
-most of its builder options with `TopicProcessor`).
+`WorkQueueProcessor` 也是一个异步的 processor，也能够重发来自多个上游发布者的元素，
+同样在创建时需要配置 `shared` （它多数构造器配置与 `TopicProcessor` 相同）。
 
-It relaxes its compliance with the Reactive Streams specification, but it acquires the
-benefit of requiring fewer resources than the `TopicProcessor`. It is still based on a
-`RingBuffer` but avoids the overhead of creating one consumer `Thread` per `Subscriber`.
-As a result, it scales better than the `TopicProcessor`.
+它放松了对响应式流规范的兼容，但是好处就在于相对于 `TopicProcessor` 来说需要更少的资源。
+它仍然基于 `RingBuffer`，但是不再要求每一个订阅者都关联一个线程，因此相对于 `TopicProcessor`
+来说更具扩展性。
 
-The trade-off is that its distribution pattern is a little bit different: Requests from
-each subscriber all add up together, and the processor relays signals to only one
-`Subscriber` at a time, in a kind of round-robin distribution rather than fan-out
-pattern.
+代价在于分发模式有些区别：来自订阅者的请求会汇总在一起，并且这个 processor 每次只对一个
+订阅者发送数据，因此需要循环（round-robin）对订阅者发送数据，而不是一次全部发出的模式。
 
-NOTE: A fair round-robin distribution is not guaranteed.
+NOTE: 无法保证完全公平的循环分发。
 
-The `WorkQueueProcessor` mostly has the same builder options as the `TopicProcessor`,
-such as `autoCancel`, `share`, and `waitStrategy`. The maximum number of downstream
-subscribers is also driven by a configurable `ExecutorService` with the `executor`
-option.
+`WorkQueueProcessor` 多数构造器方法与 `TopicProcessor` 相同，比如 `autoCancel`、`share`，
+以及 `waitStrategy`。下游订阅者的最大数目同样由构造器 `executor` 配置的 `ExecutorService`
+决定。
 
-WARNING: You should take care not to subscribe too many `Subscribers` to a
-`WorkQueueProcessor`, as doing so *could lock the processor*. If you need to limit the
-number of possible subscribers, prefer doing so by using a `ThreadPoolExecutor` or a
-`ForkJoinPool`. The processor can detect their capacity and throw an exception if you
-subscribe one too many times.
+WARNING: 你最好注意不要有太多订阅者订阅 `WorkQueueProcessor`，因为这 *会锁住 processor*。
+如果你需要限制订阅者数量，最好使用一个 `ThreadPoolExecutor` 或 `ForkJoinPool`。这个
+processor 能够检测到（线程池）容量并在订阅者过多时抛出异常。
 
 //TODO == MonoProcessor
