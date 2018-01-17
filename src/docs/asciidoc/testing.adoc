@@ -1,17 +1,16 @@
 [[testing]]
-= Testing
+= 测试
 
-Whether you have written a simple chain of Reactor operators or your own operator,
-automated testing is always a good idea.
+无论你是编写了一个简单的 Reactor operator 链，还是开发了自定义的 operator，对它进行
+自动化的测试总是一个好主意。
 
-Reactor comes with a few elements dedicated to testing, gathered into their own
-artifact: `reactor-test`. You can find that project
-https://github.com/reactor/reactor-core/tree/master/reactor-test/src[on Github],
-inside of the _reactor-core_ repository.
+Reactor 内置一些专门用于测试的元素，放在一个专门的 artifact 里： `reactor-test`。
+你可以在 https://github.com/reactor/reactor-core/tree/master/reactor-test/src[on Github]
+的 _reactor-core_ 库里找到这个项目。
 
-To use it in your tests, add it as a test dependency:
+如果要用它来进行测试，添加 scope 为 test 的依赖。
 
-.reactor-test in Maven, in `<dependencies>`
+.reactor-test 用 Maven 配置 `<dependencies>`
 [source,xml]
 ----
 <dependency>
@@ -21,9 +20,9 @@ To use it in your tests, add it as a test dependency:
     <1>
 </dependency>
 ----
-<1> If you use the <<getting,BOM>>, you do not need to specify a `<version>`.
+<1> 如果你使用了 <<getting,BOM>>，你不需要指定 `<version>`。
 
-.reactor-test in Gradle, amend the `dependencies` block
+.reactor-test 用 Gradle 配置 `dependencies`
 [source,groovy]
 ----
 dependencies {
@@ -31,25 +30,20 @@ dependencies {
 }
 ----
 
-The two main uses of `reactor-test` are:
+`reactor-test` 的两个主要用途：
 
-* Testing that a sequence follows a given scenario, step-by-step, with `StepVerifier`.
-* Producing data in order to test the behavior of operators (including you own operators)
-downstream with `TestPublisher`.
+* 使用 `StepVerifier` 一步一步地测试一个给定场景的序列。
+* 使用 `TestPublisher` 生成数据来测试下游的 operators（包括你自己的 operator）。
 
-== Testing a Scenario with `StepVerifier`
+== 使用 `StepVerifier` 来测试
 
-The most common case for testing a Reactor sequence is to have a `Flux` or `Mono` defined
-in your code (for example, it might be returned by a method) and wanting to test how it
-behaves when subscribed to.
+最常见的测试 Reactor 序列的场景就是定义一个 `Flux` 或 `Mono`，然后在订阅它的时候测试它的行为。
 
-This situation translates well to defining a "test scenario", where you define your
-expectations in terms of events, step-by-step: what is the next expected event? Do you
-expect the `Flux` to emit a particular value? Or maybe to do nothing for the next 300ms?
-All of that can be expressed through the `StepVerifier` API.
+当你的测试关注于每一次的事件的时候，就非常容易转化为使用 `StepVerifier` 的测试场景：
+下一个期望的事件是什么？你是否期望使用 `Flux` 来发出一个特别的值？或者接下来 300ms
+什么都不做？所有这些都可以使用 `StepVerifier` API 来表示。
 
-For instance, you could have the following utility method in your codebase that
-decorates a `Flux`:
+例如，你可能会使用如下的工具方法来包装一个 `Flux`：
 
 [source,java]
 ----
@@ -58,12 +52,12 @@ public <T> Flux<T> appendBoomError(Flux<T> source) {
 }
 ----
 
-In order to test it, you want to verify the following scenario:
+要测试它的话，你需要校验如下内容：
 
-> I expect this `Flux` to first emit `foo`, then emit `bar`, and then *produce an
-error* with the message, `boom`. Subscribe and *verify* these expectations.
+> 我希望这个 `Flux` 先发出 `foo`，然后发出 `bar`，然后 *生成一个内容为 `boom` 的错误*。
+最后订阅并校验它们。
 
-In the `StepVerifier` API, this translates to the following test:
+使用 `StepVerifier` API 来表示以上的验证过程：
 
 [source,java]
 ----
@@ -79,100 +73,76 @@ public void testAppendBoomError() {
     .verify(); // <6>
 }
 ----
-<1> Since our method needs a source `Flux`, define a simple one for testing purposes.
-<2> Create a `StepVerifier` builder that wraps and verifies a `Flux`.
-<3> Pass the `Flux` to be tested (the result of calling our utility method).
-<4> The first signal we expect to happen upon subscription is an `onNext`, with a value
-of `foo`.
-<5> The last signal we expect to happen is a termination of the sequence with an
-`onError`. The exception should have `boom` as a message.
-<6> It is important to trigger the test by calling `verify()`.
+<1> 由于被测试方法需要一个 `Flux`，定义一个简单的 `Flux` 用于测试。
+<2> 创建一个 `StepVerifier` 构造器来包装和校验一个 `Flux`。
+<3> 传进来需要测试的 `Flux`（即待测方法的返回结果）。
+<4> 第一个我们期望的信号是 `onNext`，它的值为 `foo`。
+<5> 最后我们期望的是一个终止信号 `onError`，异常内容应该为 `boom`。
+<6> 不要忘了使用 `verify()` 触发测试。
 
-The API is a builder. You start by creating a `StepVerifier` and passing the
-sequence to be tested. This offers a choice of methods that allow you to:
+API 是一个构造器，通过传入一个要测试的序列来创建一个 `StepVerifier`。从而你可以：
 
-* Express _expectations_ about the next signals to occur. If any other signal is received
-(or the content of the signal does not match the expectation), the whole test fails with
-a meaningful `AssertionError`. For example, you might use `expectNext(T...)` and
-`expectNextCount(long)`.
-* _Consume_ the next signal. This is used when you want to skip part of the sequence or
-when you want to apply a custom `assertion` on the content of the signal (for example, to
-check that there is an `onNext` event and assert that the emitted item is a list of size
-5). For example, you might use `consumeNextWith(Consumer<T>)`.
-* Take _miscellaneous actions_ such as pausing or running arbitrary code. For example, if
-you want to manipulate a test-specific state or context. To that effect, you might use
-`thenAwait(Duration)` and `then(Runnable)`.
+* 表示你 _期望_ 发生的下一个信号。如果收到其他信号（或者信号与期望不匹配），整个测试就会
+失败（`AssertionError`）。例如你可能会用到 `expectNext(T...)` 或 `expectNextCount(long)`。
+* _消费_ 下一个信号。当你想要跳过部分序列或者当你想对信号内容进行自定义的 `assertion`
+的时候会用到它（比如要校验是否有一个 `onNext` 信号，并校验对应发出的元素是否是一个 size 为
+5 的 List）。你可能会用到 `consumeNextWith(Consumer<T>)`。
+* _更多样的操作_ 比如暂停或运行一段代码。比如，你想对测试状态或内容进行调整或处理，
+你可能会用到 `thenAwait(Duration)` 和 `then(Runnable)`。
 
-For terminal events, the corresponding expectation methods (`expectComplete()` and
-`expectError()` and all their variants) switch to an API where you cannot express
-expectations anymore. In that last step, all you can do is perform some additional
-configuration on the `StepVerifier` and then *trigger the verification*, often
-with `verify()` or one of its variants.
+对于终止事件，相应的期望方法（`expectComplete()`、`expectError()`，及其所有的变种方法）
+使用之后就不能再继续增加别的期望方法了。最后你只能对 `StepVerifier` 进行一些额外的配置并
+*触发校验*（通常调用 `verify()` 及其变种方法）。
 
-What happens at this point is that the StepVerifier subscribes to the tested `Flux` or
-`Mono` and plays the sequence, comparing each new signal with the next step in the
-scenario. As long as these match, the test is considered a success. As soon as there is a
-discrepancy, an `AssertionError` is thrown.
+从 StepVerifier 内部来看，它订阅了待测试的 `Flux` 或 `Mono`，然后将序列中的每个信号与测试
+场景的期望进行比对。如果匹配的话，测试成功。如果有不匹配的情况，则抛出 `AssertionError` 异常。
 
-IMPORTANT: Remember the `verify()` step, which triggers the verification. In order to
-help, the API includes a few shortcut methods that combine the terminal expectations with
-a call to `verify()`: `verifyComplete()`, `verifyError()`, `verifyErrorMessage(String)`,
-and others.
+IMPORTANT: 请记住是 `verify()` 触发了校验过程。这个 API 还有一些结合了 `verify()` 与期望的终止信号
+的方法：`verifyComplete()`、`verifyError()`、`verifyErrorMessage(String)` 等。
 
-Note that, if one of the lambda-based expectations throws an `AssertionError`, it is
-reported as is, failing the test. This is useful for custom assertions.
+注意，如果有一个传入 lambda 的期望方法抛出了 `AssertionError`，会被报告为测试失败。
+这可用于自定义 assertion。
 
-TIP: By default, the `verify()` method and derived shortcut methods (`verifyThenAssertThat`,
-`verifyComplete()`, etc.) has no timeout. It can block indefinitely. You can use
-`StepVerifier.setDefaultTimeout(Duration)` to globally set a timeout for these methods,
-or specify one on a per-call basis with `verify(Duration)`.
+TIP: 默认情况下，`verify()` 方法（及同源的 `verifyThenAssertThat`、`verifyComplete()`等）
+没有超时的概念。它可能会永远阻塞住。你可以使用 `StepVerifier.setDefaultTimeout(Duration)`
+来设置一个全局的超时时间，或使用 `verify(Duration)` 指定。
 
-== Manipulating Time
+== 操控时间
 
-`StepVerifier` can be used with time-based operators to avoid long run times for
-corresponding tests. This is done through the `StepVerifier.withVirtualTime` builder.
+`StepVerifier` 可以用来测试基于时间的 operator，从而避免测试的长时间运行。可以使用构造器
+`StepVerifier.withVirtualTime` 达到这一点。
 
-It looks like the following example:
+示例如下：
 
 [source,java]
 ----
 StepVerifier.withVirtualTime(() -> Mono.delay(Duration.ofDays(1)))
-//... continue expectations here
+//... 继续追加期望方法
 ----
 
-This *virtual time* feature plugs in a custom `Scheduler` in Reactor's `Schedulers`
-factory. Since these timed operators usually use the default `Schedulers.parallel()`
-scheduler, replacing it with a `VirtualTimeScheduler` does the trick. However, an
-important prerequisite is that the operator be instantiated _after_ the virtual time
-scheduler has been activated.
+*虚拟时间（virtual time）* 的功能会在 Reactor 的调度器（`Scheduler`）工厂方法中插入一个自定义的
+调度器。这些基于时间的 operators 通常默认使用 `Schedulers.parallel()` 调度器。（虚拟时间的）
+技巧在于使用一个 `VirtualTimeScheduler` 来代替默认调度器。然而一个重要的前提就是，只有在初始化
+虚拟时间调度器之后的 operator 才会起作用。
 
-In order to increase the chances this happens correctly, the `StepVerifier` does not take
-a simple `Flux` as input. `withVirtualTime` takes a `Supplier`, which allows for lazily
-creating the instance of the tested flux _after_ having done the scheduler set up.
+为了提高 `StepVerifier` 正常起作用的概率，它一般不接收一个简单的 `Flux` 作为输入，而是接收
+一个 `Supplier`，从而可以在配置好订阅者 *之后* “懒创建”待测试的 flux。
 
-IMPORTANT: Take extra care to ensure the `Supplier<Publisher<T>>` can be used in a lazy
-fashion. Otherwise, virtual time is not guaranteed. Especially avoid instantiating the
-`Flux` earlier in the test code and having the `Supplier` return that variable. Instead,
-always instantiate the `Flux` inside the lambda.
+IMPORTANT: 要注意的是，`Supplier<Publisher<T>>` 可用于“懒创建”，否则不能保证虚拟时间
+能完全起作用。尤其要避免提前实例化 `Flux`，要在 `Supplier` 中用 lambda 创建并返回 `Flux` 变量。
 
-There are two expectation methods that deal with time, and they are both valid with or
-without virtual time:
+有两种处理时间的期望方法，无论是否配置虚拟时间都是可用的：
 
-* `thenAwait(Duration)` pauses the evaluation of steps (allowing a few signals to occur
-or delays to run out).
-* `expectNoEvent(Duration)` also lets the sequence play out for a given duration but
-fails the test if *any* signal occurs during that time.
+* `thenAwait(Duration)` 暂停校验步骤（允许信号延迟发出）。
+* `expectNoEvent(Duration)` 同样让序列持续一定的时间，期间如果有 *任何* 信号发出则测试失败。
 
-Both methods pause the thread for the given duration in classic mode and advance the
-virtual clock instead in virtual mode.
+两个方法都会基于给定的持续时间暂停线程的执行，如果是在虚拟时间模式下就相应地使用虚拟时间。
 
 [[tip-expectNoEvent]]
-TIP: `expectNoEvent` also considers the `subscription` as an event. If you use it as a
-first step, it usually fails because the subscription signal is detected. Use
-`expectSubscription().expectNoEvent(duration)` instead.
+TIP: `expectNoEvent` 将订阅（`subscription`）也认作一个事件。假设你用它作为第一步，如果检测
+到有订阅信号，也会失败。这时候可以使用 `expectSubscription().expectNoEvent(duration)` 来代替。
 
-In order to quickly evaluate the behavior of our `Mono.delay` above, we can finish
-writing our code like this:
+为了快速校验前边提到的 `Mono.delay`，我们可以这样完成代码：
 
 [source,java]
 ----
@@ -182,54 +152,45 @@ StepVerifier.withVirtualTime(() -> Mono.delay(Duration.ofDays(1)))
     .expectNext(0) // <3>
     .verifyComplete(); // <4>
 ----
-<1> See the <<tip-expectNoEvent,tip>> above.
-<2> Expect nothing to happen during a full day.
-<3> Then expect a delay that emits `0`.
-<4> Then expect completion (and trigger the verification).
+<1> 如上 <<tip-expectNoEvent,tip>>。
+<2> 期待一天内没有信号发生。
+<3> 然后期待一个 next 信号为 `0`。
+<4> 然后期待完成（同时触发校验）。
 
-We could have used `thenAwait(Duration.ofDays(1))` above, but `expectNoEvent` has the
-benefit of guaranteeing that nothing happened earlier than it should have.
+我们也可以使用 `thenAwait(Duration.ofDays(1))`，但是 `expectNoEvent` 的好处是
+能够验证在此之前不会发生什么。
 
-Note that `verify()` returns a `Duration` value. This is the *real-time* duration of the
-entire test.
+注意 `verify()` 返回一个 `Duration`，这是整个测试的 *真实时间*。
 
-WARNING: Virtual time is not a silver bullet. Keep in mind that _all_ `Schedulers` are
-replaced with the same `VirtualTimeScheduler`. In some cases, you can lock the
-verification process because the virtual clock has not moved forward before an
-expectation is expressed, resulting in the expectation waiting on data that can only be
-produced by advancing time. In most cases, you need to advance the virtual clock for
-sequences to emit. Virtual time also gets very limited with infinite sequences, which
-might hog the thread on which both the sequence and its verification run.
+WARNING: 虚拟时间并非银弹。请记住 _所有的_ 调度器都会被替换为 `VirtualTimeScheduler`。
+有些时候你可以锁定校验过程，因为虚拟时钟在遇到第一个期望校验之前并不会开始，所以对于
+“无数据“的期望校验也必须能够运行在虚拟时间模式下。在无限序列中，虚拟时间模式的发挥
+空间也很有限，因为它可能导致线程（序列的发出和校验的运行都在这个线程上）卡住。
 
-== Performing Post-execution Assertions with `StepVerifier`
-After having described the final expectation of your scenario, you can switch to a
-complementary assertion API instead of triggering `verify()`. To do so, use
-`verifyThenAssertThat()` instead.
+== 使用 `StepVerifier` 进行“后校验”
+当配置完你测试场景的最后的期望方法后，你可以使用 `verifyThenAssertThat()` 来代替
+`verify()` 触发执行后的校验。
 
-`verifyThenAssertThat()` returns a `StepVerifier.Assertions` object, which you can use to
-assert a few elements of state once the whole scenario has played out successfully
-(because it *also calls `verify()`*). Typical (albeit advanced) usage is to capture
-elements that have been dropped by some operator and assert them (see the section on
-<<hooks,Hooks>>).
+`verifyThenAssertThat()` 返回一个 `StepVerifier.Assertions` 对象，你可以用它来校验
+整个测试场景成功刚结束后的一些状态（*它也会调用 `verify()`*）。典型应用就是校验有多少
+元素被 operator 丢弃（参考 <<hooks,Hooks>>）。
 
-== Testing the `Context`
-For more information about the `Context`, see <<context>>.
+== 测试 `Context`
+更多关于 `Context` 的内容请参考 <<context>>。
 
-`StepVerifier` comes with a couple of expectations around the propagation of a `Context`:
+`StepVerifier` 有一些期望方法可以用来测试 `Context`：
 
-  - `expectAccessibleContext`: returns a `ContextExpectations` object that you can use
-  to set up expectations on the propagated `Context`. Be sure to call `then()` to return
-  to the set up of sequence expectations.
+  - `expectAccessibleContext`: 返回一个 `ContextExpectations` 对象，你可以用它来在 `Context`
+  上配置期望校验。一定记住要调用 `then()` 来返回到对序列的期望校验上来。
 
-  - `expectNoAccessibleContext`: set up an expectation that NO `Context` can be propagated
-  up the chain of operators under test. This most likely occurs when the `Publisher` under
-  test is not a Reactor one, or doesn't have any operator that can propagate the `Context`
-  (e.g. just a _generator_ source).
+  - `expectNoAccessibleContext`: 是对“没有`Context`”的校验。通常用于
+  被测试的 `Publisher` 并不是一个响应式的，或没有任何 operator 能够传递 `Context`
+  （比如一个 `generate` 的 `Publisher`）.
 
-Additionally, one can associate a test-specific initial `Context` to a `StepVerifier` by
-using `StepVerifierOptions` to create the verifier.
+此外，还可以用 `StepVerifierOptions` 方法传入一个测试用的初始 `Context` 给 `StepVerifier`，
+从而可以创建一个校验（verifier）。
 
-These features are demonstrated in the following snippet:
+这些特性通过下边的代码演示：
 
 [source,java]
 ----
@@ -241,59 +202,46 @@ StepVerifier.create(Mono.just(1).map(i -> i + 10),
 		            .expectNext(11)
 		            .verifyComplete(); // <5>
 ----
-<1> Create the `StepVerifier` using `StepVerifierOptions` and pass in an initial `Context`
-<2> Start setting up expectations about `Context` propagation. This alone ensures that a
-`Context` *was* propagated.
-<3> An example of a `Context`-specific expectation: it must contain value "bar" for key "foo".
-<4> We `then()` switch back to setting up normal expectations on the data.
-<5> Let's not forget to `verify()` the whole set of expectations.
+<1> 使用 `StepVerifierOptions` 创建 `StepVerifier` 并传入初始 `Context`。
+<2> 开始对 `Context` 进行校验，这里只是确保 `Context` 正常传播了。
+<3> 对 `Context` 进行校验的例子：比如验证是否包含一个 "foo" - "bar" 键值对。
+<4> 使用 `then()` 切换回对序列的校验。
+<5> 不要忘了用 `verify()` 触发整个校验过程。
 
-== Manually Emitting with `TestPublisher`
-For more advanced test cases, it might be useful to have complete mastery over the source
-of data, in order to trigger finely chosen signals that closely match the particular
-situation you want to test.
+== 用 `TestPublisher` 手动发出元素
+对于更多高级的测试，如果能够完全掌控源发出的数据就会方便很多，因为这样就可以在测试的
+时候更加有的放矢地发出想测的数据。
 
-Another situation is when you have implemented your own operator and you want to verify
-how it behaves with regards to the Reactive Streams specification, especially if its
-source is not well behaved.
+另一种情况就是你实现了自己的 operator，然后想校验它的行为——尤其是在源不稳定的时候——是否符合响应式流规范。
 
-For both cases, `reactor-test` offers the `TestPublisher` class. This is a `Publisher<T>`
-that lets you programmatically trigger various signals:
+`reactor-test` 提供了 `TestPublisher` 类来应对这两种需求。这个类本质上是一个 `Publisher<T>`，
+你可以通过可编程的方式来用它发出各种信号：
 
-* `next(T)` and `next(T, T...)` triggers 1-n `onNext` signals.
-* `emit(T...)` does the same and does `complete()`.
-* `complete()` terminates with an `onComplete` signal.
-* `error(Throwable)` terminates with an `onError` signal.
+* `next(T)` 以及 `next(T, T...)` 发出 1-n 个 `onNext` 信号。
+* `emit(T...)` 起同样作用，并且会执行 `complete()`。
+* `complete()` 会发出终止信号 `onComplete`。
+* `error(Throwable)` 会发出终止信号 `onError`。
 
-A well behaved `TestPublisher` can be obtained through the `create` factory method. Also,
-a misbehaving `TestPublisher` can be created using the `createNonCompliant` factory
-method. The latter takes a value or multiple values from the `TestPublisher.Violation`
-enum. The values define which parts of the specification the publisher can overlook.
-These enum values include:
+使用 `create` 工厂方法就可以得到一个正常的 `TestPublisher`。而使用 `createNonCompliant`
+工厂方法可以创建一个“不正常”的 `TestPublisher`。后者需要传入由 `TestPublisher.Violation`
+枚举指定的一组选项，这些选项可用于告诉 publisher 忽略哪些问题。枚举值有：
 
-* `REQUEST_OVERFLOW`: Allows `next` calls to be made despite an insufficient request,
-without triggering an `IllegalStateException`.
-* `ALLOW_NULL`: Allows `next` calls to be made with a `null` value without triggering a
-`NullPointerException`.
-* `CLEANUP_ON_TERMINATE`: Allows termination signals to be sent several times in a row.
-This includes `complete()`, `error()` and `emit()`.
+* `REQUEST_OVERFLOW`: 允许 `next` 在请求不足的时候也可以调用，而不会触发 `IllegalStateException`。
+* `ALLOW_NULL`: 允许 `next` 能够发出一个 `null` 值而不会触发 `NullPointerException`。
+* `CLEANUP_ON_TERMINATE`: 可以重复多次发出终止信号，包括 `complete()`、`error()` 和 `emit()`。
 
-Finally, the `TestPublisher` keeps track of internal state after subscription, which can
-be asserted through its various `assert*` methods.
+最后，`TestPublisher` 还可以用不同的 `assert*` 来跟踪其内部的订阅状态。
 
-It can be used as a `Flux` or `Mono` by using the conversion methods `flux()` and
-`mono()`.
+使用转换方法 `flux()` 和 `mono()` 可以将其作为 `Flux` 和 `Mono` 来使用。
 
-== Checking the Execution Path with `PublisherProbe`
-When building complex chains of operators, you could come across cases where
-there are several possible execution paths, materialized by distinct sub-sequences.
+== 用 `PublisherProbe` 检查执行路径
+当构建复杂的 operators 链时，可能会有多个子序列，从而导致多个执行路径。
 
-Most of the time, these sub-sequences produce a specific-enough `onNext` signal
-that you can assert it was executed by looking at the end result.
+多数时候，这些子序列会生成一个足够明确的 `onNext` 信号，你可以通过检查最终结果
+来判断它是否执行。
 
-For instance, consider the following method, which builds a chain of operators from a
-source and uses a `switchIfEmpty` to fallback to a particular alternative if the source
-is empty:
+考虑下边这个方法，它构建了一条 operators 链，并使用 `switchIfEmpty` 方法在源为空的情况下，
+替换成另一个源。
 
 [source,java]
 ----
@@ -304,7 +252,7 @@ public Flux<String> processOrFallback(Mono<String> source, Publisher<String> fal
 }
 ----
 
-It is easy enough to test which logical branch of the switchIfEmpty was used, as follows:
+很容易就可以测试出 switchIfEmpty 的哪一个逻辑分支被使用了，如下：
 [source,java]
 ----
 @Test
@@ -323,9 +271,8 @@ public void testEmptyPathIsUsed() {
 }
 ----
 
-But think about an example where the method produces a `Mono<Void>` instead. It waits
-for the source to complete, performs an additional task, and completes. If the source
-is empty, a fallback Runnable-like task must be performed instead, as follows:
+但是如果例子中的方法返回的是一个 `Mono<Void>` 呢？它等待源发送结束，执行一个额外的任务，
+然后就结束了。如果源是空的，则执行另一个备用的类似于 Runnable 的任务，如下：
 
 [source,java]
 ----
@@ -339,20 +286,18 @@ public Mono<Void> processOrFallback(Mono<String> commandSource, Mono<Void> doWhe
             .switchIfEmpty(doWhenEmpty); // <2>
 }
 ----
-<1> The `then()` forgets about the command result. It cares only that it was completed.
-<2> How to distinguish between two cases that both are empty sequences?
+<1> `then()` 方法会忽略 command，它只关心是否结束。
+<2> 两个都是空序列，这个时候如何区分（哪边执行了）呢？
 
-In order to verify that your processOrFallback indeed goes through the `doWhenEmpty` path,
-you need to write a bit of boilerplate. Namely you need a `Mono<Void>` that:
+为了验证执行路径是经过了 `doWhenEmpty` 的，你需要编写额外的代码，比如你需要一个这样的
+`Mono<Void>`：
 
-* Captures the fact that it has been subscribed to
-* Lets you assert that fact **after** the whole processing has terminated.
+* 能够捕获到它被订阅的事实。
+* 以上事实需要在整个执行结束 **之后** 再进行验证。
 
-Before version 3.1, you would need to manually maintain one `AtomicBoolean` per state you
-wanted to assert and attach a corresponding `doOn*` callback to the publisher you wanted
-to evaluate. This could be a lot of boilerplate when having to apply this pattern
-regularly. Fortunately, since 3.1.0 there's an alternative with `PublisherProbe`, as
-follows:
+在 3.1 版本以前，你需要为每一种状态维护一个 `AtomicBoolean` 变量，然后在相应的 `doOn*`
+回调中观察它的值。这需要添加不少的额外代码。好在，版本 3.1.0 之后可以使用 `PublisherProbe`来做，
+如下：
 
 [source,java]
 ----
@@ -368,13 +313,11 @@ public void testCommandEmptyPathIsUsed() {
     probe.assertWasNotCancelled(); //<5>
 }
 ----
-<1> Create a probe that translates to an empty sequence.
-<2> Use the probe in place of `Mono<Void>` by calling `probe.mono()`.
-<3> After completion of the sequence, the probe lets you assert that it was used. You
-can check that is was subscribed to...
-<4> ...as well as actually requested for data...
-<5> ...and whether or not it was cancelled.
+<1> 创建一个探针（probe），它会转化为一个空序列。
+<2> 在需要使用 `Mono<Void>` 的位置调用 `probe.mono()` 来替换为探针。
+<3> 序列结束之后，你可以用这个探针来判断序列是如何使用的，你可以检查是它从哪（条路径）被订阅的...
+<4> ...对于请求也是一样的...
+<5> ...以及是否被取消了。
 
-You can also use the probe in place of a `Flux<T>` by calling `.flux()` instead of
-`.mono()`. For cases where you need to probe an execution path but also need the
-probe to emit data, you can wrap any `Publisher<T>` using `PublisherProbe.of(Publisher)`.
+你也可以在使用 `Flux<T>` 的位置通过调用 `.flux()` 方法来放置探针。如果你既需要用探针检查执行路径
+还需要它能够发出数据，你可以用 `PublisherProbe.of(Publisher)` 方法包装一个 `Publisher<T>` 来搞定。
