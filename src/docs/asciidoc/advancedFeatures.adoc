@@ -630,33 +630,25 @@ the `onOperatorError` hook, so calling `resetOnOperatorError()` also resets it. 
 independently reset via `resetOnOperatorDebug()` as it uses a specific key internally.
 
 [[context]]
-== Adding a Context to a Reactive Sequence
-One of the big technical challenges encountered when switching from an imperative
-programming perspective to a reactive programming mindset lies in how you deal with
-threading.
+== 增加一个 Context 到响应式序列
+当从命令式编程风格切换到响应式编程风格的时候，一个技术上最大的挑战就是线程处理。
 
-Contrary to what you might be used to, in reactive programming, a `Thread` can be used
-to process several asynchronous sequences that run roughly at the same time (actually, in
-non-blocking locksteps). The execution can also easily and often jump from one thread to
-another.
+与习惯做法不同的是，在响应式编程中，一个线程（`Thread`）可以被用于处理多个同时运行的异步序列
+（实际上是非阻塞的）。执行过程也会经常从一个线程切换到另一个线程。
 
-This arrangement is especially hard for developers that use features dependent on the
-threading model being more "stable", such as `ThreadLocal`. As it lets you associate
-data with a *thread*, it becomes tricky to use in a reactive context. As a result,
-libraries that rely on `ThreadLocal` at least introduce new challenges when used with
-Reactor. At worst, they work badly or even fail. Using the MDC of Logback to store and
-log correlation IDs is a prime example of such a situation.
+这样的情况下，对于开发者来说，如果依赖线程模型中相对“稳定”的特性——比如 `ThreadLocal`
+——就会变得很难。因为它会让你将数据绑定到一个 *线程* 上，所以在响应式环境中使用就变得
+比较困难。因此，将使用了 `ThreadLocal` 的库应用于 Reactor 的时候就会带来新的挑战。通常会更糟，
+它用起来效果会更差，甚至会失败。 比如，使用 Logback 的 MDC 来存储日志相关的 ID，就是一个非常符合
+这种情况的例子。
 
-The usual workaround for `ThreadLocal` usage is to move the contextual data, `C`, along
-your business data, `T`, in the sequence, by using `Tuple2<T, C>` for instance. This does
-not look good and leaks an orthogonal concern (the contextual data) into your method and
-`Flux` signatures.
+通常的对 `ThreadLocal` 的替代方案是将环境相关的数据 `C`，同业务数据 `T` 一起置于序列中,
+比如使用 `Tuple2<T, C>`。这种方案看起来并不好，况且会在方法和 `Flux` 泛型中暴露环境数据信息。
 
-Since version `3.1.0`, Reactor comes with an advanced feature that is somewhat comparable
-to `ThreadLocal` but applied to a `Flux` or a `Mono` instead of a `Thread`: the `Context`.
+自从版本 `3.1.0`，Reactor 引入了一个类似于 `ThreadLocal` 的高级功能：`Context`。它作用于一个
+`Flux` 或一个 `Mono` 上，而不是应用于一个线程（`Thread`）。
 
-As an illustration of how it looks like, here is a very simple example of both writing to
-the `Context` and reading from it:
+为了说明，这里有个读写 `Context` 的简单例子：
 [source,java]
 ----
 String key = "message";
@@ -670,75 +662,55 @@ StepVerifier.create(r)
             .verifyComplete();
 ----
 
-In the following sections, we'll learn about the `Context` and how to use it, so that you
-will eventually understand the example above.
+接下来的几个小节，我们来了解 `Context` 是什么以及如何用，从而最终可以理解上边的例子。
 
-IMPORTANT: This is an advanced feature that is more targeted at library developers. It
-requires good understanding of the lifecycle of a `Subscription` and is intended for
-libraries that are responsible for the subscriptions.
+IMPORTANT: 这是一个主要面向库开发人员的高级功能。这需要开发者对 `Subscription` 的生命周期
+充分理解，并且明白它主要用于 subscription 相关的库。
 
-=== The `Context` API
-A `Context` is an interface reminiscent of `Map`: it stores key-value pairs and lets you
-fetch a value you stored by its key. More specifically:
+=== `Context` API
+`Context` 是一个类似于 `Map`（这种数据结构）的接口：它存储键值（key-value）对，你需要通过 key 来获取值：
 
-* Both key and values are of type `Object`, so a `Context` can contain any number of
-highly divergent values from different libraries and sources.
-* A `Context` is *immutable*.
-* Use `put(Object key, Object value)` to store a key-value pair, returning a new
-`Context` instance. You can also merge two contexts into a new one by using
-`putAll(Context)`.
-* You can check if the key is present with `hasKey(Object key)`.
-* Use `getOrDefault(Object key, T defaultValue)` to retrieve a value (cast to a `T`) or
-fall back to a default one if the Context does not have that key.
-* Use `getOrEmpty(Object key)` to get an `Optional<T>` (the context attempts to cast the
-stored value to `T`).
-* Use `delete(Object key)` to remove the value associated to a key, returning a new
-`Context`.
+* key 和 value 都是 `Object` 类型，所以 `Context` 可以包含任意数量的任意对象。
+* `Context` 是 *不可变的（immutable）*。
+* 用 `put(Object key, Object value)` 方法来存储一个键值对，返回一个新的 `Context` 对象。
+你也可以用 `putAll(Context)` 方法将两个 context 合并为一个新的 context。
+* 用 `hasKey(Object key)` 方法检查一个 key 是否已经存在。
+* 用 `getOrDefault(Object key, T defaultValue)` 方法取回 key 对应的值（类型转换为 `T`），
+或在找不到这个 key 的情况下返回一个默认值。
+* 用 `getOrEmpty(Object key)` 来得到一个 `Optional<T>` （context 会尝试将值转换为 `T`）。
+* 用 `delete(Object key)` 来删除 key 关联的值，并返回一个新的 `Context`。
 
-TIP: When *creating a* `Context`, you can create pre-valued contexts with up to five
-key-value pairs by using the static `Context.of` methods. They take 2, 4, 6, 8 or 10
-`Object` instances, each couple of `Object` instances being a key-value pair to add to
-the `Context`. +
+TIP: *创建一个* `Context` 时，你可以用静态方法 `Context.of` 预先存储最多 5 个键值对。
+它接受 2, 4, 6, 8 或 10 个 `Object` 对象，两两一对作为键值对添加到 `Context`。 +
  +
-Alternatively you can also create an empty `Context` by using `Context.empty()`.
+你也可以用 `Context.empty()` 方法来创建一个空的 `Context`。
 
-=== Tying the `Context` to a `Flux` and Writing
-To make the context useful, it must be tied to a specific sequence and be accessible by
-each operator in a chain. Note that the operator must be  a Reactor native operator, as
-`Context` is specific to Reactor.
+=== 把 `Context` 绑定到 `Flux` and Writing
+为了使用 context，它必须要绑定到一个指定的序列，并且链上的每个 operator 都可以访问它。
+注意，这里的 operator 必须是 Reactor 内置的 operator，因为 `Context` 是 Reactor 特有的。
 
-Actually, a `Context` is tied to each `Subscriber` to a chain. It uses the `Subscription`
-propagation mechanism to make itself available to each operator, starting with the final
-`subscribe` and moving up the chain.
+实际上，一个 `Context` 是绑定到每一个链中的 `Subscriber` 上的。 它使用 `Subscription`
+的传播机制来让自己对每一个 operator 都可见（从最后一个 `subscribe` 沿链向上）。
 
-In order to populate the `Context`, which can only be done at subscription time, you need
-to use the `subscriberContext` operator.
+为了填充 `Context` ——只能在订阅时（subscription time）——你需要使用 `subscriberContext` operator。
 
-Use `subscriberContext(Context)`, which merges the `Context` you provide and the
-`Context` from downstream (remember, the `Context` is propagated from the bottom of the
-chain towards the top). This is done through a call to `putAll`, resulting in a new
-`Context` for upstream.
+`subscriberContext(Context)` 方法会将你提供的 `Context` 与来自下游（记住，`Context` 是从下游
+向上游传播的）的 `Context`合并。 这通过调用 `putAll` 实现，最后会生成一个新的 `Context` 给上游。
 
-TIP: You can also use the more advanced `subscriberContext(Function<Context, Context>)`.
-It receives the state of the `Context` from downstream and lets you put or delete values
-as you see fit, returning the new `Context` to use. You can even decide to return a
-completely different instance, although it is really not recommended (doing so might
-impact libraries that depend on the `Context`).
+TIP: 你也可以用更高级的 `subscriberContext(Function<Context, Context>)`。它接受来自下游的
+`Context`，然后你可以根据需要添加或删除值，然后返回新的 `Context`。你甚至可以返回一个完全不同
+的对象，虽然不太建议这样（这样可能影响到依赖这个 `Context` 的库）。
 
-=== Reading the Context
-Populating the `Context` is one aspect, but retrieving that data from it is equally
-important. Most of the time, the responsibility of putting information into the `Context`
-is on the end user's side, while exploiting that information is on the library's side,
-as the library is usually upstream of the client code.
+=== 读取 Context
+填充 `Context` 是一方面，读取数据同样重要。多数时候，添加内容到 `Context` 是最终用户的责任，
+但是利用这些信息是库的责任，因为库通常是客户代码的上游。
 
-The tool for reading data from the context is the static `Mono.subscriberContext()`
-method.
+读取 context 数据使用静态方法 `Mono.subscriberContext()`。
 
-=== Simple Examples
-The examples in this section are meant as ways to better understand some of the caveats of
-using a `Context`.
+=== 简单的例子
+本例的初衷是为了让你对如何使用 `Context` 有个更好的理解。
 
-Let's first look back at our simple example from the introduction in a bit more details:
+让我们先回头看一下最初的例子：
 
 [source,java]
 ----
@@ -752,22 +724,18 @@ StepVerifier.create(r)
             .expectNext("Hello World") //<4>
             .verifyComplete();
 ----
-<1> The chain of operators ends with a call to `subscriberContext(Function)` that puts
-`"World"` into the `Context` under the key `"message"`.
-<2> We `flatMap` on the source element, materializing the `Context` with `Mono.subscriberContext()`.
-<3> We then use `map` to extract the data associated to `"message"` and concatenate that with
-the original word.
-<4> The resulting `Mono<String>` indeed emits `"Hello World"`.
+<1> operator 链以调用 `subscriberContext(Function)` 结尾，将 `"World"` 作为 `"message"` 这个
+key 的 值添加到 `Context` 中。
+<2> 对源调用 `flatMap` 用 `Mono.subscriberContext()` 方法拿到 `Context`。
+<3> 然后使用 `map` 读取关联到 `"message"` 的值，然后与原来的值连接。
+<4> 最后 `Mono<String>` 确实发出了 `"Hello World"`。
 
-IMPORTANT: The numbering above vs the actual line order is not a mistake: it represents
-the execution order. Even though `subscriberContext` is the last piece of the chain, it is
-the one that gets executed first (due to its subscription time nature, and the fact that
-the subscription signal flows from bottom to top).
+IMPORTANT: 上边的数字顺序并不是按照代码行顺序排的，这并非错误：它代表了执行顺序。虽然
+`subscriberContext` 是链上的最后一个环节，但确实最先执行的（原因在于 subscription 信号
+是从下游向上的）。
 
-Note that in your chain of operators, the **relative positions** of where you **write** to the
-`Context` and where you **read** from it matters: the `Context`
-is immutable and its content can only be seen by operators above it, as demonstrated in
-the following code example:
+注意在你的 operator 链中，**写入** 与 **读取** `Context` 的 **相对位置** 很重要：因为
+`Context` 是不可变的，它的内容只能被上游的 operator 看到，如下例所示：
 
 [source,java]
 ----
@@ -781,13 +749,11 @@ StepVerifier.create(r)
             .expectNext("Hello Stranger") //<3>
             .verifyComplete();
 ----
-<1> The `Context` is written to too high in the chain...
-<2> As a result, in the `flatMap`, there's no value associated to our key. A default value
-is used instead.
-<3> The resulting `Mono<String>` thus emits `"Hello Stranger"`.
+<1> 写入 `Context` 的位置太靠上了...
+<2> 所以在 `flatMap` 就没有 key 关联的值，使用了默认值。
+<3> 结果 `Mono<String>` 发出了 `"Hello Stranger"`。
 
-The following example also demonstrates the immutable nature of the `Context`, and how
-`Mono.subscriberContext()` always returns the `Context` set by `subscriberContext` calls:
+下面的例子同样说明了 `Context` 的不可变性（`Mono.subscriberContext()` 总是返回由 `subscriberContext` 配置的 `Context`）：
 
 [source,java]
 ----
@@ -802,15 +768,14 @@ StepVerifier.create(r)
 	.expectNext("Default") // <5>
 	.verifyComplete();
 ----
-<1> We materialize the `Context`
-<2> In a `map` we attempt to mutate it
-<3> We re-materialize the `Context` in a `flatMap`
-<4> We read the attempted key in the `Context`
-<5> The key was never set to `"Hello"`.
+<1> 拿到 `Context`。
+<2> 在 `map` 方法中我们尝试修改它。
+<3> 在 `flatMap` 中再次获取 `Context`。
+<4> 读取 `Context` 中可能的值。
+<5> 值从来没有被设置为 `"Hello"`。
 
-Similarly, in case of several attempts to write the same key to the `Context`, the
-**relative order of the writes** matters too: operators reading the `Context` will see
-the value that was set closest to under them, as demonstrated in the following example:
+类似的，如果多次对 `Context` 中的同一个 key 赋值的话，要看 **写入的相对顺序** ：
+读取 `Context` 的 operator 只能拿到下游最近的一次写入的值，如下例所示：
 
 [source,java]
 ----
@@ -825,19 +790,16 @@ StepVerifier.create(r)
             .expectNext("Hello Reactor") //<3>
             .verifyComplete();
 ----
-<1> A write attempt on key `"message"`.
-<2> Another write attempt on key `"message"`.
-<3> The `map` only saw the value set closest to it (and below it): `"Reactor"`.
+<1> 写入 `"message"` 的值。
+<2> 另一次写入 `"message"` 的值。
+<3> `map` 方法值能拿到下游最近的一次写入的值： `"Reactor"`。
 
-Here what happens is that the `Context` is populated during subscription with `"World"`.
-Then the subscription signal moves upstream, and another write happens. This produces a
-second immutable `Context` with a value of `"Reactor"`. After that, data starts flowing.
-The `flatMap` sees the `Context` closest to it, which is our second `Context` with the
-`"Reactor"` value.
+这里，首先 `Context` 中的 key 被赋值 `"World"`。然后订阅信号（subscription signal）向上游
+移动，又发生了另一次写入。这次生成了第二个不变的 `Context`，里边的值是 `"Reactor"`。之后，
+数据开始流动， `flatMap` 拿到最近的 `Context` ，也就是第二个值为 `Reactor` 的 `Context`。
 
-You might wonder if the `Context` is propagated along with the data signal. If that was
-the case, putting another `flatMap` between these two writes would use the value from
-the top `Context`. But this is not the case, as demonstrated by the following example:
+你可能会觉得 `Context` 是与数据信号一块传播的。如果是那样的话，在两次写入操作中间加入的一个
+`flatMap` 会使用最上游的这个 `Context`。但并不是这样的，如下：
 
 [source,java]
 ----
@@ -854,17 +816,16 @@ StepVerifier.create(r)
             .expectNext("Hello Reactor World") //<5>
             .verifyComplete();
 ----
-<1> This is the first write to happen.
-<2> This is the second write to happen.
-<3> First `flatMap` sees second write.
-<4> Second `flatMap` concatenates result from first one with the value from **first write**.
-<5> The `Mono` emits `"Hello Reactor World"`.
+<1> 这里是第一次赋值。
+<2> 这里是第二次赋值。
+<3> 第一个 `flatMap` 看到的是第二次的赋值。
+<4> 第二个 `flatMap` 将上一个的结果与 **第一次赋值** 的 context 值连接。
+<5> `Mono` 发出的是 `"Hello Reactor World"`。
 
-The reason is that the `Context` is associated to the `Subscriber` and each operator
-accesses the `Context` by requesting it from its downstream `Subscriber`.
+原因在于 `Context` 是与 `Subscriber` 关联的，而每一个 operator 访问的 `Context`
+来自其下游的 `Subscriber`。
 
-One last interesting propagation case is the one where the `Context` is also written to
-**inside** a `flatMap`, as in the following example:
+最后一个有意思的传播方式是，对 `Context` 的赋值也可以在一个 `flatMap` **内部**，如下：
 
 [source,java]
 ----
@@ -884,28 +845,26 @@ StepVerifier.create(r)
             .expectNext("Hello World Reactor")
             .verifyComplete();
 ----
-<1> This `subscriberContext` does not impact anything outside of its `flatMap`
-<2> This `subscriberContext` impacts the main sequence's `Context`
+<1> 这个 `subscriberContext` 不会影响所在 `flatMap` 之外的任何东西。
+<2> 这个 `subscriberContext` 会影响主序列的 `Context`。
 
-In the example above, the final emitted value is `"Hello World Reactor"` and not "Hello
-Reactor World", because the `subscriberContext` that writes "Reactor" does so as part of
-the inner sequence of the second `flatMap`. As a consequence, it is not visible / propagated
-through the main sequence and the first `flatMap` doesn't see it. Propagation + immutability
-isolate the `Context` in operators that create intermediate inner sequences like `flatMap`.
+上边的例子中，最后发出的值是 `"Hello World Reactor"` 而不是 "Hello Reactor World"，因为赋值
+"Reactor" 的 `subscriberContext` 是作用于第二个 `flatMap` 的内部序列的。所以不会在主序列可见/
+传播，第一个 `flatMap` 也看不到它。传播（Propagation） + 不可变性（immutability）将类似
+`flatMap` 这样的 operator 中的创建的内部序列中的 `Context` 与外部隔离开来。
 
-=== Full Example
-Let's consider a more real life example of a library reading information from the `Context`:
-A reactive HTTP client that takes a `Mono<String>` as the source of data for a `PUT` but
-also looks for a particular Context key to add a correlation ID to the request's headers.
+=== 完整的例子
+让我们来看一个实际的从 `Context` 中读取值的例子：一个响应式的 HTTP 客户端将一个 `Mono<String>`
+（用于 `PUT` 请求）作为数据源，同时通过一个特定的 key 使用 Context 将相关的ID信息放入请求头中。
 
-From the user perspective, it is called as follows:
+从用户角度，是这样调用的：
 
 [source,java]
 ----
 doPut("www.example.com", Mono.just("Walter"))
 ----
 
-In order to propagate a correlation ID, it would be called as follows:
+为了传播一个相关ID，应该这样调用：
 
 [source,java]
 ----
@@ -913,14 +872,11 @@ doPut("www.example.com", Mono.just("Walter"))
 	.subscriberContext(Context.of(HTTP_CORRELATION_ID, "2-j3r9afaf92j-afkaf"))
 ----
 
-As you can see in the snippets above, the user code uses `subscriberContext` to populate
-a `Context` with an `HTTP_CORRELATION_ID` key-value pair. The upstream of the operator is
-a `Mono<Tuple2<Integer, String>>` (a simplistic representation of an HTTP response)
-returned by the HTTP client library. So it is effectively passing information from the
-user code to the library code.
+由上可见，用户代码使用了 `subscriberContext` 来为 `Context` 的 `HTTP_CORRELATION_ID`
+赋值。上游的 operator 是一个由 HTTP 客户端库返回的 `Mono<Tuple2<Integer, String>>`
+（一个简化的 HTTP 响应）。所以能够正确将信息从用户代码传递给库代码。
 
-The following example shows mock code from the library's perspective that reads the
-context and "augments the request" if it can find the correlation ID:
+下边的例子演示了从库的角度由 context 读取值的模拟代码，如果能够找到相关ID，则“增加请求”：
 
 [source,java]
 ----
@@ -944,21 +900,18 @@ Mono<Tuple2<Integer, String>> doPut(String url, Mono<String> data) {
 			.map(msg -> Tuples.of(200, msg));
 }
 ----
-<1> Materialize the `Context` through `Mono.subscriberContext()`.
-<2> Extract a value for a the correlation ID key, as an `Optional`.
-<3> If the key was present in the context, use the correlation ID as a header.
+<1> 用 `Mono.subscriberContext()` 拿到 `Context`。
+<2> 提取出相关ID的值——是一个 `Optional`。
+<3> 如果值存在，那么就将其加入请求头。
 
-In the library snippet, you can see how it zips the data `Mono` with
-`Mono.subscriberContext()`. This gives the library a `Tuple2<String, Context>`, and that
-context contains the `HTTP_CORRELATION_ID` entry from downstream (as it is on the direct
-path to the subscriber).
+在这段库代码片段中，你可以看到它是如何将 `Mono` 和 `Mono.subscriberContext()` zip 起来的。
+返回的是一个 `Tuple2<String, Context>`，这个 `Context` 包含来自下游的 `HTTP_CORRELATION_ID`
+的值。
 
-The library code then uses `map` to extract an `Optional<String>` for that key, and, if
-the entry is present, it uses the passed correlation ID as a `X-Correlation-ID` header.
-That last part is simulated by the `handle` above.
+库代码接着用 `map` 读取出那个 key 的值 `Optional<String>`，如果值存在，将其作为 `X-Correlation-ID` 请求头。
+最后一块而用 `handle` 来处理。
 
-The whole test that validates the library code used the correlation ID can be written as
-follows:
+用来验证上边的库代码的测试程序如下：
 
 [source,java]
 ----
