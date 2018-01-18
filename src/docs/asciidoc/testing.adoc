@@ -90,9 +90,9 @@ API 是一个构造器，通过传入一个要测试的序列来创建一个 `St
 * _更多样的操作_ 比如暂停或运行一段代码。比如，你想对测试状态或内容进行调整或处理，
 你可能会用到 `thenAwait(Duration)` 和 `then(Runnable)`。
 
-对于终止事件，相应的期望方法（`expectComplete()`、`expectError()`，及其所有的变种方法）
+对于终止事件，相应的期望方法（`expectComplete()`、`expectError()`，及其所有的变体方法）
 使用之后就不能再继续增加别的期望方法了。最后你只能对 `StepVerifier` 进行一些额外的配置并
-*触发校验*（通常调用 `verify()` 及其变种方法）。
+*触发校验*（通常调用 `verify()` 及其变体方法）。
 
 从 StepVerifier 内部来看，它订阅了待测试的 `Flux` 或 `Mono`，然后将序列中的每个信号与测试
 场景的期望进行比对。如果匹配的话，测试成功。如果有不匹配的情况，则抛出 `AssertionError` 异常。
