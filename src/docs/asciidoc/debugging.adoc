@@ -1,23 +1,20 @@
 [[debugging]]
-= Debugging Reactor
-Switching from an imperative and synchronous programming paradigm to a reactive and
-asynchronous one can sometimes be daunting. One of the steepest steps in the learning
-curve is how to analyze and debug when something goes wrong.
+= 调试 Reactor
+从命令式和同步式编程切换到响应式和异步式编程有时候是令人生畏的。
+学习曲线中最陡峭的异步就是出错时如何分析和调试。
 
-In the imperative world, debugging is usually pretty straightforward: just read the
-stacktrace and you see where the problem originated and more: Was it entirely a failure
-of your code? Did the failure occur in some library code? If so, what part of your code
-called the library, potentially passing in improper parameters that ultimately caused the
-failure?
+在命令式世界，调试通常都是非常直观的：直接看 stack trace 就可以找到问题出现的位置，
+以及：是否问题责任全部出在你自己的代码？问题是不是发生在某些库代码？如果是，
+那你的哪部分代码调用了库，是不是传参不合适导致的问题？
 
-== The Typical Reactor Stack Trace
-When you shift to asynchronous code, things can get much more complicated.
+== 典型的 Reactor Stack Trace
+当你切换到异步代码，事情就变得复杂的多了。
 
 //TODO The code that generated the following stack trace should be here
 
-Consider the following stack trace:
+看一下下边的 stack trace：
 
-.A typically Reactor stack trace
+.一段典型的 Reactor stack trace
 [source]
 ----
 java.lang.IndexOutOfBoundsException: Source emitted more than one item
@@ -41,85 +38,70 @@ java.lang.IndexOutOfBoundsException: Source emitted more than one item
 	at reactor.guide.GuideTests.debuggingCommonStacktrace(GuideTests.java:722)
 ----
 
-There is a lot going on there. We get an `IndexOutOfBoundsException`, which tells us that
-a "*source emitted* _more than one item_".
+这里边有好多信息，我们得到了一个 `IndexOutOfBoundsException`，内容是 "*源发出了* _不止一个元素_"。
 
-We can probably quickly come to assume that this source is a Flux/Mono, as confirmed by
-the line below that mentions `MonoSingle`. So it appears to be some sort of complaint
-from a `single` operator.
+我们也许可以很快假定这个源是一个 Flux/Mono，并通过下一行提到的 `MonoSingle` 确定是 Mono。
+看上去是来自一个 `single` operator 的抱怨。
 
-Referring to the Javadoc for `Mono#single` operator, we see that `single` has a contract:
-The source must emit exactly one element. It appears we had a source that emitted more
-than one and thus violated that contract.
+查看 Javadoc 中关于 `Mono#single` operator 的说明，我们看到 `single` 有一个规定：
+源必须只能发出一个元素。看来是有一个源发出了多于一个元素，从而违反了这一规定。
 
-Can we dig deeper and identify that source? The following rows are not very helpful. They
-take us on a travel inside the internals of what seems to be a reactive chain, through
-multiple calls to `subscribe` and `request`.
+我们可以更进一步找出那个源吗？下边的这些内容帮不上什么忙，只是打印了一些内部的似乎是一个响应式链的信息，
+主要是一些 `subscribe` 和 `request` 的调用。
 
-By skimming over these rows, we can at least start to form a picture of the kind of chain
-that went wrong: It seems to involve a `MonoSingle`, a `FluxFlatMap`, and a `FluxRange`
-(each gets several rows in the trace, but overall these three classes are involved). So a
-`range().flatMap().single()` chain maybe?
+粗略过一下这些行，我们至少可以勾画出一个大致的出问题的链：大概涉及一个 `MonoSingle`、一个
+`FluxFlatMap`，以及一个 `FluxRange`（每一个都对应 trace 中的几行，但总体涉及这三个类）。
+所以难道是 `range().flatMap().single()` 这样的链？
 
-But what if we use that pattern a lot in our application? This still does not tell us
-much, and simply searching for `single` isn't going to find the problem. Then the last
-line refers to some of our code. Finally, we are getting close.
+但是如果在我们的应用中多处都用到这一模式，那怎么办？通过这些还是不能确定什么，
+搜索 `single` 也找不到问题所在。最后一行指向了我们的代码。我们似乎终于接近真相了。
 
-Hold on, though. When we go to the source file, all we see is that a
-pre-existing `Flux` is subscribed to, as follows:
+不过，等等... 当我们找到源码文件，我们只能找到一个已存在的 `Flux` 被订阅了，如下：
 [source,java]
 ----
 toDebug.subscribe(System.out::println, Throwable::printStackTrace);
 ----
 
-All of this happened at subscription time, but the `Flux` itself was not
-_declared_ there. Worse, when we go to where the variable is declared, we see:
+所有这些都发生在订阅时，但是 `Flux` 本身没有在这里 _声明_ 。更糟的是，
+当我们找到变量声明的地方，我们看到：
 [source,java]
 ----
-public Mono<String> toDebug; //please overlook the public class attribute
+public Mono<String> toDebug; //请忽略 public 的属性
 ----
 
-The variable is not _instantiated_ where it is declared. We must assume a worst-case
-scenario where we find out that there could be a few different code paths that set it in
-the application. We remain unsure of which one caused the issue.
+变量声明的地方并没有 _实例化_ 。我们必须做最坏的打算，那就是在这个应用中，
+可能在几个不同的代码路径上对这个变量赋了值，但我们不确定是哪一个导致了问题。
 
-NOTE: This is kind of the Reactor equivalent of a runtime error, as opposed to a
-compilation error.
+NOTE: 这是一种 Reactor 运行时错误，而不是编译错误。
 
-What we want to find out more easily is where the operator was added into the chain -
-that is,  where the `Flux` was declared. We usually refer to that as the *assembly* of
-the `Flux`.
+我们希望找到的是 operator 在哪里添加到操作链上的 —— 也就是 `Flux` 在哪里
+声明的。我们通常说这个 `Flux` 是被 *组装（assembly）* 的。
 
 [[debug-activate]]
-== Activating Debug Mode
-Even though the stacktrace was still able to convey some information for someone with a
-bit of experience, we can see that it is not ideal by itself in more advanced cases.
+== 开启调试模式
+即便 stack trace 能够对有些许经验的开发者传递一些信息，但是在一些复杂的情况下，
+这并不是一种理想的方式。
 
-Fortunately, Reactor comes with a debugging-oriented capability of
-*assembly-time instrumentation*.
+幸运的是，Reactor 内置了一种面向调试的能力—— *组装时测量（assembly-time instrumentation）*。
 
-This is done by customizing the `Hook.onOperator` hook *at application start* (or at
-least before the incriminated `Flux` or `Mono` can be instantiated), as follows:
+这通过 *在应用启动的时候* （或至少在有问题的 `Flux` 或 `Mono` 实例化之前）
+加入自定义的 `Hook.onOperator` 钩子（hook），如下：
 [source,java]
 ----
 Hooks.onOperatorDebug();
 ----
 
-This starts instrumenting the calls to the `Flux` (and `Mono`) operator  methods (where
-they are assembled into the chain) by wrapping the construction of the operator and
-capturing a stacktrace there. Since this is done when the operator chain is declared, the
-hook should be activated *before* that, so the safest way is to activate it right at the
-start of your application.
+这行代码——通过包装 operator 的构造方法，并在此捕捉 stack trace——来监测对这个
+`Flux`（或 `Mono`）的 operator 方法的调用（也就是“组装”链的地方）。由于这些在
+operator 链被声明的地方就搞定，这个 hook 应该在 *早于* 声明的时候被激活，
+最保险的方式就是在你程序的最开始就激活它。
 
-Later on, if an exception occurs, the failing operator is able to refer to that capture
-and append it to the stack trace.
+之后，如果发生了异常，导致失败的 operator 能够找到捕捉点并补充 stack trace。
 
-In the next section, we see how the stack trace differs and how to interpret
-that new information.
+在下一小节，我们看一下 stack trace 会有什么不同，以及如何对其进行分析。
 
-== Reading a Stack Trace in Debug Mode
-When we reuse our initial example but activate the `operatorStacktrace` debug feature,
-the stack trace is as follows:
+== 阅读调试模式的 Stack Trace
+我们在对上边的例子激活 `operatorStacktrace` 调试功能后，stack trace 如下：
 
 [source]
 ----
@@ -144,29 +126,23 @@ Assembly trace from producer [reactor.core.publisher.MonoSingle] : <4>
 Error has been observed by the following operator(s): <5>
 	|_	Flux.single(TestWatcher.java:55) <6>
 ----
-<1> This is new: We see the wrapper operator that captures the stack.
-<2> Apart from that, the first section of the stack trace is still the same for the most
-part, showing a bit of the operator's internals (so we removed a bit of the snippet here).
+<1> 这一条是新的：可以发现外层 operator 捕捉到了 stack trace。
+<2> 第一部分的 stack trace 多数与上边一样，显示了 operator 内部的信息（所以省略了这一块）。
 //TODO I'd put it back in. Wading through the whole thing is part of the task
 // you're describing. You might instead highlight the most relevant lines, to
 // teach people what to look for.
-<3> This is where the new stuff from debugging mode starts to appear.
-<4> First, we get some details on where the operator was assembled.
-<5> We also get a traceback of the error as it propagated through the operator chain,
-from first to last (error site to subscribe site).
-<6> Each operator that saw the error is mentioned along with the class and line where it
-originated. If an operator is assembled from within Reactor code, the latter would be
-omitted.
+<3> 从这里开始，是在调试模式下显示的内容。
+<4> 首先我们获得了关于 operator 组装的信息。
+<5> 以及错误沿着 operator chain 传播的轨迹（从错误点到订阅点）。
+<6> 每一个看到这个错误的 operator 都会列出，包括类和行信息。如果 operator 是在 Reactor
+源码内部组装的，行信息会被忽略。
 
-As you can see, the captured stack trace is appended to the original error as a
-suppressed `OnAssemblyException`. There are two parts to it, but the first section is the
-most interesting. It shows the path of construction for the operator that triggered the
-exception. Here it shows that the `single` that caused our issue was created in the
-`scatterAndGather` method, itself called from a `populateDebug` method that got executed
-through JUnit.
+可见，捕获的 stack trace 作为 `OnAssemblyException` 添加到原始错误信息的之后。有两部分，
+但是第一部分更加有意思。它显示了 operator 触发异常的路径。这里显示的是 `scatterAndGather`
+方法中的 `single` 导致的问题，而 `scatterAndGather` 方法是在 JUnit 中被 `populateDebug`
+方法调用的。
 
-Now that we are armed with enough information to find the culprit, we can have
-a meaningful look at that `scatterAndGather` method:
+既然我们已经有足够的信息来查出罪魁祸首，我们就来看一下 `scatterAndGather` 方法吧：
 [source,java]
 ----
 private Mono<String> scatterAndGather(Flux<String> urls) {
@@ -174,22 +150,19 @@ private Mono<String> scatterAndGather(Flux<String> urls) {
            .single(); <1>
 }
 ----
-<1> Sure enough, here is our `single`.
+<1> 找到了，就是这个 `single`。
 
-Now we can see what the root cause of the error was a `flatMap` that performs
-several HTTP calls to a few URLs is chained with `single`, which is too
-restrictive. After a short `git blame` and a quick discussion with the author of
-that line, we find out he meant to use the less restrictive `take(1)` instead.
+现在我们可以发现错误的根源是将多个 HTTP 请求转化为 URLs 的 `flatMap` 方法后边接的是 `single`，
+这太严格了。使用 `git blame` 找到代码作者，并同他讨论过后，发现他是本来是想用不那么严格的 `take(1)`
+方法的。
 
-*We have solved our problem.*
+*我们解决了问题。*
 
 [quote]
-Error has been observed by the following operator(s):
+Error 被以下这些 operator(s) 观察（observed）了：
 
-That second part of the debug stack trace was not necessarily interesting in
-this particular example, because the error was actually happening in the last
-operator in the chain (the one closest to `subscribe`). Considering another
-example might make it more clear:
+调试信息的第二部分在这个例子中意义不大，因为错误实际发生在最后一个 operator 上（离 `subscribe` 最近的一个）。
+另一个例子可能更加清楚：
 [source,java]
 ----
 FakeRepository.findAllUserByName(Flux.just("pedro", "simon", "stephane"))
@@ -198,8 +171,7 @@ FakeRepository.findAllUserByName(Flux.just("pedro", "simon", "stephane"))
               .blockLast();
 ----
 
-Now imagine that, inside `findAllUserByName`, there is a `map` that fails. Here
-we would see the following final traceback:
+现在想象一下在 `findAllUserByName` 内部有个 `map` 方法报错了。我们可能会看到如下的 trace：
 [source,java]
 ----
 Error has been observed by the following operator(s):
@@ -211,51 +183,40 @@ Error has been observed by the following operator(s):
 	|_	Flux.transform(GuideDebuggingExtraTests.java:42)
 ----
 
-This corresponds to the section of the chain of operators that gets notified of the error:
+这与链上收到错误通知的 operators 是一致：
 
-. The exception originates in the first `map`.
-. It is seen by a second `map` (both in fact correspond to the `findAllUserByName`
-method).
-. It is then seen by a `filter` and a `transform`, which indicate that part of the chain
-is constructed via a reusable transformation function (here, the `applyFilters` utility
-method).
-. Finally, it is seen by an `elapsed` and a `transform`. Once again, `elapsed` is applied
-by the transformation function of that second transform.
+. 异常源自第一个 `map`。
+. 被第二个 `map` 看到（都在 `findAllUserByName` 方法中）。
+. 接着被一个 `filter` 和一个 `transform` 看到，说明链的这部分是由一个可重复使用的转换方法组装的
+（这里是 `applyFilters` 工具方法）。
+. 最后被一个 `elapsed` 和一个 `transform` 看到，类似的， `elapsed` 由第二个转换方法（`enrichUser`）
+组装。
 
-We deal with a form of instrumentation here, and creating a stack trace is costly. That
-is why this debugging feature should only be activated in a controlled manner, as a last
-resort.
+用这种形式的检测方式构造 stack trace 是成本较高的。也因此这种调试模式作为最终大招，
+只应该在可控的方式下激活。
 
-=== The `checkpoint()` Alternative
-The debug mode is global and affects every single operator assembled into a `Flux` or
-`Mono` inside the application. This has the benefit of allowing *after-the-fact
-debugging*: whatever the error, we will obtain additional info to debug it.
+=== 用 `checkpoint()` 方式替代
+调试模式是全局性的，会影响到程序中每一个组装到一个 `Flux` 或 `Mono` 的 operator。好处在于可以进行
+*事后调试（after-the-fact debugging）*：无论错误是什么，我们都会得到足够的调试信息。
 
-As we saw earlier, this global knowledge comes at the cost of an impact on performance
-(due to the number of populated stack traces). That cost can be reduced if we have an
-idea of likely problematic operators. However, we usually do not know which operators are
-likely to be problematic unless we observed an error in the wild, saw we were missing
-assembly information, and then modified the code to activate assembly tracking, hoping to
-observe the same error again.
+就像前边见到的那样，这种全局性的调试会因为成本较高而影响性能（其影响在于生成的 stack traces 数量）。
+如果我们能大概定位到疑似出问题的 operator 的话就可以不用花那么大的成本。然而，问题出现后，
+我们通常无法定位到哪一个 operators 可能存在问题，因为缺少一些 trace 信息，我们得修改代码，
+打开调试模式，期望能够复现问题。
 
-In that scenario, we have to switch into debugging mode and make preparations in order to
-better observe a second occurrence of the error, this time capturing all the additional
-information.
+这种情况下，我们需要切换到调试模式，并进行一些必要的准备工作以便能够更好的发现复现的问题，
+并捕捉到所有的信息。（译者加：这两段感觉有点废话。。。）
 
-If you can identify reactive chains that you assemble in your application for which
-serviceability is critical, *a mix of both techniques can be achieved with the
-`checkpoint()` operator.*
+如果你能确定是在你的代码中组装的响应式链存在问题，而且程序的可服务性又是很重要的，
+那么你可以 *使用 `checkpoint()` operator，它有两种调试技术可用*。
 
-You can chain this operator into a method chain. The `checkpoint` operator works like the
-hook version, but only for its link of that particular chain.
+你可以把这个 operator 加到链中。这时 `checkpoint` operator 就像是一个 hook，但只对它所在的链起作用。
 
-There is also a `checkpoint(String)` variant that lets you add a unique String identifier
-to the assembly traceback. This way, the stack trace is omitted and you rely on the
-description to identify the assembly site. A `checkpoint(String)` imposes less processing
-cost than a regular `checkpoint`.
+还有一个 `checkpoint(String)` 的方法变体，你可以传入一个独特的字符串以方便在 assembly traceback 中识别信息。
+这样会省略 stack trace，你可以依赖这个字符串（以下改称“定位描述符”）来定位到组装点。`checkpoint(String)` 比 `checkpoint`
+有更低的执行成本。
 
-`checkpoint(String)` includes "light" in its output (which can be handy when
-searching), as shown in the following example:
+`checkpoint(String)` 在它的输出中包含 "light" （可以方便用于搜索），如下所示：
 
 ----
 ...
@@ -263,11 +224,9 @@ searching), as shown in the following example:
 Assembly site of producer [reactor.core.publisher.FluxElapsed] is identified by light checkpoint [light checkpoint identifier].
 ----
 
-Last but not least, if you want to add a more generic description to the checkpoint but
-still rely on the stack trace mechanism to identify the assembly site, you can force that
-behavior by using the `checkpoint("description", true)` version. We are now back to the
-initial message for the traceback, augmented with a `description`, as shown in the
-following example:
+最后的但同样重要的是，如果你既想通过 checkpoint 添加定位描述符，同时又依赖于 stack trace
+来定位组装点，你可以使用 `checkpoint("description", true)` 来实现这一点。这时回溯信息又出来了，
+同时附加了定位描述符，如下例所示：
 
 ----
 Suppressed: reactor.core.publisher.FluxOnAssembly$OnAssemblyException:
@@ -277,40 +236,34 @@ Assembly trace from producer [reactor.core.publisher.ParallelSource], described 
 Error has been observed by the following operator(s):
 	|_	ParallelFlux.checkpointnull
 ----
-<1> `descriptionCorrelation1234` is the description provided in the `checkpoint`.
+<1> `descriptionCorrelation1234` 是通过 `checkpoint` 给出的定位描述符。
 
-The description could be a static identifier or user-readable description or a wider
-*correlation ID* (for instance, coming from a header in the case of an HTTP request).
+定位描述符可以是静态的字符串、或人类可读的描述、或一个 *correlation ID*（例如，
+来自 HTTP 请求头的信息）。
 
-NOTE: When both global debugging and local `checkpoint()` are enabled, checkpointed
-snapshot stacks are appended as suppressed error output after the observing operator
-graph and following the same declarative order.
+NOTE: 当全局调试模式和 `checkpoint()` 都开启的时候，checkpoint 的 stacks 输出会作为
+suppressed 错误输出，按照声明顺序添加在 operator 图（graph）的后面。
 
-== Logging a Stream
-In addition to stack trace debugging and analysis, another powerful tool to have in your
-toolkit is the ability to trace and log events in an asynchronous sequence.
+== 记录流的日志
+除了基于 stack trace 的调试和分析，还有一个有效的工具可以跟踪异步序列并记录日志。
 
-The `log()` operator can do just that. Chained inside a sequence, it will peek at every
-event of the `Flux` or `Mono` upstream of it (including `onNext`, `onError`, and
-`onComplete` and _subscriptions_, _cancellations_, and _requests_).
+就是 `log()` operator。将其加到操作链上之后，它会读（只读，peek）每一个
+在其上游的 `Flux` 或 `Mono` 事件（包括 `onNext`、`onError`、 `onComplete`，
+以及 _订阅_、 _取消_、和 _请求_）。
 
-.Side note on logging implementation
+.边注：关于 logging 的具体实现
 ****
-The `log` operator uses the `Loggers` utility class, which picks up common logging
-frameworks like Log4J and Logback through *`SLF4J`* and defaults to logging to the
-console in case SLF4J is unavailable.
+`log` operator 通过 *`SLF4J`* 使用类似 Log4J 和 Logback 这样的公共的日志工具，
+如果 SLF4J 不存在的话，则直接将日志输出到控制台。
 
-The Console fallback uses `System.err` for the `WARN` and `ERROR` log levels and
-`System.out` for everything else.
+控制台使用 `System.err` 记录 `WARN` 和 `ERROR` 级别的日志，使用
+`System.out` 记录其他级别的日志。
 
-If you prefer a JDK `java.util.logging` fallback, as in 3.0.x, you can get it by setting
-the `reactor.logging.fallback` System property to `JDK`.
+如果你喜欢使用 JDK `java.util.logging`，在 3.0.x 你可以设置 JDK 的系统属性 `reactor.logging.fallback`。
 ****
 
-For instance, suppose we have _logback_ activated and configured and a chain like
-`range(1,10).take(3)`. By placing a `log()` just before the _take_, we can get some
-insight into how it works and what kind of events it propagates upstream to the _range_,
-as shown in the following example:
+假设我们配置并激活了 _logback_，以及一个形如 `range(1,10).take(3)` 的操作链。通过将 `log()` 放在 _take_ 之前，
+我们就可以看到它内部是如何运行的，以及什么样的事件会向上游传播给 _range_，如下所示：
 
 [source,java]
 ----
@@ -320,7 +273,7 @@ Flux<Integer> flux = Flux.range(1, 10)
 flux.subscribe();
 ----
 
-This prints out (through the logger's console appender):
+输出如下（通过 logger 的 console appender）：
 ----
 10:45:20.200 [main] INFO  reactor.Flux.Range.1 - | onSubscribe([Synchronous Fuseable] FluxRange.RangeSubscription) <1>
 10:45:20.205 [main] INFO  reactor.Flux.Range.1 - | request(unbounded) <2>
@@ -330,25 +283,19 @@ This prints out (through the logger's console appender):
 10:45:20.205 [main] INFO  reactor.Flux.Range.1 - | cancel() <4>
 ----
 
-Here, in addition to the logger's own formatter (time, thread, level, message), the
-`log()` operator outputs a few things in its own format:
+这里，除了 logger 自己的格式（时间、线程、级别、消息），`log()` operator
+还输出了其他一些格式化的东西：
 
-<1> `reactor.Flux.Range.1` is an automatic _category_ for the log, in case you use the
-operator several times in a chain. It allows you to distinguish which operator's events
-are logged (in this case, the `range`). The identifier can be overwritten with your own
-custom category by using the `log(String)` method signature. After a few separating
-characters, the actual event gets printed. Here we get an `onSubscribe` call, an
-`request` call, three `onNext` calls, and a `cancel` call. For the first line,
-`onSubscribe`, we get the implementation of the `Subscriber`, which usually corresponds
-to the operator-specific implementation. Between square brackets, we get additional
-information, including whether the operator can be automatically optimized via
-synchronous or asynchronous fusion (see the appendix on <<microfusion>>).
-<2> On the second line, we can see that an unbounded request was propagated up from
-downstream.
-<3> Then the range sends three values in a row.
-<4> On the last line, we see `cancel()`.
+<1> `reactor.Flux.Range.1` 是自动生成的日志 _类别（category）_，以防你在操作链中多次使用
+同一个 operator。通过它你可以分辨出来是哪个 operator 的事件（这里是 `range` 的）。
+你可以调用 `log(String)` 方法用自定义的类别替换这个标识符。在几个用于分隔的字符之后，
+打印出了实际的事件。这里是一个 `onSubscribe` 调用、一个 `request` 调用、三个 `onNext` 调用，
+以及一个 `cancel` 调用。对于第一行的 `onSubscribe`，我们知道了 `Subscriber` 的具体实现，
+通常与 operator 指定的实现是一致的，在方括号内有一些额外信息，包括这个 operator 是否能够
+通过同步或异步融合（fusion，具体见附录 <<microfusion>>）的方式进行自动优化。
+<2> 第二行，我们可以看到是一个由下游传播上来的个数无限的请求。
+<3> 然后 range 一下发出三个值。
+<4> 最后一行，我们看到了 `cancel()`。
 
-The last line, *(4)*, is the most interesting. We can see the `take` in action there. It
-operates by cutting the sequence short after it has seen enough elements emitted. In
-short, `take()` causes the source to `cancel()` once it has emitted the user-requested
-amount.
+最后一行，*(4)*，最有意思。我们看到 `take` 在这里发挥作用了。在它拿到足够的元素之后，
+就将序列切断了。简单来说，`take()` 导致源在发出用户请求的数量后 `cancel()` 了。
