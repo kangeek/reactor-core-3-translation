@@ -144,7 +144,7 @@ userService.getFavorites(userId) // <1>
 <6> 通过描述对数据的最终处理（在 UI 中显示）和对错误的处理（显示在 popup 中）来触发（`subscribe`）。
 
 如果你想确保“收藏的ID”的数据在800ms内获得（如果超时，从缓存中获取）呢？在基于回调的代码中，
-会比较复杂。但 Reactor 中就很简单，在处理链中增加一个 `timeout` 的操作（operator）即可。
+会比较复杂。但 Reactor 中就很简单，在处理链中增加一个 `timeout` 的操作符即可。
 
 .Reactor 中增加超时控制的例子
 [source,java]
@@ -258,7 +258,7 @@ assertThat(results).containsExactly( // <8>
 此外还会关注一下几个方面：
 
 * *可编排性（Composability）* 以及 *可读性（Readability）*
-* 使用丰富的 *操作（operator）* 方式来处理形如 *流* 的数据
+* 使用丰富的 *操作符* 来处理形如 *流* 的数据
 * 在 *订阅（subscribe）* 之前什么都不会发生
 * *背压（backpressure）* 具体来说即 _消费者能够反向告知生产者生产内容的速度的能力_
 * *高层次* （同时也是有高价值的）的抽象，从而达到 _并发无关_ 的效果
@@ -284,18 +284,18 @@ Reactor 提供了丰富的编排操作，从而代码直观反映了处理流程
 原材料会经过不同的中间处理过程，或者作为半成品与其他半成品进行组装。如果某处有齿轮卡住，
 或者某件产品的包装过程花费了太久时间，相应的工位就可以向上游发出信号来限制或停止发出原材料。
 
-=== 操作（Operators）
-在 Reactor 中，operator就像装配线中的工位（操作员或装配机器人）。每一个 operator
+=== 操作符（Operators）
+在 Reactor 中，操作符（operator）就像装配线中的工位（操作员或装配机器人）。每一个操作符
 对 `Publisher` 进行相应的处理，然后将 `Publisher` 包装为一个新的 `Publisher`。就像一个链条，
 数据源自第一个 `Publisher`，然后顺链条而下，在每个环节进行相应的处理。最终，一个订阅者
 (`Subscriber`）终结这个过程。请记住，在订阅者（`Subscriber`）订阅（subscribe）到一个
 发布者（`Publisher`）之前，什么都不会发生。
 
-TIP: 理解了 operator 会创建新的 `Publisher` 实例这一点，能够帮助你避免一个常见的问题，
-这种问题会让你觉得处理链上的某个 operator 没有起作用。相关内容请参考 <<faq.chain,item>> 。
+TIP: 理解了操作符会创建新的 `Publisher` 实例这一点，能够帮助你避免一个常见的问题，
+这种问题会让你觉得处理链上的某个操作符没有起作用。相关内容请参考 <<faq.chain,item>> 。
 
-虽然响应式流规范（Reactive Streams specification）没有规定任何 operator， 类似 Reactor
-这样的响应式库所带来的最大附加价值之一就是提供丰富的 operator。包括基础的转换操作，
+虽然响应式流规范（Reactive Streams specification）没有规定任何操作符， 类似 Reactor
+这样的响应式库所带来的最大附加价值之一就是提供丰富的操作符。包括基础的转换操作，
 到过滤操作，甚至复杂的编排和错误处理操作。
 
 [[reactive.subscribe]]

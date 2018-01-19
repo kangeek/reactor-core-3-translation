@@ -45,7 +45,7 @@ https://github.com/reactor/reactor-core/blob/master/CONTRIBUTING.md[这里]进�
 == 如何开始阅读本文档
 * 如果你想直接写代码请参考 <<getting-started>> 。
 * 如果你对 _响应式编程（Reactive Programming）_ 比较陌生，最好从 <<intro-reactive>> 开始。
-* 如果你对 Reactor 的理念比较熟悉，只是在编写程序时查找合适的 operator， 请参考附录
+* 如果你对 Reactor 的理念比较熟悉，只是在编写程序时查找合适的操作符， 请参考附录
  <<which-operator>> 。
 * 如果你想深入了解 Reactor 的核心功能，请参考 <<core-features>>，以便了解：
 ** 关于 Reactor 的响应式类型 "<<flux>>" 和 "<<mono>>"。
