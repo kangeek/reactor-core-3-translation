@@ -12,8 +12,8 @@
 
 == 贡献本文档
 本参考文档用 http://asciidoctor.org/docs/asciidoc-writers-guide/[Asciidoc] 编写，
-其源码见 https://github.com/reactor/reactor-core/tree/master/src/docs/asciidoc。
-（译者加：本翻译见 https://github.com/get-set/reactor-core/tree/master-zh/src/docs/asciidoc。）
+其源码见 https://github.com/reactor/reactor-core/tree/master/src/docs/asciidoc
+（译者加：本翻译见 https://github.com/get-set/reactor-core/tree/master-zh/src/docs/asciidoc ）。
 
 如有任何补充，我们欢迎你提交 pull request。
 
