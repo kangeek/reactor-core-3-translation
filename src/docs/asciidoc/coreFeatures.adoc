@@ -188,10 +188,10 @@ https://projectreactor.io/docs/core/release/api/reactor/core/scheduler/Scheduler
 来创建）。你也可以使用 `newXXX` 方法来创建不同的调度器。比如 `Schedulers.newElastic(yourScheduleName)`
  创建一个新的名为 `yourScheduleName` 的弹性调度器。
 
-NOTE: Operators 基于非阻塞算法实现，从而可以利用到某些调度器的工作窃取（work stealing）
+NOTE: 操作符基于非阻塞算法实现，从而可以利用到某些调度器的工作窃取（work stealing）
 特性的好处。
 
-一些 operators 默认会使用一个指定的调度器（通常也允许开发者调整为其他调度器）例如，
+一些操作符默认会使用一个指定的调度器（通常也允许开发者调整为其他调度器）例如，
 通过工厂方法 `Flux.interval(Duration.ofMillis(300))` 生成的每 300ms 打点一次的 `Flux<Long>`，
 默认情况下使用的是 `Schedulers.parallel()`，下边的代码演示了如何将其装换为 `Schedulers.single()`：
 
@@ -203,39 +203,39 @@ Reactor 提供了两种在响应式链中调整调度器 `Scheduler` 的方法�
 是有讲究的，而 `subscribeOn` 则无所谓。要理解它们的不同，你首先要理解
 <<reactive.subscribe,nothing happens until you subscribe()>>。
 
-在 Reactor 中，当你在操作链上添加 operator 的时候，你可以根据需要在 `Flux` 和 `Mono`
+在 Reactor 中，当你在操作链上添加操作符的时候，你可以根据需要在 `Flux` 和 `Mono`
 的实现中包装其他的 `Flux` 和 `Mono`。一旦你订阅（subscribe）了它，一个 `Subscriber` 的链
 就被创建了，一直向上到第一个 publisher 。这些对开发者是不可见的，开发者所能看到的是最外一层的
-`Flux` （或 `Mono`）和 `Subscription`，但是具体的任务是在中间这些跟 operator 相关的
+`Flux` （或 `Mono`）和 `Subscription`，但是具体的任务是在中间这些跟操作符相关的
 subscriber 上处理的。
 
-基于此，我们仔细研究一下 `publishOn` 和 `subscribeOn` 这两个 operator：
+基于此，我们仔细研究一下 `publishOn` 和 `subscribeOn` 这两个操作符：
 
-* `publishOn` 的用法和其他 operator 一样，处于订阅链（subscriber chain）中。它将下游
+* `publishOn` 的用法和其他操作符一样，处于订阅链（subscriber chain）中。它将下游
 信号传给上游同时将上游的数据递给下游，同时执行指定的调度器 `Scheduler` 的某个工作
-线程上的回调。它会 *改变后续的 operators 的执行所在线程* （知道下一个 `publishOn` 加到
+线程上的回调。它会 *改变后续的操作符的执行所在线程* （知道下一个 `publishOn` 加到
 这个链上。
 * `subscribeOn` 用于订阅（subscription）过程，作用于那个向上的 subscriber 链（subscribe
 的是才被激活，方向是向上游的）。所以，无论你把 `subscribeOn` 至于操作链（译者注：这里是
-指代码表示的 operator 的链）的什么位置， *它都会影响到源头的线程执行环境（context）*。
-但是，它不会影响到后续的 `publishOn`，后者仍能够切换后续 operator 的线程执行环境。
+指代码表示的操作链）的什么位置， *它都会影响到源头的线程执行环境（context）*。
+但是，它不会影响到后续的 `publishOn`，后者仍能够切换后续操作符的线程执行环境。
 
 （译者加：关于 `publishOn` 和 `subscribeOn`，由于能力所限，直译的文字总是感觉不够明白，
-这里补充说一下我的理解： 对于一个 operator 链， `publishOn` 从字面上看是 publish 嘛，
-所以影响的是“向下的”后续的 operator 的线程执行环境，会被以后的 `publishOn` 覆盖；
-而 `subscribeOn` 相反，影响的是“向上的”直到源头的各个 operator 的线程执行环境，所以
+这里补充说一下我的理解： 对于一个操作链， `publishOn` 从字面上看是 publish 嘛，
+所以影响的是“向下的”后续的操作符的线程执行环境，会被以后的 `publishOn` 覆盖；
+而 `subscribeOn` 相反，影响的是“向上的”直到源头的各个操作符的线程执行环境，所以
 会被前边的 `subscribeOn` 覆盖。）
 
-NOTE: 只有 operator 链中最早的 `subscribeOn` 调用才算数。
+NOTE: 只有操作链中最早的 `subscribeOn` 调用才算数。
 
 include::threading.adoc[]
 
 [[error.handling]]
 == 处理错误
-TIP: 如果想了解有哪些可用于错误处理的 operator，请参考 <<which.errors,the relevant operator decision tree>>。
+TIP: 如果想了解有哪些可用于错误处理的操作符，请参考 <<which.errors,the relevant operator decision tree>>。
 
 在响应式流中，错误（error）是终止（terminal）事件。当有错误发生时，它会导致流序列停止，
-并且错误信号会沿着 operator 链条向下传递，直至遇到你定义的 `Subscriber` 及其 `onError` 方法。
+并且错误信号会沿着操作链条向下传递，直至遇到你定义的 `Subscriber` 及其 `onError` 方法。
 
 这样的错误还是应该在应用层面解决的。比如，你可能会将错误信息显示在用户界面，或者通过某个
 REST 端点（endpoint）发出。因此，订阅者（subscriber）的 `onError` 方法是应该定义的。
@@ -246,13 +246,13 @@ WARNING: 如果没有定义，`onError` 会抛出 `UnsupportedOperationException
 Reactor 还提供了其他的用于在链中处理错误的方法，即错误处理操作（error-handling operators）。
 // TODO What does that look like? Can we get a sample?
 
-IMPORTANT: 在你了解错误处理 operator之前，你必须牢记 *响应式流中的任何错误都是一个终止事件*。
-即使用了错误处理 operator，也不会让源头流序列继续。而是将 `onError` 信号转化为一个 *新的* 序列
+IMPORTANT: 在你了解错误处理操作符之前，你必须牢记 *响应式流中的任何错误都是一个终止事件*。
+即使用了错误处理操作符，也不会让源头流序列继续。而是将 `onError` 信号转化为一个 *新的* 序列
 的开始。换句话说，它代替了被终结的 _上游_ 流序列。
 
 现在我们来逐个看看错误处理的方法。需要的时候我们会同时用到命令式编程风格的 `try` 代码块来作比较。
 
-=== 错误处理 Operator
+=== “错误处理”方法
 你也许熟悉在 try-catch 代码块中处理异常的几种方法。常见的包括如下几种：
 
 . 捕获并返回一个静态的缺省值。
@@ -262,9 +262,9 @@ IMPORTANT: 在你了解错误处理 operator之前，你必须牢记 *响应式�
 . 捕获，记录错误日志，然后继续抛出。
 . 使用 `finally` 来清理资源，或使用 Java 7 引入的 "try-with-resource"。
 
-以上所有这些在 Reactor 都有相应的基于 error-handling operators 处理方式。
+以上所有这些在 Reactor 都有相应的基于 error-handling 操作符处理方式。
 
-在开始研究这些 operator 之前，我们先准备好响应式链（reactive chain）方式和 try-catch 代码块方式（以便对比）。
+在开始研究这些操作符之前，我们先准备好响应式链（reactive chain）方式和 try-catch 代码块方式（以便对比）。
 
 当订阅的时候，位于链结尾的 `onError` 回调方法和 `catch` 块类似，一旦有异常，执行过程会跳入到 catch：
 [source,java]
@@ -298,7 +298,7 @@ try {
 <2> ...后续的代码跳过...
 <3> ...执行过程直接到这。
 
-既然我们准备了两种方式做对比，我们就来看一下不同的错误处理场景，以及相应的 operator。
+既然我们准备了两种方式做对比，我们就来看一下不同的错误处理场景，以及相应的操作符。
 
 ==== 静态缺省值
 与第 *(1)* 条（捕获并返回一个静态的缺省值）对应的是 `onErrorReturn`：
@@ -469,7 +469,7 @@ Flux.just("foo", "bar")
 
 ==== 演示终止方法 `onError`
 为了演示当错误出现的时候如何导致上游序列终止，我们使用 `Flux.interval` 构造一个更加直观的例子。
-这个 interval operator 会在每 x 单位的时间发出一个自增的 `Long` 值。
+这个 interval 操作符会在每 x 单位的时间发出一个自增的 `Long` 值。
 
 [source,java]
 ----
@@ -498,7 +498,7 @@ Uh oh
 即使多给了 1 秒钟时间，也没有更多的 tick 信号由 `interval` 产生了，所以序列确实被错误信号终止了。
 
 ==== 重试
-还有一个用于错误处理的 operator 你可能会用到，就是 `retry`，见文知意，用它可以对出现错误的序列进行重试。
+还有一个用于错误处理的操作符你可能会用到，就是 `retry`，见文知意，用它可以对出现错误的序列进行重试。
 
 问题是它对于上游 `Flux` 是基于重订阅（*re-subscribing*）的方式。这实际上已经一个不同的序列了，
 发出错误信号的序列仍然是终止了的。为了验证这一点，我们可以在继续用上边的例子，增加一个 `retry(1)`
@@ -540,7 +540,7 @@ java.lang.RuntimeException: boom
 由于异常再次出现，便将异常传递到下游了。
 
 还有一个“高配版”的 `retry` （`retryWhen`），它使用一个伴随（"companion"） `Flux`
-来判断对某次错误是否要重试。这个伴随 `Flux` 是由 operator 创建的，但是由开发者包装它，
+来判断对某次错误是否要重试。这个伴随 `Flux` 是由操作符创建的，但是由开发者包装它，
 从而实现对重试操作的配置。
 
 这个伴随 `Flux` 是一个 `Flux<Throwable>`，它作为 `retryWhen` 的唯一参数被传递给一个
@@ -576,8 +576,8 @@ include::snippetRetryWhenRetry.adoc[]
 TIP: 类似的代码也可以被用于实现 _exponential backoff and retry_ 模式
 （译者加：重试指定的次数, 且每一次重试之间停顿的时间逐渐增加），参考 <<faq.exponentialBackoff,FAQ>>。
 
-=== 在 Operator 或 Function 中处理异常
-总体来说，所有的 operators 自身都可能包含触发异常的代码，或自定义的可能导致失败的代码，
+=== 在操作符或函数式中处理异常
+总体来说，所有的操作符自身都可能包含触发异常的代码，或自定义的可能导致失败的代码，
 所以它们都自带一些错误处理方式。
 
 一般来说，一个 *不受检异常（Unchecked Exception）* 总是由 `onError` 传递。例如，

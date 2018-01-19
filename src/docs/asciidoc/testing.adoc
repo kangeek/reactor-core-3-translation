@@ -1,7 +1,7 @@
 [[testing]]
 = 测试
 
-无论你是编写了一个简单的 Reactor operator 链，还是开发了自定义的 operator，对它进行
+无论你是编写了一个简单的 Reactor 操作链，还是开发了自定义的操作符，对它进行
 自动化的测试总是一个好主意。
 
 Reactor 内置一些专门用于测试的元素，放在一个专门的 artifact 里： `reactor-test`。
@@ -33,7 +33,7 @@ dependencies {
 `reactor-test` 的两个主要用途：
 
 * 使用 `StepVerifier` 一步一步地测试一个给定场景的序列。
-* 使用 `TestPublisher` 生成数据来测试下游的 operators（包括你自己的 operator）。
+* 使用 `TestPublisher` 生成数据来测试下游的操作符（包括你自己的operator）。
 
 == 使用 `StepVerifier` 来测试
 
@@ -109,7 +109,7 @@ TIP: 默认情况下，`verify()` 方法（及同源的 `verifyThenAssertThat`�
 
 == 操控时间
 
-`StepVerifier` 可以用来测试基于时间的 operator，从而避免测试的长时间运行。可以使用构造器
+`StepVerifier` 可以用来测试基于时间的操作符，从而避免测试的长时间运行。可以使用构造器
 `StepVerifier.withVirtualTime` 达到这一点。
 
 示例如下：
@@ -121,9 +121,9 @@ StepVerifier.withVirtualTime(() -> Mono.delay(Duration.ofDays(1)))
 ----
 
 *虚拟时间（virtual time）* 的功能会在 Reactor 的调度器（`Scheduler`）工厂方法中插入一个自定义的
-调度器。这些基于时间的 operators 通常默认使用 `Schedulers.parallel()` 调度器。（虚拟时间的）
+调度器。这些基于时间的操作符通常默认使用 `Schedulers.parallel()` 调度器。（虚拟时间的）
 技巧在于使用一个 `VirtualTimeScheduler` 来代替默认调度器。然而一个重要的前提就是，只有在初始化
-虚拟时间调度器之后的 operator 才会起作用。
+虚拟时间调度器之后的操作符才会起作用。
 
 为了提高 `StepVerifier` 正常起作用的概率，它一般不接收一个简单的 `Flux` 作为输入，而是接收
 一个 `Supplier`，从而可以在配置好订阅者 *之后* “懒创建”待测试的 flux。
@@ -173,7 +173,7 @@ WARNING: 虚拟时间并非银弹。请记住 _所有的_ 调度器都会被替�
 
 `verifyThenAssertThat()` 返回一个 `StepVerifier.Assertions` 对象，你可以用它来校验
 整个测试场景成功刚结束后的一些状态（*它也会调用 `verify()`*）。典型应用就是校验有多少
-元素被 operator 丢弃（参考 <<hooks,Hooks>>）。
+元素被操作符丢弃（参考 <<hooks,Hooks>>）。
 
 == 测试 `Context`
 更多关于 `Context` 的内容请参考 <<context>>。
@@ -184,7 +184,7 @@ WARNING: 虚拟时间并非银弹。请记住 _所有的_ 调度器都会被替�
   上配置期望校验。一定记住要调用 `then()` 来返回到对序列的期望校验上来。
 
   - `expectNoAccessibleContext`: 是对“没有`Context`”的校验。通常用于
-  被测试的 `Publisher` 并不是一个响应式的，或没有任何 operator 能够传递 `Context`
+  被测试的 `Publisher` 并不是一个响应式的，或没有任何操作符能够传递 `Context`
   （比如一个 `generate` 的 `Publisher`）.
 
 此外，还可以用 `StepVerifierOptions` 方法传入一个测试用的初始 `Context` 给 `StepVerifier`，
@@ -212,7 +212,7 @@ StepVerifier.create(Mono.just(1).map(i -> i + 10),
 对于更多高级的测试，如果能够完全掌控源发出的数据就会方便很多，因为这样就可以在测试的
 时候更加有的放矢地发出想测的数据。
 
-另一种情况就是你实现了自己的 operator，然后想校验它的行为——尤其是在源不稳定的时候——是否符合响应式流规范。
+另一种情况就是你实现了自己的操作符，然后想校验它的行为——尤其是在源不稳定的时候——是否符合响应式流规范。
 
 `reactor-test` 提供了 `TestPublisher` 类来应对这两种需求。这个类本质上是一个 `Publisher<T>`，
 你可以通过可编程的方式来用它发出各种信号：
@@ -235,12 +235,12 @@ StepVerifier.create(Mono.just(1).map(i -> i + 10),
 使用转换方法 `flux()` 和 `mono()` 可以将其作为 `Flux` 和 `Mono` 来使用。
 
 == 用 `PublisherProbe` 检查执行路径
-当构建复杂的 operators 链时，可能会有多个子序列，从而导致多个执行路径。
+当构建复杂的操作链时，可能会有多个子序列，从而导致多个执行路径。
 
 多数时候，这些子序列会生成一个足够明确的 `onNext` 信号，你可以通过检查最终结果
 来判断它是否执行。
 
-考虑下边这个方法，它构建了一条 operators 链，并使用 `switchIfEmpty` 方法在源为空的情况下，
+考虑下边这个方法，它构建了一条操作链，并使用 `switchIfEmpty` 方法在源为空的情况下，
 替换成另一个源。
 
 [source,java]
