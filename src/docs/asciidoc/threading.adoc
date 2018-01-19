@@ -1,20 +1,16 @@
 [[threading]]
-== Threading
+== 线程模型
 
-`Flux` and `Mono` do not create threads. Some operators, such as `publishOn`, do create
-threads. Also, as a form of work sharing, these operators can "steal" threads from other
-work pools if the other pools are currently idle. Consequently, neither the `Flux` or
-`Mono` objects nor the `Subscriber` objects have to be smart about threads. They rely on
-the operators to manage the threads and work pools.
+`Flux` 和 `Mono` 不会创建线程。一些操作符，比如 `publishOn`，会创建线程。同时，作为一种任务共享形式，
+这些操作符可能会从其他任务池（work pool）——如果其他任务池是空闲的话——那里“偷”线程。因此，
+无论是 `Flux`、`Mono` 还是 `Subscriber` 都应该精于线程处理。它们依赖这些操作符来管理线程和任务池。
 
-`publishOn` forces the next operator (and possibly subsequent operators after the next
-one) to run on a different thread. Similarly, `subscribeOn` forces the previous operator
-(and possibly operators prior to the previous one) to run on a different thread. Remember
-that, until you subscribe, you define a process but do not start it. For that reason,
-Reactor can use these rules to determine how the processing must proceed. Then, when you
-subscribe, the whole process starts working.
+`publishOn` 强制下一个操作符（很可能包括下一个的下一个...）来运行在一个不同的线程上。
+类似的，`subscribeOn` 强制上一个操作符（很可能包括上一个的上一个...）来运行在一个不同的线程上。
+记住，在你订阅（subscribe）前，你只是定义了处理流程，而没有启动发布者。基于此，Reactor
+可以使用这些规则来决定如何执行操作链。然后，一旦你订阅了，整个流程就开始工作了。
 
-Consider an example showing that multiple threads can support work sharing:
+下边的例子演示了支持任务共享的多线程模型：
 
 [source,java]
 ----
@@ -22,23 +18,19 @@ Flux.range(1, 10000) <1>
     .publishOn(Schedulers.parallel()) <2>
     .subscribe(result) <3>
 ----
-<1> Create a `Flux` for 10,000 items
-<2> Create as many threads as there are CPUs (minimum 4).
-<3> <<reactive.subscribe>>.
+<1> 创建一个有 10,000 个元素的 `Flux`。
+<2> 创建等同于 CPU 个数的线程（最小为4）。
+<3> <<reactive.subscribe>>。
 
-`Scheduler.parallel()` creates a fixed pool of single-threaded `ExecutorService`-based
-workers. Because one or two threads may lead to problems, it always creates at least four
-threads. The publishOn method then shares these threaded workers, getting items from
-whichever thread is emitting when `publishOn` requests an item. In this fashion, we get
-work  sharing (a form of resource sharing). Reactor enables several other ways to share
-for  resources as well, as documented in
-https://projectreactor.io/docs/core/release/api/reactor/core/scheduler/Schedulers.html[Schedulers].
+`Scheduler.parallel()` 创建一个基于单线程 `ExecutorService` 的固定大小的任务线程池。
+因为可能会有一个或两个线程导致问题，它总是至少创建 4 个线程。然后 publishOn 方法便共享了这些任务线程，
+当 `publishOn` 请求元素的时候，会从任一个正在发出元素的线程那里获取元素。这样，
+就是进行了任务共享（一种资源共享方式）。Reactor 还提供了好几种共享资源的方式，请参考
+https://projectreactor.io/docs/core/release/api/reactor/core/scheduler/Schedulers.html[Schedulers]。
 
-`Scheduler.elastic()` also creates threads and is a handy way to create a dedicated
-thread in the case of wrapping a blocking resource (such as a synchronous service). See
-<<faq.wrap-blocking>>.
+`Scheduler.elastic()` 也能创建线程，它能够很方便地创建专门的线程（以便跑一些可能会阻塞资源的任务，
+比如一个同步服务），请见 <<faq.wrap-blocking>>。
 
-Behind the scenes, the operators ensure thread safety by using incremental counters and
-guard conditions. For instance, if we have four threads hitting a single stream (as shown
-in the preceding example) each request increments a counter, so that future requests from
-the threads get the right item.
+内部机制保证了这些操作符能够借助自增计数器（incremental counters）和警戒条件（guard conditions）
+以线程安全的方式工作。例如，如果我们有四个线程处理一个流（就像上边的例子），每一个请求会让计数器自增，
+这样后续的来自不同线程的请求就能拿到正确的元素。
