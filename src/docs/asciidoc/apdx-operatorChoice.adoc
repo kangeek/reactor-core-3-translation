@@ -1,15 +1,14 @@
 [[which-operator]]
-= Which operator do I need?
-TIP: In this section, if an operator is specific to `Flux` or `Mono` it is
-prefixed accordingly. Common operators have no prefix. When a specific use case
-is covered by a combination of operators, it is presented as a method call, with
-leading dot and parameters in parentheses, like this: `.methodCall(parameter)`.
+= 我需要哪个操作符（operator）呢？
+TIP：在这一节，如果一个操作符是专属于 `Flux` 或 `Mono` 的，那么会给它注明前缀。
+公共的操作符没有前缀。如果一个具体的用例涉及多个操作符的组合，这里以方法调用的方式展现，
+会以一个点（.）开头，并将参数置于圆括号内，比如： `.methodCall(parameter)`。
 
-//TODO flux: cache, share, replay, publish, publishOn/subscribeOn/cancelOn
+//TODO flux：cache, share, replay, publish, publishOn/subscribeOn/cancelOn
 //compose/transform, retryWhen, repeatWhen, sort, startWith
 //TODO Mono.sequenceEqual
 
-I want to deal with:
+我想搞定：
 
 * <<which.create>>
 
@@ -28,260 +27,253 @@ I want to deal with:
 * <<which.blocking>>
 
 [[which.create]]
-== Creating a New Sequence...
-* that emits a `T`, and I already have: `just`
-** ...from an `Optional<T>`: `Mono#justOrEmpty(Optional<T>)`
-** ...from a potentially `null` T: `Mono#justOrEmpty(T)`
-* that emits a `T` returned by a method: `just` as well
-** ...but lazily captured: use `Mono#fromSupplier` or wrap `just` inside `defer`
-* that emits several `T` I can explicitly enumerate: `Flux#just(T...)`
-* that iterates over:
-** an array: `Flux#fromArray`
-** a collection or iterable: `Flux#fromIterable`
-** a range of integers: `Flux#range`
-** a `Stream` supplied for each Subscription: `Flux#fromStream(Supplier<Stream>)`
-* that emits from various single-valued sources such as:
-** a `Supplier<T>`: `Mono#fromSupplier`
-** a task: `Mono#fromCallable`, `Mono#fromRunnable`
-** a `CompletableFuture<T>`: `Mono#fromFuture`
-* that completes: `empty`
-* that errors immediately: `error`
-** ...but lazily build the `Throwable`: `error(Supplier<Throwable>)`
-* that never does anything: `never`
-* that is decided at subscription: `defer`
-* that depends on a disposable resource: `using`
-* that generates events programmatically (can use state):
-** synchronously and one-by-one: `Flux#generate`
-** asynchronously (can also be sync), multiple emissions possible in one pass: `Flux#create`
-(`Mono#create` as well, without the multiple emission aspect)
+== 创建一个新序列，它...
+* 发出一个 `T`，我已经有了：`just`
+** ...基于一个 `Optional<T>`：`Mono#justOrEmpty(Optional<T>)`
+** ...基于一个可能为 `null` 的 T：`Mono#justOrEmpty(T)`
+* 发出一个 `T`，且还是由 `just` 方法返回
+** ...但是“懒”创建的：使用 `Mono#fromSupplier` 或用 `defer` 包装 `just`
+* 发出许多 `T`，这些元素我可以明确列举出来：`Flux#just(T...)`
+* 基于迭代数据结构:
+** 一个数组：`Flux#fromArray`
+** 一个集合或 iterable：`Flux#fromIterable`
+** 一个 Integer 的 range：`Flux#range`
+** 一个 `Stream` 提供给每一个订阅：`Flux#fromStream(Supplier<Stream>)`
+* 基于一个参数值给出的源：
+** 一个 `Supplier<T>`：`Mono#fromSupplier`
+** 一个任务：`Mono#fromCallable`，`Mono#fromRunnable`
+** 一个 `CompletableFuture<T>`：`Mono#fromFuture`
+* 直接完成：`empty`
+* 立即生成错误：`error`
+* 什么都不做：`never`
+* 订阅时才决定：`defer`
+* 依赖一个可回收的资源：`using`
+* 可编程地生成事件（可以使用状态）:
+** 同步且逐个的：`Flux#generate`
+** 异步（也可同步）的，每次尽可能多发出元素：`Flux#create`
+（`Mono#create` 也是异步的，只不过只能发一个）
 
 [[which.values]]
-== Transforming an Existing Sequence
-* I want to transform existing data:
-** on a 1-to-1 basis (eg. strings to their length): `map`
-*** ...by just casting it: `cast`
-*** ...in order to materialize each source value's index: `Flux#indexed`
-** on a 1-to-n basis (eg. strings to their characters): `flatMap` + use a factory method
-** on a 1-to-n basis with programmatic behavior for each source element and/or state: `handle`
-** running an asynchronous task for each source item (eg. urls to http request): `flatMap` + an async `Publisher`-returning method
-*** ...ignoring some data: conditionally return a `Mono.empty()` in the flatMap lambda
-*** ...retaining the original sequence order: `Flux#flatMapSequential` (this triggers the async processes immediately but reorders the results)
-*** ...where the async task can return multiple values, from a `Mono` source: `Mono#flatMapMany`
+== 对序列进行转化
+* 我想转化一个序列：
+** 1对1地转化（比如字符串转化为它的长度）：`map`
+*** ...类型转化：`cast`
+*** ...为了获得每个元素的序号：`Flux#index`
+** 1对n地转化（如字符串转化为一串字符）：`flatMap` + 使用一个工厂方法
+** 1对n地转化可自定义转化方法和/或状态：`handle`
+** 对每一个元素执行一个异步操作（如对 url 执行 http 请求）：`flatMap` + 一个异步的返回类型为 `Publisher` 的方法
+*** ...忽略一些数据：在 flatMap lambda 中根据条件返回一个 `Mono.empty()`
+*** ...保留原来的序列顺序：`Flux#flatMapSequential`（对每个元素的异步任务会立即执行，但会将结果按照原序列顺序排序）
+*** ...当 Mono 元素的异步任务会返回多个元素的序列时：`Mono#flatMapMany`
 
-* I want to add pre-set elements to an existing sequence:
-** at the start: `Flux#startWith(T...)`
-** at the end: `Flux#concatWith(T...)`
-
-* I want to aggregate a `Flux`: (the `Flux#` prefix is assumed below)
-** into a List: `collectList`, `collectSortedList`
-** into a Map: `collectMap`, `collectMultiMap`
-** into an arbitrary container: `collect`
-** into the size of the sequence: `count`
-** by applying a function between each element (eg. running sum): `reduce`
-*** ...but emitting each intermediary value: `scan`
-** into a boolean value from a predicate:
-*** applied to all values (AND): `all`
-*** applied to at least one value (OR): `any`
-*** testing the presence of any value: `hasElements`
-*** testing the presence of a specific value: `hasElement`
+* 我想将 `Flux` 转化为集合（一下都是针对 `Flux` 的）
+** 转化为 List：`collectList`，`collectSortedList`
+** 转化为 Map：`collectMap`，`collectMultiMap`
+** 转化为自定义集合：`collect`
+** 计数：`count`
+** reduce 算法（将上个元素的reduce结果与当前元素值作为输入执行reduce方法，如sum） `reduce`
+*** ...将每次 reduce 的结果立即发出：`scan`
+** 转化为一个 boolean 值：
+*** 对所有元素判断都为true：`all`
+*** 对至少一个元素判断为true：`any`
+*** 判断序列是否有元素（不为空）：`hasElements`
+*** 判断序列中是否有匹配的元素：`hasElement`
 
 
-* I want to combine publishers...
-** in sequential order: `Flux#concat` or `.concatWith(other)`
-*** ...but delaying any error until remaining publishers have been emitted: `Flux#concatDelayError`
-*** ...but eagerly subscribing to subsequent publishers: `Flux#mergeSequential`
-** in emission order (combined items emitted as they come): `Flux#merge` / `.mergeWith(other)`
-*** ...with different types (transforming merge): `Flux#zip` / `Flux#zipWith`
-** by pairing values:
-*** from 2 Monos into a `Tuple2`: `Mono#zipWith`
-*** from n Monos when they all completed: `Mono#zip`
-** by coordinating their termination:
-*** from 1 Mono and any source into a `Mono<Void>`: `Mono#and`
-*** from n sources when they all completed: `Mono#when`
-*** into an arbitrary container type:
-**** each time all sides have emitted: `Flux#zip` (up to the smallest cardinality)
-**** each time a new value arrives at either side: `Flux#combineLatest`
-** only considering the sequence that emits first: `Flux#first`, `Mono#first`, `mono.or
-(otherMono).or(thirdMono)`, `flux.or(otherFlux).or(thirdFlux)
-** triggered by the elements in a source sequence: `switchMap` (each source element is mapped to a Publisher)
-** triggered by the start of the next publisher in a sequence of publishers: `switchOnNext`
+* 我想合并 publishers...
+** 按序连接：`Flux#concat` 或 `.concatWith(other)`
+*** ...即使有错误，也会等所有的 publishers 连接完成：`Flux#concatDelayError`
+*** ...按订阅顺序连接（这里的合并仍然可以理解成序列的连接）：`Flux#mergeSequential`
+** 按元素发出的顺序合并（无论哪个序列的，元素先到先合并）：`Flux#merge` / `.mergeWith(other)`
+*** ...元素类型会发生变化：`Flux#zip` / `Flux#zipWith`
+** 将元素组合：
+*** 2个 Monos 组成1个 `Tuple2`：`Mono#zipWith`
+*** n个 Monos 的元素都发出来后组成一个 Tuple：`Mono#zip`
+** 在终止信号出现时“采取行动”：
+*** 在 Mono 终止时转换为一个 `Mono<Void>`：`Mono#and`
+*** 当 n 个 Mono 都终止时返回 `Mono<Void>`：`Mono#when`
+*** 返回一个存放组合数据的类型，对于被合并的多个序列：
+**** 每个序列都发出一个元素时：`Flux#zip`
+**** 任何一个序列发出元素时：`Flux#combineLatest`
+** 只取各个序列的第一个元素：`Flux#first`，`Mono#first`，`mono.or
+(otherMono).or(thirdMono)`，`flux.or(otherFlux).or(thirdFlux)
+** 由一个序列触发（类似于 `flatMap`，不过“喜新厌旧”）：`switchMap`
+** 由每个新序列开始时触发（也是“喜新厌旧”风格）：`switchOnNext`
 
-* I want to repeat an existing sequence: `repeat`
-** ...but at time intervals: `Flux.interval(duration).flatMap(tick -> myExistingPublisher)`
+* 我想重复一个序列：`repeat`
+** ...但是以一定的间隔重复：`Flux.interval(duration).flatMap(tick -> myExistingPublisher)`
 
-* I have an empty sequence but...
-** I want a value instead: `defaultIfEmpty`
-** I want another sequence instead: `switchIfEmpty`
+* 我有一个空序列，但是...
+** 我想要一个缺省值来代替：`defaultIfEmpty`
+** 我想要一个缺省的序列来代替：`switchIfEmpty`
 
-* I have a sequence but I am not interested in values: `ignoreElements`
-** ...and I want the completion represented as a `Mono`: `then`
-** ...and I want to wait for another task to complete at the end: `thenEmpty`
-** ...and I want to switch to another `Mono` at the end: `Mono#then(mono)`
-** ...and I want to emit a single value at the end: `Mono#thenReturn(T)`
-** ...and I want to switch to a `Flux` at the end: `thenMany`
+* 我有一个序列，但是我对序列的元素值不感兴趣：`ignoreElements`
+** ...并且我希望用 `Mono` 来表示序列已经结束：`then`
+** ...并且我想在序列结束后等待另一个任务完成：`thenEmpty`
+** ...并且我想在序列结束之后返回一个 `Mono`：`Mono#then(mono)`
+** ...并且我想在序列结束之后返回一个 `Flux`：`thenMany`
 
-* I have a Mono for which I want to defer completion...
-** ...only when 1-N other publishers have all emitted (or completed): `Mono#delayUntilOther`
-*** ...and deriving these publishers from the Mono value: `Mono#delayUntil(Function)`
+* 我有一个 Mono 但我想延迟完成...
+** ...当有1个或N个其他 publishers 都发出（或结束）时才完成：`Mono#delayUntilOther`
+*** ...使用一个函数式来定义如何获取“其他 publisher”：`Mono#delayUntil(Function)`
 
-* I want to expand elements recursively into a graph of sequences and emit the combination...
-** ...expanding the graph breadth first: `expand(Function)`
-** ...expanding the graph depth first: `expandDeep(Function)`
+* 我想基于一个递归的生成序列的规则扩展每一个元素，然后合并为一个序列发出：
+** ...广度优先：`expand(Function)`
+** ...深度优先：`expandDeep(Function)`
 
 [[which.peeking]]
-== Peeking into a Sequence
-* Without modifying the final sequence, I want to:
-** get notified of / execute additional behavior footnote:[sometimes referred to as "side-effects"] on:
-*** emissions: `doOnNext`
-*** completion: `Flux#doOnComplete`, `Mono#doOnSuccess` (includes the result if any)
-*** error termination: `doOnError`
-*** cancellation: `doOnCancel`
-*** subscription: `doOnSubscribe`
-*** request: `doOnRequest`
-*** completion or error: `doOnTerminate` (Mono version includes the result if any)
-**** but *after* it has been propagated downstream: `doAfterTerminate`
-*** any type of signal, represented as a `Signal`: `Flux#doOnEach`
-*** any terminating condition (complete, error, cancel): `doFinally`
-** log what happens internally: `log`
+== “窥视”（只读）序列
+* 再不对序列造成改变的情况下，我想：
+** 得到通知或执行一些操作：
+*** 发出元素：`doOnNext`
+*** 序列完成：`Flux#doOnComplete`，`Mono#doOnSuccess`
+*** 因错误终止：`doOnError`
+*** 取消：`doOnCancel`
+*** 订阅时：`doOnSubscribe`
+*** 请求时：`doOnRequest`
+*** 完成或错误终止：`doOnTerminate`（Mono的方法可能包含有结果）
+**** 但是在终止信号向下游传递 *之后* ：`doAfterTerminate`
+*** 所有类型的信号（`Signal`）：`Flux#doOnEach`
+*** 所有结束的情况（完成complete、错误error、取消cancel）：`doFinally`
+** 记录日志：`log`
 
-* I want to know of all events:
-** each represented as `Signal` object:
-*** in a callback outside the sequence: `doOnEach`
-*** instead of the original onNext emissions: `materialize`
-**** ...and get back to the onNexts: `dematerialize`
-** as a line in a log: `log`
+* 我想知道所有的事件:
+** 每一个事件都体现为一个 `single` 对象：
+*** 执行 callback：`doOnEach`
+*** 每个元素转化为 `single` 对象：`materialize`
+**** ...在转化回元素：`dematerialize`
+** 转化为一行日志：`log`
 
 [[which.filtering]]
-== Filtering a Sequence
-* I want to filter a sequence:
-** based on an arbitrary criteria: `filter`
-*** ...that is asynchronously computed: `filterWhen`
-** restricting on the type of the emitted objects: `ofType`
-** by ignoring the values altogether: `ignoreElements`
-** by ignoring duplicates:
-*** in the whole sequence (logical set): `Flux#distinct`
-*** between subsequently emitted items (deduplication): `Flux#distinctUntilChanged`
+== 过滤序列
+* 我想过滤一个序列
+** 基于给定的判断条件：`filter`
+*** ...异步地进行判断：`filterWhen`
+** 仅限于指定类型的对象：`ofType`
+** 忽略所有元素：`ignoreElements`
+** 去重:
+*** 对于整个序列：`Flux#distinct`
+*** 去掉连续重复的元素：`Flux#distinctUntilChanged`
 
-* I want to keep only a subset of the sequence:
-** by taking N elements:
-*** at the beginning of the sequence: `Flux#take(long)`
-**** ...based on a duration: `Flux#take(Duration)`
-**** ...only the first element, as a `Mono`: `Flux#next()`
-**** ...using `request(N)` rather than cancellation: `Flux#limitRequest(long)`
-*** at the end of the sequence: `Flux#takeLast`
-*** until a criteria is met (inclusive): `Flux#takeUntil` (predicate-based), `Flux#takeUntilOther` (companion publisher-based)
-*** while a criteria is met (exclusive): `Flux#takeWhile`
-** by taking at most 1 element:
-*** at a specific position: `Flux#elementAt`
-*** at the end: `.takeLast(1)`
-**** ...and emit an error if empty: `Flux#last()`
-**** ...and emit a default value if empty: `Flux#last(T)`
-** by skipping elements:
-*** at the beginning of the sequence: `Flux#skip(long)`
-**** ...based on a duration: `Flux#skip(Duration)`
-*** at the end of the sequence: `Flux#skipLast`
-*** until a criteria is met (inclusive): `Flux#skipUntil` (predicate-based), `Flux#skipUntilOther` (companion publisher-based)
-*** while a criteria is met (exclusive): `Flux#skipWhile`
-** by sampling items:
-*** by duration: `Flux#sample(Duration)`
-**** but keeping the first element in the sampling window instead of the last: `sampleFirst`
-*** by a publisher-based window: `Flux#sample(Publisher)`
-*** based on a publisher "timing out": `Flux#sampleTimeout` (each element triggers a publisher, and is emitted if that publisher does not overlap with the next)
+* 我只想要一部分序列：
+** 只要 N 个元素：
+*** 从序列的第一个元素开始算：`Flux#take(long)`
+**** ...取一段时间内发出的元素：`Flux#take(Duration)`
+**** ...只取第一个元素放到 `Mono` 中返回：`Flux#next()`
+**** ...使用 `request(N)` 而不是取消：`Flux#limitRequest(long)`
+*** 从序列的最后一个元素倒数：`Flux#takeLast`
+*** 直到满足某个条件（包含）：`Flux#takeUntil`（基于判断条件），`Flux#takeUntilOther`（基于对 publisher 的比较）
+*** 直到满足某个条件（不包含）：`Flux#takeWhile`
+** 最多只取 1 个元素：
+*** 给定序号：`Flux#elementAt`
+*** 最后一个：`.takeLast(1)`
+**** ...如果为序列空则发出错误信号：`Flux#last()`
+**** ...如果序列为空则返回默认值：`Flux#last(T)`
+** 跳过一些元素：
+*** 从序列的第一个元素开始跳过：`Flux#skip(long)`
+**** ...跳过一段时间内发出的元素：`Flux#skip(Duration)`
+*** 跳过最后的 n 个元素：`Flux#skipLast`
+*** 直到满足某个条件（包含）：`Flux#skipUntil`（基于判断条件），`Flux#skipUntilOther` （基于对 publisher 的比较）
+*** 直到满足某个条件（不包含）：`Flux#skipWhile`
+** 采样：
+*** 给定采样周期：`Flux#sample(Duration)`
+**** 取采样周期里的第一个元素而不是最后一个：`sampleFirst`
+*** 基于另一个 publisher：`Flux#sample(Publisher)`
+*** 基于 publisher“超时”：`Flux#sampleTimeout` （每一个元素会触发一个 publisher，如果这个 publisher 不被下一个元素触发的 publisher 覆盖就发出这个元素）
 
-* I expect at most 1 element (error if more than one)...
-** and I want an error if the sequence is empty: `Flux#single()`
-** and I want a default value if the sequence is empty: `Flux#single(T)`
-** and I accept an empty sequence as well: `Flux#singleOrEmpty`
+* 我只想要一个元素（如果多于一个就返回错误）...
+** 如果序列为空，发出错误信号：`Flux#single()`
+** 如果序列为空，发出一个缺省值：`Flux#single(T)`
+** 如果序列为空就返回一个空序列：`Flux#singleOrEmpty`
 
 
 
 [[which.errors]]
-== Handling Errors
-* I want to create an erroring sequence: `error`...
-** ...to replace the completion of a successful `Flux`: `.concat(Flux.error(e))`
-** ...to replace the *emission* of a successful `Mono`: `.then(Mono.error(e))`
-** ...if too much time elapses between onNexts: `timeout`
-** ...lazily: `error(Supplier<Throwable>)`
+== 错误处理
+* 我想创建一个错误序列：`error`...
+** ...替换一个完成的 `Flux`：`.concat(Flux.error(e))`
+** ...替换一个完成的 `Mono`：`.then(Mono.error(e))`
+** ...如果元素超时未发出：`timeout`
 
-* I want the try/catch equivalent of:
-** throwing: `error`
-** catching an exception:
-*** and falling back to a default value: `onErrorReturn`
-*** and falling back to another `Flux` or `Mono`: `onErrorResume`
-*** and wrapping and re-throwing: `.onErrorMap(t -> new RuntimeException(t))`
-** the finally block: `doFinally`
-** the using pattern from Java 7: `using` factory method
+* 我想要类似 try/catch 的表达方式：
+** 抛出异常：`error`
+** 捕获异常：
+*** 然后返回缺省值：`onErrorReturn`
+*** 然后返回一个 `Flux` 或 `Mono`：`onErrorResume`
+*** 包装异常后再抛出：`.onErrorMap(t -> new RuntimeException(t))`
+** finally 代码块：`doFinally`
+** Java 7 之后的 try-with-resources 写法：`using` 工厂方法
 
-* I want to recover from errors...
-** by falling back:
-*** to a value: `onErrorReturn`
-*** to a `Publisher` or `Mono`, possibly different ones depending on the error: `Flux#onErrorResume` and `Mono#onErrorResume`
-** by retrying: `retry`
-*** ...triggered by a companion control Flux: `retryWhen`
+* 我想从错误中恢复...
+** 返回一个缺省的：
+*** 的值：`onErrorReturn`
+*** `Publisher`：`Flux#onErrorResume` 和 `Mono#onErrorResume`
+** 重试：`retry`
+*** ...由一个用于伴随 Flux 触发：`retryWhen`
 
-* I want to deal with backpressure "errors"footnote:[request max from upstream and apply the strategy when downstream does not produce enough request]...
-** by throwing a special `IllegalStateException`: `Flux#onBackpressureError`
-** by dropping excess values: `Flux#onBackpressureDrop`
-*** ...except the last one seen: `Flux#onBackpressureLatest`
-** by buffering excess values (bounded or unbounded): `Flux#onBackpressureBuffer`
-*** ...and applying a strategy when bounded buffer also overflows: `Flux#onBackpressureBuffer` with a `BufferOverflowStrategy`
+* 我想处理回压错误（向上游发出“MAX”的 request，如果下游的 request 比较少，则应用策略）...
+** 抛出 `IllegalStateException`：`Flux#onBackpressureError`
+** 丢弃策略：`Flux#onBackpressureDrop`
+*** ...但是不丢弃最后一个元素：`Flux#onBackpressureLatest`
+** 缓存策略（有限或无限）：`Flux#onBackpressureBuffer`
+*** ...当有限的缓存空间用满则应用给定策略：`Flux#onBackpressureBuffer` 带有策略 `BufferOverflowStrategy`
 
 [[which.time]]
-== Working with Time
-* I want to associate emissions with a timing (`Tuple2<Long, T>`) measured...
-** since subscription: `elapsed`
-** since the dawn of time (well, computer time): `timestamp`
+== 基于时间的操作
+* 我想将元素转换为带有时间信息的 `Tuple2<Long, T>`...
+** 从订阅时开始：`elapsed`
+** 记录时间戳：`timestamp`
 
-* I want my sequence to be interrupted if there is too much delay between emissions: `timeout`
+* 如果元素间延迟过长则中止序列：`timeout`
 
-* I want to get ticks from a clock, regular time intervals: `Flux#interval`
+* 以固定的周期发出元素：`Flux#interval`
 
-* I want to emit a single `0` after an initial delay: static `Mono.delay`.
+* 在一个给定的延迟后发出 `0`：static `Mono.delay`.
 
-* I want to introduce a delay:
-** between each onNext signal: `Mono#delayElement`, `Flux#delayElements`
-** before the subscription happens: `delaySubscription`
+* 我想引入延迟：
+** 对每一个元素：`Mono#delayElement`，`Flux#delayElements`
+** 延迟订阅：`delaySubscription`
 
 [[which.window]]
-== Splitting a `Flux`
-* I want to split a `Flux<T>` into a `Flux<Flux<T>>`, by a boundary criteria:
-** of size: `window(int)`
-*** ...with overlapping or dropping windows: `window(int, int)`
-** of time `window(Duration)`
-*** ...with overlapping or dropping windows: `window(Duration, Duration)`
-** of size OR time (window closes when count is reached or timeout elapsed): `windowTimeout(int, Duration)`
-** based on a predicate on elements: `windowUntil`
-*** ...…emitting the element that triggered the boundary in the next window (`cutBefore` variant): `.windowUntil(predicate, true)`
-*** ...keeping the window open while elements match a predicate: `windowWhile` (non-matching elements are not emitted)
-** driven by an arbitrary boundary represented by onNexts in a control Publisher: `window(Publisher)`, `windowWhen`
+== 拆分 `Flux`
+* 我想将一个 `Flux<T>` 拆分为一个 `Flux<Flux<T>>`：
+** 以个数为界：`window(int)`
+*** ...会出现重叠或丢弃的情况：`window(int, int)`
+** 以时间为界：`window(Duration)`
+*** ...会出现重叠或丢弃的情况：`window(Duration, Duration)`
+** 以个数或时间为界：`windowTimeout(int, Duration)`
+** 基于对元素的判断条件：`windowUntil`
+*** ...触发判断条件的元素会分到下一波（`cutBefore` 变量）：`.windowUntil(predicate, true)`
+*** ...满足条件的元素在一波，直到不满足条件的元素发出开始下一波：`windowWhile` （不满足条件的元素会被丢弃）
+** 通过另一个 Publisher 的每一个 onNext 信号来拆分序列：`window(Publisher)`，`windowWhen`
 
-* I want to split a `Flux<T>` and buffer elements within boundaries together...
-** into `List`:
-*** by a size boundary: `buffer(int)`
-**** ...with overlapping or dropping buffers: `buffer(int, int)`
-*** by a duration boundary: `buffer(Duration)`
-**** ...with overlapping or dropping buffers: `buffer(Duration, Duration)`
-*** by a size OR duration boundary: `bufferTimeout(int, Duration)`
-*** by an arbitrary criteria boundary: `bufferUntil(Predicate)`
-**** ...putting the element that triggered the boundary in the next buffer: `.bufferUntil(predicate, true)`
-**** ...buffering while predicate matches and dropping the element that triggered the boundary: `bufferWhile(Predicate)`
-*** driven by an arbitrary boundary represented by onNexts in a control Publisher: `buffer(Publisher)`, `bufferWhen`
-** into an arbitrary "collection" type `C`: use variants like `buffer(int, Supplier<C>)`
+* 我想将一个 `Flux<T>` 的元素拆分到集合...
+** 拆分为一个一个的 `List`:
+*** 以个数为界：`buffer(int)`
+**** ...会出现重叠或丢弃的情况：`buffer(int, int)`
+*** 以时间为界：`buffer(Duration)`
+**** ...会出现重叠或丢弃的情况：`buffer(Duration, Duration)`
+*** 以个数或时间为界：`bufferTimeout(int, Duration)`
+*** 基于对元素的判断条件：`bufferUntil(Predicate)`
+**** ...触发判断条件的元素会分到下一个buffer：`.bufferUntil(predicate, true)`
+**** ...满足条件的元素在一个buffer，直到不满足条件的元素发出开始下一buffer：`bufferWhile(Predicate)`
+*** 通过另一个 Publisher 的每一个 onNext 信号来拆分序列：`buffer(Publisher)`，`bufferWhen`
+** 拆分到指定类型的 "collection"：`buffer(int, Supplier<C>)`
 
-* I want to split a `Flux<T>` so that element that share a characteristic end up in the same sub-flux: `groupBy(Function<T,K>)`
-TIP: Note that this returns a `Flux<GroupedFlux<K, T>>`, each inner `GroupedFlux` shares the same `K` key accessible through `key()`.
+* 我想将 `Flux<T>` 中具有共同特征的元素分组到子 Flux：`groupBy(Function<T,K>)`
+TIP：注意返回值是 `Flux<GroupedFlux<K, T>>`，每一个 `GroupedFlux` 具有相同的 key 值 `K`，可以通过 `key()` 方法获取。
 
 [[which.blocking]]
-== Going Back to the Synchronous World
-* I have a `Flux<T>` and I want to:
-** block until I can get the first element: `Flux#blockFirst`
-*** ...with a timeout: `Flux#blockFirst(Duration)`
-** block until I can get the last element (or null if empty): `Flux#blockLast`
-*** ...with a timeout: `Flux#blockLast(Duration)`
-** synchronously switch to an `Iterable<T>`: `Flux#toIterable`
-** synchronously switch to a Java 8 `Stream<T>`: `Flux#toStream`
+== 回到同步的世界
+* 我有一个 `Flux<T>`，我想：
+** 在拿到第一个元素前阻塞：`Flux#blockFirst`
+*** ...并给出超时时限：`Flux#blockFirst(Duration)`
+** 在拿到最后一个元素前阻塞（如果序列为空则返回 null）：`Flux#blockLast`
+*** ...并给出超时时限：`Flux#blockLast(Duration)`
+** 同步地转换为 `Iterable<T>`：`Flux#toIterable`
+** 同步地转换为 Java 8 `Stream<T>`：`Flux#toStream`
 
-* I have a `Mono<T>` and I want:
-** to block until I can get the value: `Mono#block`
-*** ...with a timeout: `Mono#block(Duration)`
-** a `CompletableFuture<T>`: `Mono#toFuture`
+* 我有一个 `Mono<T>`，我想：
+** 在拿到元素前阻塞：`Mono#block`
+*** ...并给出超时时限：`Mono#block(Duration)`
+** 转换为 `CompletableFuture<T>`：`Mono#toFuture`
