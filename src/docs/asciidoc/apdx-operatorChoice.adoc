@@ -1,5 +1,5 @@
 [[which-operator]]
-= 我需要哪个操作符（operator）呢？
+= 我需要哪个操作符？
 TIP：在这一节，如果一个操作符是专属于 `Flux` 或 `Mono` 的，那么会给它注明前缀。
 公共的操作符没有前缀。如果一个具体的用例涉及多个操作符的组合，这里以方法调用的方式展现，
 会以一个点（.）开头，并将参数置于圆括号内，比如： `.methodCall(parameter)`。
@@ -13,8 +13,6 @@ TIP：在这一节，如果一个操作符是专属于 `Flux` 或 `Mono` 的，�
 * <<which.create>>
 
 * <<which.values>>
-
-* <<which.filtering>>
 
 * <<which.peeking>>
 
