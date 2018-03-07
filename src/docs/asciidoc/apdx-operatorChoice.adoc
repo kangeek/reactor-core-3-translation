@@ -14,6 +14,8 @@ TIP：在这一节，如果一个操作符是专属于 `Flux` 或 `Mono` 的，�
 
 * <<which.values>>
 
+* <<which.filtering>>
+
 * <<which.peeking>>
 
 * <<which.errors>>
@@ -43,6 +45,7 @@ TIP：在这一节，如果一个操作符是专属于 `Flux` 或 `Mono` 的，�
 ** 一个 `CompletableFuture<T>`：`Mono#fromFuture`
 * 直接完成：`empty`
 * 立即生成错误：`error`
+** ...但是“懒”的方式生成 `Throwable`：`error(Supplier<Throwable>)`
 * 什么都不做：`never`
 * 订阅时才决定：`defer`
 * 依赖一个可回收的资源：`using`
@@ -63,6 +66,10 @@ TIP：在这一节，如果一个操作符是专属于 `Flux` 或 `Mono` 的，�
 *** ...忽略一些数据：在 flatMap lambda 中根据条件返回一个 `Mono.empty()`
 *** ...保留原来的序列顺序：`Flux#flatMapSequential`（对每个元素的异步任务会立即执行，但会将结果按照原序列顺序排序）
 *** ...当 Mono 元素的异步任务会返回多个元素的序列时：`Mono#flatMapMany`
+
+* 我想添加一些数据元素到一个现有的序列：
+** 在开头添加：`Flux#startWith(T...)`
+** 在最后添加：`Flux#concatWith(T...)`
 
 * 我想将 `Flux` 转化为集合（一下都是针对 `Flux` 的）
 ** 转化为 List：`collectList`，`collectSortedList`
@@ -109,6 +116,7 @@ TIP：在这一节，如果一个操作符是专属于 `Flux` 或 `Mono` 的，�
 ** ...并且我希望用 `Mono` 来表示序列已经结束：`then`
 ** ...并且我想在序列结束后等待另一个任务完成：`thenEmpty`
 ** ...并且我想在序列结束之后返回一个 `Mono`：`Mono#then(mono)`
+** ...并且我想在序列结束之后返回一个值：`Mono#thenReturn(T)`
 ** ...并且我想在序列结束之后返回一个 `Flux`：`thenMany`
 
 * 我有一个 Mono 但我想延迟完成...
@@ -192,6 +200,7 @@ TIP：在这一节，如果一个操作符是专属于 `Flux` 或 `Mono` 的，�
 ** ...替换一个完成的 `Flux`：`.concat(Flux.error(e))`
 ** ...替换一个完成的 `Mono`：`.then(Mono.error(e))`
 ** ...如果元素超时未发出：`timeout`
+** ...“懒”创建：`error(Supplier<Throwable>)`
 
 * 我想要类似 try/catch 的表达方式：
 ** 抛出异常：`error`

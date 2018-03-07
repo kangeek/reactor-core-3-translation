@@ -1,21 +1,20 @@
 [[about-doc]]
 = 关于本文档
 :linkattrs:
-本节是对 Reactor参考文档（译者加：原文一会儿“document”一会儿“guide”，不影响理解的情况下，
-翻译就一律用“文档”了哈） 的简要概述。你并不需要从头到尾阅读该文档。每一节的内容都是独立
-的，不过会有其他章节的链接。
+本节是对 Reactor参考文档（译者加：原文估计是多个人写的，时而“document”时而“guide”，不影响理解的情况下，
+翻译就一律用“文档”了） 的简要概述。你并不需要从头到尾阅读该文档。每一节的内容都是独立的，不过会有其他章节的链接。
 
 == 最新版本 & 版权说明
-本Reactor参考文档也提供HTML形式。最新版本见 http://projectreactor.io/docs/core/release/reference/docs/index.html
+本Reactor参考文档也提供HTML形式。最新版本见 http://projectreactor.io/docs/core/release/reference/docs/index.html。
 
 本文档的副本你可以自用，亦可分发给他人。不过无论是打印版还是电子版，请免费提供。
 
 == 贡献本文档
 本参考文档用 http://asciidoctor.org/docs/asciidoc-writers-guide/[Asciidoc] 编写，
 其源码见 https://github.com/reactor/reactor-core/tree/master/src/docs/asciidoc
-（译者加：本翻译见 https://github.com/get-set/reactor-core/tree/master-zh/src/docs/asciidoc ）。
+（译者加：本翻译源码见 https://github.com/get-set/reactor-core/tree/master-zh/src/docs/asciidoc ）。
 
-如有任何补充，我们欢迎你提交 pull request。
+如有任何补充，欢迎你提交 pull request。
 
 我们建议你将源码 checkout 到本地，这样可以使用 gradle 的 `asciidoctor` 任务检查文档渲染效果。
 有些章节会包含其他文件，Github 并不一定能够渲染出来。
@@ -40,7 +39,7 @@ http://github.com/reactor/reactor-core/issues[reactor-core] （涉及 Reactor �
 NOTE: 所有 Reactor 项目都是开源的，
 https://github.com/reactor/reactor-core/tree/master/src/docs/asciidoc[包括本文档]。
 如果你发现本文档有问题，或希望补充一些内容，请参考
-https://github.com/reactor/reactor-core/blob/master/CONTRIBUTING.md[这里]进行了解。
+https://github.com/reactor/reactor-core/blob/master/CONTRIBUTING.md[这里] 进行了解。
 
 == 如何开始阅读本文档
 * 如果你想直接写代码请参考 <<getting-started>> 。
@@ -48,9 +47,9 @@ https://github.com/reactor/reactor-core/blob/master/CONTRIBUTING.md[这里]进�
 * 如果你对 Reactor 的理念比较熟悉，只是在编写程序时查找合适的操作符， 请参考附录
  <<which-operator>> 。
 * 如果你想深入了解 Reactor 的核心功能，请参考 <<core-features>>，以便了解：
-** 关于 Reactor 的响应式类型 "<<flux>>" 和 "<<mono>>"。
-** 如何调整执行的线程环境： <<schedulers,a Scheduler>>.
-** 如何处理问题： <<error.handling>> .
+** 关于 Reactor 的响应式类型 "<<flux>>" 和 "<<mono>>"；
+** 如何调整执行的线程环境： <<schedulers,调度器>>；
+** 如何处理问题： <<error.handling>>。
 * 单测的内容主要来自 `reactor-test` 项目，参考 <<testing>>。
 * <<producing>> 提供了更加丰富的创建响应式源（reactive source）的方式。
 * 其他高级主题请看参考 <<advanced>>。

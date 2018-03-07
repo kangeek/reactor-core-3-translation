@@ -12,20 +12,19 @@
 == 介绍 Reactor
 
 Reactor 是一个用于JVM的完全非阻塞的响应式编程框架，具备高效的需求管理（即对
-“背压（backpressure）”的控制）。它与 Java 8 函数式 API 直接继承，比如 `CompletableFuture`，
-`Stream`， 以及`Duration`。它提供了异步序列 API `Flux`（用于[N]个元素）和 `Mono`（用于
-[0|1]个元素），从而完整实现了“响应式扩展规范”（Reactive Extensions Specification）。
+“背压（backpressure）”的控制）能力。它与 Java 8 函数式 API 直接集成，比如 `CompletableFuture`，
+`Stream`， 以及 `Duration`。它提供了异步序列 API `Flux`（用于[N]个元素）和 `Mono`（用于
+[0|1]个元素），并完全遵循和实现了“响应式扩展规范”（Reactive Extensions Specification）。
 
 Reactor 的 `reactor-ipc` 组件还支持非阻塞的进程间通信（inter-process communication, IPC）。
-Reactor IPC 为HTTP（包括 Websockets）、TCP 和 UDP 提供了支持背压的网络引擎，从而适合
+Reactor IPC 为 HTTP（包括 Websockets）、TCP 和 UDP 提供了支持背压的网络引擎，从而适合
 应用于微服务架构。并且完整支持响应式编解码（reactive encoding and decoding）。
 
 [[prerequisites]]
 == 前提
-Reactor Core runs on `Java 8` and above.
 Reactor Core 运行于 `Java 8` 及以上版本。
 
-依赖于 `org.reactive-streams:reactive-streams:1.0.2`。
+依赖 `org.reactive-streams:reactive-streams:1.0.2`。
 
 [NOTE]
 ====
@@ -39,11 +38,11 @@ Reactor Core 运行于 `Java 8` 及以上版本。
 [[getting-started-understanding-bom]]
 == 了解 BOM
 自从 `reactor-core 3.0.4`，随着 `Aluminium` 版本发布上车（release train）以来，Reactor 3
-使用了 BOM（Bill of Materials - 一种标准的 Maven artifact）。
+使用了 BOM（Bill of Materials，一种标准的 Maven artifact）。
 
 使用 BOM 可以管理一组良好集成的 maven artifacts，从而无需操心不同版本组件的互相依赖问题。
 
-BOM 是一系列能够有版本的 artifacts，通过“发布列车”（release train）的发布方式管理，
+BOM 是一系列有版本信息的 artifacts，通过“列车发布”（release train）的发布方式管理，
 每趟发布列车由一个“代号+修饰词”组成，比如：
 
 [verse]
@@ -53,7 +52,7 @@ Aluminium-SR1
 Bismuth-RELEASE
 Carbon-SR32
 
-代号替代了传统的 主版本.次版本 的数字形式。这些代号主要来自
+代号替代了传统的“主版本.次版本”的数字形式。这些代号主要来自
 https://en.wikipedia.org/wiki/Periodic_table#Overview[Periodic Table of
 Elements]， 按首字母顺序依次选取。
 
@@ -66,10 +65,10 @@ Elements]， 按首字母顺序依次选取。
 
 [[getting]]
 == 获取 Reactor
-前边提到，使用 Reactor的最简单方式是在你的项目中配置 BOM 以及相关依赖。注意，当你添加这样
-的依赖的时候，要省略版本（<version>）配置，从而自动使用 BOM 中指定的版本。
+前边提到，使用 Reactor 的最简单方式是在你的项目中配置 BOM 以及相关依赖。
+注意，当你这样添加依赖的时候，要省略版本（<version>）配置，从而自动使用 BOM 中指定的版本。
 
-当然，如果你希望使用某个版本的 artifact，仍然可以指定。甚至完全不使用 BOM，而是逐个配置
+当然，如果你希望使用某个版本的 artifact，仍然可以指定。甚至完全不使用 BOM，逐个配置
 artifact 的版本也是可以的。
 
 === Maven 配置
