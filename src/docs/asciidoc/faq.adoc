@@ -1,12 +1,10 @@
 [[faq]]
-= FAQ, Best Practices, and "How do I...?"
+= FAQ，最佳实践，以及“我如何...?”
 
 [[faq.wrap-blocking]]
-== How do I wrap a synchronous, blocking call?
+== 如何包装一个同步阻塞的调用？
 
-It's often the case that a source of information is synchronous and blocking.
-To deal with such sources in your Reactor applications, apply the following
-pattern:
+很多时候，信息源是同步和阻塞的。在 Reactor 中，我们用以下方式处理这种信息源：
 
 [source,java]
 ----
@@ -16,49 +14,44 @@ Mono blockingWrapper = Mono.fromCallable(() -> { <1>
 blockingWrapper = blockingWrapper.subscribeOn(Schedulers.elastic()); <3>
 ----
 
-<1> Create a new `Mono` by using `fromCallable`.
-<2> Return the asynchronous, blocking resource.
-<3> Ensure each subscription will happen on a dedicated single-threaded worker
-from `Schedulers.elastic()`.
+<1> 使用 `fromCallable` 方法生成一个 Mono；
+<2> 返回同步、阻塞的资源；
+<3> 使用 `Schedulers.elastic()` 确保对每一个订阅来说运行在一个专门的线程上。
 
-You should use a Mono because the source returns one value. You should use
-`Schedulers.elastic` because it creates a dedicated thread to wait for the
-blocking resource without tying up some other resource.
+因为调用返回一个值，所以你应该使用 Mono。你应该使用 `Schedulers.elastic`
+因为它会创建一个专门的线程来等待阻塞的调用返回。
 
-Note that `subscribeOn` does not subscribe to the `Mono`. It specifies what
-kind of `Scheduler` to use when a subscribe call happens.
+注意 `subscribeOn` 方法并不会“订阅”这个 `Mono`。它只是指定了订阅操作使用哪个 `Scheduler`。
 
 [[faq.chain]]
-== I used an operator on my `Flux` but it doesn't seem to apply. What gives?
+== 用在 `Flux` 上的操作符好像没起作用，为啥？
 
-Make sure that the variable you `.subscribe()` to has been affected by the
-operators you think should have been applied to it.
+请确认你确实对调用 `.subscribe()` 的发布者应用了这个操作符。
 
-Reactor operators are decorators. They return a different instance that wraps
-the source sequence and add behavior. That is why the preferred way of using
-operators is to *chain* the calls.
+Reactor 的操作符是装饰器（decorators）。它们会返回一个不同的（发布者）实例，
+这个实例对上游序列进行了包装并增加了一些的处理行为。所以，最推荐的方式是将操作符“串”起来。
 
-Compare the following two examples:
+对比下边的两个例子：
 
-.without chaining (incorrect)
+.没有串起来（不正确的）
 [source,java]
 ----
 Flux<String> flux = Flux.just("foo", "chain");
 flux.map(secret -> secret.replaceAll(".", "*")); <1>
 flux.subscribe(next -> System.out.println("Received: " + next));
 ----
-<1> The mistake is here. The result isn't attached to the `flux` variable.
+<1> 问题在这， `flux` 变量并没有改变。
 
-.without chaining (correct)
+.串起来（正确的）
 [source,java]
 ----
 Flux<String> flux = Flux.just("foo", "chain");
 flux = flux.map(secret -> secret.replaceAll(".", "*"));
 flux.subscribe(next -> System.out.println("Received: " + next));
 ----
-This sample is even better (because it's simpler):
+下边的例子更好（因为更简洁）：
 
-.with chaining (best)
+.串起来（最好的）
 [source,java]
 ----
 Flux<String> secrets = Flux
@@ -67,7 +60,7 @@ Flux<String> secrets = Flux
   .subscribe(next -> System.out.println("Received: " + next));
 ----
 
-The first version will output:
+第一个例子的输出：
 
 [source]
 ----
@@ -75,7 +68,7 @@ Received: foo
 Received: chain
 ----
 
-Whereas the two other versions will output the expected:
+后两个例子的输出：
 
 [source]
 ----
@@ -84,60 +77,54 @@ Received: *****
 ----
 
 [[faq.monoThen]]
-== My `Mono` `zipWith`/`zipWhen` is never called
+== `Mono` `zipWith`/`zipWhen` 没有被调用
 
-.example
+.例子
 [source,java]
 ----
-myMethod.process("a") // this method returns Mono<Void>
-        .zipWith(myMethod.process("b"), combinator) //this is never called
+myMethod.process("a") // 这个方法返回 Mono<Void>
+        .zipWith(myMethod.process("b"), combinator) //没有被调用
         .subscribe();
 ----
 
-If the source `Mono` is either `empty` or a `Mono<Void>` (a `Mono<Void>` is
-empty for all intents and purposes), some combinations will never be called.
+如果源 `Mono` 为空或是一个 `Mono<Void>`（`Mono<Void>` 通常用于“空”的场景），
+下边的组合操作就不会被调用。
 
-This is the typical case for any transformer like the `zipWith` operator, which by
-definition needs an
-element from each source to produce its output. If any of the sources are
-empty, `and` produces an empty sequence as well, so be careful of its usage.
-For example, using `zipWith()` after a `then()` may cause this problem.
+对于类似 `zipWith` 的用于转换的操作符来说，这是比较典型的场景。
+这些操作符依赖于数据元素来转换为输出的元素。
+如果任何一个序列是空的，则返回的就是一个空序列，所以请谨慎使用。
+例如在 `then()` 之后使用 `zipWith()` 就会导致这一问题。
 
-This is even more true of the variants of `and` that take a `Function`, meaning
-that the associated Mono is chosen lazily depending on the incoming value
-(which never comes in the cases of empty or `Void` sequences).
+对于以 `Function` 作为参数的 `and` 更是如此，因为返回的 Mono
+是依赖于收到的数据懒加载的（而对于空序列或 `Void` 的序列来说是没有数据发出来的）。
 
-You can use `.defaultIfEmpty(T)` to replace an *empty* sequence of `T` (not a
-`Void` sequence) with a default value, which could help avoid some of these
-situations. Here's an example this:
+你可以使用 `.defaultIfEmpty(T)` 将空序列替换为包含 `T` 类型缺省值的序列（而不是 `Void` 序列），
+从而可以避免类似的情况出现。举例如下：
 
-.use `defaultIfEmpty` before `zipWhen`
+.在 `zipWhen` 前使用 `defaultIfEmpty`
 [source,java]
 ----
-myMethod.emptySequenceForKey("a") // this method returns empty Mono<String>
-        .defaultIfEmpty("") // this converts empty sequence to just the empty String
-        .zipWhen(aString -> myMethod.process("b")) //this is called with the empty String
+myMethod.emptySequenceForKey("a") // 这个方法返回一个空的 Mono<String>
+        .defaultIfEmpty("") // 将空序列转换为包含字符串 "" 的序列
+        .zipWhen(aString -> myMethod.process("b")) // 当 "" 发出时被调用
         .subscribe();
 ----
 
 [[faq.retryWhen]]
-== How to use `retryWhen` to emulate `retry(3)`?
-The `retryWhen` operator can be quite complex. Hopefully this snippet of code
-can help you understand how it works by attempting to emulate a simpler
-`retry(3)`:
+== 如何用 `retryWhen` 来实现 `retry(3)` 的效果？
+`retryWhen` 方法比较复杂，希望下边的一段模拟 `retry(3)` 的代码能够帮你更好地理解它的工作方式：
 include::snippetRetryWhenRetry.adoc[]
 
 [[faq.exponentialBackoff]]
-== How to use `retryWhen` for exponential backoff?
-Exponential backoff produces retry attempts with a growing delay between each
-of the attempts, so as not to overload the source systems and risk an all out
-crash. The rationale is that if the source produces an error, it is already in
-an unstable state and not likely to immediately recover from it. So blindly
-retrying immediately is likely to produce yet another error and add to the
-instability.
+== 如何使用 `retryWhen` 进行 exponential backoff？
+Exponential backoff 的意思是进行的多次重试之间的间隔越来越长，
+从而避免对源系统造成过载，甚至宕机。基本原理是，如果源产生了一个错误，
+那么已经是处于不稳定状态，可能不会立刻复原。所以，如果立刻就重试可能会产生另一个错误，
+导致源更加不稳定。
 
-Here is how to implement an exponential backoff that delays retries and increase
-the delay between each attempt (pseudocode: delay = attempt number * 100 milliseconds):
+
+下面是一段实现 exponential backoff 效果的例子，每次重试的间隔都会递增
+（伪代码： delay = attempt number * 100 milliseconds）：
 [source,java]
 ----
 Flux<String> flux =
@@ -152,13 +139,12 @@ Flux.<String>error(new IllegalArgumentException())
         .doOnNext(s -> System.out.println("retried at " + LocalTime.now())) // <4>
     );
 ----
-<1> We log the time of errors.
-<2> We use the `retryWhen` + `zipWith` trick to propagate the error after 3
-retries.
-<3> Through `flatMap`, we cause a delay that depends on the attempt's index.
-<4> We also log the time at which the retry happens.
+<1> 记录错误出现的时间；
+<2> 使用 `retryWhen` + `zipWith` 的技巧实现重试3次的效果；
+<3> 通过 `flatMap` 来实现延迟时间递增的效果；
+<4> 同样记录重试的时间。
 
-When subscribed to, this fails and terminates after printing out:
+订阅它，输出如下：
 ----
 java.lang.IllegalArgumentException at 18:02:29.338
 retried at 18:02:29.459 <1>
@@ -168,22 +154,19 @@ java.lang.IllegalArgumentException at 18:02:29.663
 retried at 18:02:29.964 <3>
 java.lang.IllegalArgumentException at 18:02:29.964
 ----
-<1> first retry after about 100ms
-<2> second retry after about 200ms
-<3> third retry after about 300ms
+<1> 第一次重试延迟大约 100ms
+<2> 第二次重试延迟大约 200ms
+<3> 第三次重试延迟大约 300ms
 
 == How do I ensure thread affinity using `publishOn()`?
 
-As described in <<schedulers, Schedulers>>, `publishOn()` can be used to switch
-execution contexts. The `publishOn` operator influences the threading context
-where the rest of the operators in the chain below it will execute, up to a new
-occurrence of `publishOn`. So the placement of `publishOn` is significant.
+如 <<schedulers, Schedulers>> 所述，`publishOn()` 可以用来切换执行线程。
+`publishOn` 能够影响到其之后的操作符的执行线程，直到有新的 `publishOn` 出现。
+所以 `publishOn` 的位置很重要。
 
-For instance, in the example below, the `transform` function in `map()` is
-executed on a worker of `scheduler1` and the `processNext` method in
-`doOnNext()` is executed on a worker of `scheduler2`. Single threaded
-schedulers may be used to ensure thread affinity for different stages in the
-chain or for different subscribers.
+比如下边的例子， `map()` 中的 `transform` 方法是在 `scheduler1` 的一个工作线程上执行的，
+而 `doOnNext()` 中的 `processNext` 方法是在 `scheduler2` 的一个工作线程上执行的。
+单线程的调度器可能用于对不同阶段的任务或不同的订阅者确保线程关联性。
 
 [source,java]
 ----
