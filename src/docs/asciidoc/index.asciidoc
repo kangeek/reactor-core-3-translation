@@ -28,74 +28,74 @@ sequence这个词，主要翻译为“序列”，有些地方为了更加契合
 
 include::aboutDoc.adoc[leveloffset=1]
 ifeval::["{backend}" == "html5"]
-https://github.com/reactor/reactor-core/edit/master/src/docs/asciidoc/aboutDoc.adoc[Suggest Edit^, title="Suggest an edit to the above section via github", role="fa fa-edit"]
-to "<<about-doc>>"
+https://github.com/get-set/reactor-core/edit/master-zh/src/docs/asciidoc/aboutDoc.adoc[翻译建议^, title="通过Github的编辑功能对以上翻译内容提出建议", role="fa fa-edit"]
+- "<<about-doc>>"
 endif::[]
 
 include::gettingStarted.adoc[leveloffset=1]
 ifeval::["{backend}" == "html5"]
-https://github.com/reactor/reactor-core/edit/master/src/docs/asciidoc/gettingStarted.adoc[Suggest Edit, title="Suggest an edit to the above section via github", role="fa fa-edit"]
-to "<<getting-started>>"
+https://github.com/get-set/reactor-core/edit/master-zh/src/docs/asciidoc/gettingStarted.adoc[翻译建议, title="通过Github的编辑功能对以上翻译内容提出建议", role="fa fa-edit"]
+- "<<getting-started>>"
 endif::[]
 
 include::reactiveProgramming.adoc[leveloffset=1]
 ifeval::["{backend}" == "html5"]
-https://github.com/reactor/reactor-core/edit/master/src/docs/asciidoc/reactiveProgramming.adoc[Suggest Edit, title="Suggest an edit to the above section via github", role="fa fa-edit"]
-to "<<intro-reactive>>"
+https://github.com/get-set/reactor-core/edit/master-zh/src/docs/asciidoc/reactiveProgramming.adoc[翻译建议, title="通过Github的编辑功能对以上翻译内容提出建议", role="fa fa-edit"]
+- "<<intro-reactive>>"
 endif::[]
 
 include::coreFeatures.adoc[leveloffset=1]
 ifeval::["{backend}" == "html5"]
-https://github.com/reactor/reactor-core/edit/master/src/docs/asciidoc/coreFeatures.adoc[Suggest Edit, title="Suggest an edit to the above section via github", role="fa fa-edit"]
-to "<<core-features>>"
+https://github.com/get-set/reactor-core/edit/master-zh/src/docs/asciidoc/coreFeatures.adoc[翻译建议, title="通过Github的编辑功能对以上翻译内容提出建议", role="fa fa-edit"]
+- "<<core-features>>"
 endif::[]
 
 //TODO see other sections from consuming.adoc
 
 include::kotlin.adoc[leveloffset=1]
 ifeval::["{backend}" == "html5"]
-https://github.com/reactor/reactor-core/edit/master/src/docs/asciidoc/kotlin.adoc[Suggest Edit, title="Suggest an edit to the above section via github", role="fa fa-edit"]
-to "<<kotlin>>"
+https://github.com/get-set/reactor-core/edit/master-zh/src/docs/asciidoc/kotlin.adoc[翻译建议, title="通过Github的编辑功能对以上翻译内容提出建议", role="fa fa-edit"]
+- "<<kotlin>>"
 endif::[]
 
 include::testing.adoc[leveloffset=1]
 ifeval::["{backend}" == "html5"]
-https://github.com/reactor/reactor-core/edit/master/src/docs/asciidoc/testing.adoc[Suggest Edit, title="Suggest an edit to the above section via github", role="fa fa-edit"]
-to "<<testing>>"
+https://github.com/get-set/reactor-core/edit/master-zh/src/docs/asciidoc/testing.adoc[翻译建议, title="通过Github的编辑功能对以上翻译内容提出建议", role="fa fa-edit"]
+- "<<testing>>"
 endif::[]
 
 include::debugging.adoc[leveloffset=1]
 ifeval::["{backend}" == "html5"]
-https://github.com/reactor/reactor-core/edit/master/src/docs/asciidoc/debugging.adoc[Suggest Edit, title="Suggest an edit to the above section via github", role="fa fa-edit"]
-to "<<debugging>>"
+https://github.com/get-set/reactor-core/edit/master-zh/src/docs/asciidoc/debugging.adoc[翻译建议, title="通过Github的编辑功能对以上翻译内容提出建议", role="fa fa-edit"]
+- "<<debugging>>"
 endif::[]
 
 include::advancedFeatures.adoc[leveloffset=1]
 ifeval::["{backend}" == "html5"]
-https://github.com/reactor/reactor-core/edit/master/src/docs/asciidoc/advancedFeatures.adoc[Suggest Edit, title="Suggest an edit to the above section via github", role="fa fa-edit"]
-to "<<advanced>>"
+https://github.com/get-set/reactor-core/edit/master-zh/src/docs/asciidoc/advancedFeatures.adoc[翻译建议, title="通过Github的编辑功能对以上翻译内容提出建议", role="fa fa-edit"]
+- "<<advanced>>"
 endif::[]
 
 
 [appendix]
 include::apdx-operatorChoice.adoc[leveloffset=1]
 ifeval::["{backend}" == "html5"]
-https://github.com/reactor/reactor-core/edit/master/src/docs/asciidoc/apdx-operatorChoice.adoc[Suggest Edit, title="Suggest an edit to the above section via github", role="fa fa-edit"]
-to "<<which-operator>>"
+https://github.com/get-set/reactor-core/edit/master-zh/src/docs/asciidoc/apdx-operatorChoice.adoc[翻译建议, title="通过Github的编辑功能对以上翻译内容提出建议", role="fa fa-edit"]
+- "<<which-operator>>"
 endif::[]
 
 [appendix]
 include::faq.adoc[leveloffset=1]
 ifeval::["{backend}" == "html5"]
-https://github.com/reactor/reactor-core/edit/master/src/docs/asciidoc/faq.adoc[Suggest Edit, title="Suggest an edit to the above section via github", role="fa fa-edit"]
-to "<<faq>>"
+https://github.com/get-set/reactor-core/edit/master-zh/src/docs/asciidoc/faq.adoc[翻译建议, title="通过Github的编辑功能对以上翻译内容提出建议", role="fa fa-edit"]
+- "<<faq>>"
 endif::[]
 
 [appendix]
 include::apdx-reactorExtra.adoc[leveloffset=1]
 ifeval::["{backend}" == "html5"]
-https://github.com/reactor/reactor-core/edit/master/src/docs/asciidoc/apdx-reactorExtra.adoc[Suggest Edit, title="Suggest an edit to the above section via github", role="fa fa-edit"]
-to "<<reactor-extra>>"
+https://github.com/get-set/reactor-core/edit/master-zh/src/docs/asciidoc/apdx-reactorExtra.adoc[翻译建议, title="通过Github的编辑功能对以上翻译内容提出建议", role="fa fa-edit"]
+- "<<reactor-extra>>"
 endif::[]
 
 //TODO later add appendices about internals, writing operators, fusion
