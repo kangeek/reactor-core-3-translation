@@ -22,7 +22,7 @@
 ifeval::["{backend}" == "html5"]
 TIP: 为了方便读者的反馈，多数章节在结尾都提供一个链接，这个链接可以打开一个 Github 上的
 编辑界面，从而可以编辑相应章节的源码。这些链接在 HTML5 的版本中能够看到，就像这样：
-link:https://github.com/get-set/reactor-core/edit/master-zh/src/docs/asciidoc/aboutDoc.adoc[Suggest Edit^, role="fa fa-edit"] - <<about-doc>>。
+link:https://github.com/get-set/reactor-core/edit/master-zh/src/docs/asciidoc/aboutDoc.adoc[翻译建议^, role="fa fa-edit"] - <<about-doc>>。
 endif::[]
 
 == 获取帮助

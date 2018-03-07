@@ -2227,8 +2227,8 @@ table.CodeRay td.code>pre{padding:0}
 </li>
 <li><a href="#core-features">4. Reactor 核心特性</a>
 <ul class="sectlevel2">
-<li><a href="#flux">4.1. <code>Flux</code>, 一个包含 0-N 个元素的异步序列</a></li>
-<li><a href="#mono">4.2. <code>Mono</code>, 一种异步的 0-1 结果</a></li>
+<li><a href="#flux">4.1. <code>Flux</code>, 包含 0-N 个元素的异步序列</a></li>
+<li><a href="#mono">4.2. <code>Mono</code>, 异步的 0-1 结果</a></li>
 <li><a href="#_简单的创建和订阅_flux_或_mono_的方法">4.3. 简单的创建和订阅 Flux 或 Mono 的方法</a></li>
 <li><a href="#producing">4.4. 可编程式地创建一个序列</a></li>
 <li><a href="#schedulers">4.5. 调度器（Schedulers）</a></li>
@@ -2276,34 +2276,34 @@ table.CodeRay td.code>pre{padding:0}
 <li><a href="#null-safety">8.9. 空值安全</a></li>
 </ul>
 </li>
-<li><a href="#which-operator">Appendix A: Which operator do I need?</a>
+<li><a href="#which-operator">Appendix A: 我需要哪个操作符？</a>
 <ul class="sectlevel2">
-<li><a href="#which.create">A.1. Creating a New Sequence&#8230;&#8203;</a></li>
-<li><a href="#which.values">A.2. Transforming an Existing Sequence</a></li>
-<li><a href="#which.peeking">A.3. Peeking into a Sequence</a></li>
-<li><a href="#which.filtering">A.4. Filtering a Sequence</a></li>
-<li><a href="#which.errors">A.5. Handling Errors</a></li>
-<li><a href="#which.time">A.6. Working with Time</a></li>
-<li><a href="#which.window">A.7. Splitting a <code>Flux</code></a></li>
-<li><a href="#which.blocking">A.8. Going Back to the Synchronous World</a></li>
+<li><a href="#which.create">A.1. 创建一个新序列，它&#8230;&#8203;</a></li>
+<li><a href="#which.values">A.2. 对序列进行转化</a></li>
+<li><a href="#which.peeking">A.3. “窥视”（只读）序列</a></li>
+<li><a href="#which.filtering">A.4. 过滤序列</a></li>
+<li><a href="#which.errors">A.5. 错误处理</a></li>
+<li><a href="#which.time">A.6. 基于时间的操作</a></li>
+<li><a href="#which.window">A.7. 拆分 <code>Flux</code></a></li>
+<li><a href="#which.blocking">A.8. 回到同步的世界</a></li>
 </ul>
 </li>
-<li><a href="#faq">Appendix B: FAQ, Best Practices, and "How do I&#8230;&#8203;?"</a>
+<li><a href="#faq">Appendix B: FAQ，最佳实践，以及“我如何&#8230;&#8203;?”</a>
 <ul class="sectlevel2">
-<li><a href="#faq.wrap-blocking">B.1. How do I wrap a synchronous, blocking call?</a></li>
-<li><a href="#faq.chain">B.2. I used an operator on my <code>Flux</code> but it doesn&#8217;t seem to apply. What gives?</a></li>
-<li><a href="#faq.monoThen">B.3. My <code>Mono</code> <code>zipWith</code>/<code>zipWhen</code> is never called</a></li>
-<li><a href="#faq.retryWhen">B.4. How to use <code>retryWhen</code> to emulate <code>retry(3)</code>?</a></li>
-<li><a href="#faq.exponentialBackoff">B.5. How to use <code>retryWhen</code> for exponential backoff?</a></li>
+<li><a href="#faq.wrap-blocking">B.1. 如何包装一个同步阻塞的调用？</a></li>
+<li><a href="#faq.chain">B.2. 用在 <code>Flux</code> 上的操作符好像没起作用，为啥？</a></li>
+<li><a href="#faq.monoThen">B.3. <code>Mono</code> <code>zipWith</code>/<code>zipWhen</code> 没有被调用</a></li>
+<li><a href="#faq.retryWhen">B.4. 如何用 <code>retryWhen</code> 来实现 <code>retry(3)</code> 的效果？</a></li>
+<li><a href="#faq.exponentialBackoff">B.5. 如何使用 <code>retryWhen</code> 进行 exponential backoff？</a></li>
 <li><a href="#_how_do_i_ensure_thread_affinity_using_code_publishon_code">B.6. How do I ensure thread affinity using <code>publishOn()</code>?</a></li>
 </ul>
 </li>
 <li><a href="#reactor-extra">Appendix C: Reactor-Extra</a>
 <ul class="sectlevel2">
-<li><a href="#extra-tuples">C.1. <code>TupleUtils</code> and Functional Interfaces</a></li>
-<li><a href="#extra-math">C.2. Math Operators With <code>MathFlux</code></a></li>
-<li><a href="#extra-repeat-retry">C.3. Repeat and Retry Utilities</a></li>
-<li><a href="#extra-schedulers">C.4. Schedulers</a></li>
+<li><a href="#extra-tuples">C.1. <code>TupleUtils</code> 以及函数式接口</a></li>
+<li><a href="#extra-math">C.2. <code>MathFlux</code> 的数学操作符</a></li>
+<li><a href="#extra-repeat-retry">C.3. 重复与重试工具</a></li>
+<li><a href="#extra-schedulers">C.4. 调度器</a></li>
 </ul>
 </li>
 </ul>
@@ -2328,8 +2328,8 @@ table.CodeRay td.code>pre{padding:0}
 <p><code>Publisher</code>（发布者）、<code>Subscriber</code>（订阅者）、<code>Subscription</code>（订阅 n.）、<code>subscribe</code>（订阅 v.）。</p>
 </li>
 <li>
-<p><code>event</code>/<code>signal</code>（事件/信号，不爽的是原文经常甚至在一个句子将两个词来回用，但表示的意思是相同的，
-因此如果你看到本文翻译有时候用事件，有时候用信号，在本文档内可以认为一个意思）。</p>
+<p><code>event</code>/<code>signal</code>（事件/信号，原文常甚至在一个句子将两个词来回用，但表示的意思是基本相同的，
+因此如果你看到本文翻译有时候用事件，有时候用信号，在本文档内基本可以认为一个意思）。</p>
 </li>
 <li>
 <p><code>sequence</code>/<code>stream</code>（序列/流，两个词意思相似，本文介绍的是响应式流的内容，但是出现比较多的是
@@ -2339,11 +2339,11 @@ sequence这个词，主要翻译为“序列”，有些地方为了更加契合
 <p><code>element</code>/<code>item</code>（主要指序列中的元素，文中两个词基本翻译为“元素”）。</p>
 </li>
 <li>
-<p><code>emit</code>/<code>produce</code>/<code>generate</code>（发出/生产/生成，文中这三个英文词也有相似之处，对于 emit 多翻译为
-“发出”，对于后两个多翻译为“生成”，因为感觉用“生产”比较奇怪）、<code>consume</code>（消费）。</p>
+<p><code>emit</code>/<code>produce</code>/<code>generate</code>（发出/产生/生成，文中这三个英文词也有相似之处，对于 emit 多翻译为
+“发出”，对于后两个多翻译为“生成”）、<code>consume</code>（消费）。</p>
 </li>
 <li>
-<p><code>Processor</code>（未做翻译，保留英文，一种 <code>Publisher</code> 和 <code>Subscriber</code> 的综合体）。</p>
+<p><code>Processor</code>（未做翻译，保留英文）。</p>
 </li>
 <li>
 <p><code>operator</code>（译作操作符，声明式的可组装的响应式方法，其组装成的链译作“操作链”）。</p>
@@ -2360,14 +2360,13 @@ sequence这个词，主要翻译为“序列”，有些地方为了更加契合
 <h2 id="about-doc"><a class="anchor" href="#about-doc"></a>1. 关于本文档</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>本节是对 Reactor参考文档（译者加：原文一会儿“document”一会儿“guide”，不影响理解的情况下，
-翻译就一律用“文档”了哈） 的简要概述。你并不需要从头到尾阅读该文档。每一节的内容都是独立
-的，不过会有其他章节的链接。</p>
+<p>本节是对 Reactor参考文档（译者加：原文估计是多个人写的，时而“document”时而“guide”，不影响理解的情况下，
+翻译就一律用“文档”了） 的简要概述。你并不需要从头到尾阅读该文档。每一节的内容都是独立的，不过会有其他章节的链接。</p>
 </div>
 <div class="sect2">
 <h3 id="_最新版本_版权说明"><a class="anchor" href="#_最新版本_版权说明"></a>1.1. 最新版本 &amp; 版权说明</h3>
 <div class="paragraph">
-<p>本Reactor参考文档也提供HTML形式。最新版本见 <a href="http://projectreactor.io/docs/core/release/reference/docs/index.html" class="bare">http://projectreactor.io/docs/core/release/reference/docs/index.html</a></p>
+<p>本Reactor参考文档也提供HTML形式。最新版本见 <a href="http://projectreactor.io/docs/core/release/reference/docs/index.html。" class="bare">http://projectreactor.io/docs/core/release/reference/docs/index.html。</a></p>
 </div>
 <div class="paragraph">
 <p>本文档的副本你可以自用，亦可分发给他人。不过无论是打印版还是电子版，请免费提供。</p>
@@ -2378,10 +2377,10 @@ sequence这个词，主要翻译为“序列”，有些地方为了更加契合
 <div class="paragraph">
 <p>本参考文档用 <a href="http://asciidoctor.org/docs/asciidoc-writers-guide/">Asciidoc</a> 编写，
 其源码见 <a href="https://github.com/reactor/reactor-core/tree/master/src/docs/asciidoc" class="bare">https://github.com/reactor/reactor-core/tree/master/src/docs/asciidoc</a>
-（译者加：本翻译见 <a href="https://github.com/get-set/reactor-core/tree/master-zh/src/docs/asciidoc" class="bare">https://github.com/get-set/reactor-core/tree/master-zh/src/docs/asciidoc</a> ）。</p>
+（译者加：本翻译源码见 <a href="https://github.com/get-set/reactor-core/tree/master-zh/src/docs/asciidoc" class="bare">https://github.com/get-set/reactor-core/tree/master-zh/src/docs/asciidoc</a> ）。</p>
 </div>
 <div class="paragraph">
-<p>如有任何补充，我们欢迎你提交 pull request。</p>
+<p>如有任何补充，欢迎你提交 pull request。</p>
 </div>
 <div class="paragraph">
 <p>我们建议你将源码 checkout 到本地，这样可以使用 gradle 的 <code>asciidoctor</code> 任务检查文档渲染效果。
@@ -2396,7 +2395,7 @@ sequence这个词，主要翻译为“序列”，有些地方为了更加契合
 <td class="content">
 为了方便读者的反馈，多数章节在结尾都提供一个链接，这个链接可以打开一个 Github 上的
 编辑界面，从而可以编辑相应章节的源码。这些链接在 HTML5 的版本中能够看到，就像这样：
-<a href="https://github.com/get-set/reactor-core/edit/master-zh/src/docs/asciidoc/aboutDoc.adoc" class="fa fa-edit" target="_blank" rel="noopener">Suggest Edit</a> - <a href="#about-doc">关于本文档</a>。
+<a href="https://github.com/get-set/reactor-core/edit/master-zh/src/docs/asciidoc/aboutDoc.adoc" class="fa fa-edit" target="_blank" rel="noopener">翻译建议</a> - <a href="#about-doc">关于本文档</a>。
 </td>
 </tr>
 </table>
@@ -2434,7 +2433,7 @@ sequence这个词，主要翻译为“序列”，有些地方为了更加契合
 所有 Reactor 项目都是开源的，
 <a href="https://github.com/reactor/reactor-core/tree/master/src/docs/asciidoc">包括本文档</a>。
 如果你发现本文档有问题，或希望补充一些内容，请参考
-<a href="https://github.com/reactor/reactor-core/blob/master/CONTRIBUTING.md">这里</a>进行了解。
+<a href="https://github.com/reactor/reactor-core/blob/master/CONTRIBUTING.md">这里</a> 进行了解。
 </td>
 </tr>
 </table>
@@ -2452,20 +2451,20 @@ sequence这个词，主要翻译为“序列”，有些地方为了更加契合
 </li>
 <li>
 <p>如果你对 Reactor 的理念比较熟悉，只是在编写程序时查找合适的操作符， 请参考附录
-<a href="#which-operator">Which operator do I need?</a> 。</p>
+<a href="#which-operator">我需要哪个操作符？</a> 。</p>
 </li>
 <li>
 <p>如果你想深入了解 Reactor 的核心功能，请参考 <a href="#core-features">Reactor 核心特性</a>，以便了解：</p>
 <div class="ulist">
 <ul>
 <li>
-<p>关于 Reactor 的响应式类型 "<a href="#flux"><code>Flux</code>, 一个包含 0-N 个元素的异步序列</a>" 和 "<a href="#mono"><code>Mono</code>, 一种异步的 0-1 结果</a>"。</p>
+<p>关于 Reactor 的响应式类型 "<a href="#flux"><code>Flux</code>, 包含 0-N 个元素的异步序列</a>" 和 "<a href="#mono"><code>Mono</code>, 异步的 0-1 结果</a>"；</p>
 </li>
 <li>
-<p>如何调整执行的线程环境： <a href="#schedulers">a Scheduler</a>.</p>
+<p>如何调整执行的线程环境： <a href="#schedulers">调度器</a>；</p>
 </li>
 <li>
-<p>如何处理问题： <a href="#error.handling">处理错误</a> .</p>
+<p>如何处理问题： <a href="#error.handling">处理错误</a>。</p>
 </li>
 </ul>
 </div>
@@ -2482,8 +2481,8 @@ sequence这个词，主要翻译为“序列”，有些地方为了更加契合
 </ul>
 </div>
 <div class="paragraph">
-<p><a href="https://github.com/reactor/reactor-core/edit/master/src/docs/asciidoc/aboutDoc.adoc" class="fa fa-edit" title="Suggest an edit to the above section via github" target="_blank" rel="noopener">Suggest Edit</a>
-to "<a href="#about-doc">关于本文档</a>"</p>
+<p><a href="https://github.com/get-set/reactor-core/edit/master-zh/src/docs/asciidoc/aboutDoc.adoc" class="fa fa-edit" title="通过Github的编辑功能对以上翻译内容提出建议" target="_blank" rel="noopener">翻译建议</a>
+- "<a href="#about-doc">关于本文档</a>"</p>
 </div>
 </div>
 </div>
@@ -2514,24 +2513,23 @@ to "<a href="#about-doc">关于本文档</a>"</p>
 <h3 id="getting-started-introducing-reactor"><a class="anchor" href="#getting-started-introducing-reactor"></a>2.1. 介绍 Reactor</h3>
 <div class="paragraph">
 <p>Reactor 是一个用于JVM的完全非阻塞的响应式编程框架，具备高效的需求管理（即对
-“背压（backpressure）”的控制）。它与 Java 8 函数式 API 直接继承，比如 <code>CompletableFuture</code>，
-<code>Stream</code>， 以及`Duration`。它提供了异步序列 API <code>Flux</code>（用于[N]个元素）和 <code>Mono</code>（用于
-[0|1]个元素），从而完整实现了“响应式扩展规范”（Reactive Extensions Specification）。</p>
+“背压（backpressure）”的控制）能力。它与 Java 8 函数式 API 直接集成，比如 <code>CompletableFuture</code>，
+<code>Stream</code>， 以及 <code>Duration</code>。它提供了异步序列 API <code>Flux</code>（用于[N]个元素）和 <code>Mono</code>（用于
+[0|1]个元素），并完全遵循和实现了“响应式扩展规范”（Reactive Extensions Specification）。</p>
 </div>
 <div class="paragraph">
 <p>Reactor 的 <code>reactor-ipc</code> 组件还支持非阻塞的进程间通信（inter-process communication, IPC）。
-Reactor IPC 为HTTP（包括 Websockets）、TCP 和 UDP 提供了支持背压的网络引擎，从而适合
+Reactor IPC 为 HTTP（包括 Websockets）、TCP 和 UDP 提供了支持背压的网络引擎，从而适合
 应用于微服务架构。并且完整支持响应式编解码（reactive encoding and decoding）。</p>
 </div>
 </div>
 <div class="sect2">
 <h3 id="prerequisites"><a class="anchor" href="#prerequisites"></a>2.2. 前提</h3>
 <div class="paragraph">
-<p>Reactor Core runs on <code>Java 8</code> and above.
-Reactor Core 运行于 <code>Java 8</code> 及以上版本。</p>
+<p>Reactor Core 运行于 <code>Java 8</code> 及以上版本。</p>
 </div>
 <div class="paragraph">
-<p>依赖于 <code>org.reactive-streams:reactive-streams:1.0.2</code>。</p>
+<p>依赖 <code>org.reactive-streams:reactive-streams:1.0.2</code>。</p>
 </div>
 <div class="admonitionblock note">
 <table>
@@ -2565,13 +2563,13 @@ Reactor Core 运行于 <code>Java 8</code> 及以上版本。</p>
 <h3 id="getting-started-understanding-bom"><a class="anchor" href="#getting-started-understanding-bom"></a>2.3. 了解 BOM</h3>
 <div class="paragraph">
 <p>自从 <code>reactor-core 3.0.4</code>，随着 <code>Aluminium</code> 版本发布上车（release train）以来，Reactor 3
-使用了 BOM（Bill of Materials - 一种标准的 Maven artifact）。</p>
+使用了 BOM（Bill of Materials，一种标准的 Maven artifact）。</p>
 </div>
 <div class="paragraph">
 <p>使用 BOM 可以管理一组良好集成的 maven artifacts，从而无需操心不同版本组件的互相依赖问题。</p>
 </div>
 <div class="paragraph">
-<p>BOM 是一系列能够有版本的 artifacts，通过“发布列车”（release train）的发布方式管理，
+<p>BOM 是一系列有版本信息的 artifacts，通过“列车发布”（release train）的发布方式管理，
 每趟发布列车由一个“代号+修饰词”组成，比如：</p>
 </div>
 <div class="verseblock">
@@ -2582,7 +2580,7 @@ Bismuth-RELEASE
 Carbon-SR32</pre>
 </div>
 <div class="paragraph">
-<p>代号替代了传统的 主版本.次版本 的数字形式。这些代号主要来自
+<p>代号替代了传统的“主版本.次版本”的数字形式。这些代号主要来自
 <a href="https://en.wikipedia.org/wiki/Periodic_table#Overview">Periodic Table of
 Elements</a>， 按首字母顺序依次选取。</p>
 </div>
@@ -2609,11 +2607,11 @@ Elements</a>， 按首字母顺序依次选取。</p>
 <div class="sect2">
 <h3 id="getting"><a class="anchor" href="#getting"></a>2.4. 获取 Reactor</h3>
 <div class="paragraph">
-<p>前边提到，使用 Reactor的最简单方式是在你的项目中配置 BOM 以及相关依赖。注意，当你添加这样
-的依赖的时候，要省略版本（&lt;version&gt;）配置，从而自动使用 BOM 中指定的版本。</p>
+<p>前边提到，使用 Reactor 的最简单方式是在你的项目中配置 BOM 以及相关依赖。
+注意，当你这样添加依赖的时候，要省略版本（&lt;version&gt;）配置，从而自动使用 BOM 中指定的版本。</p>
 </div>
 <div class="paragraph">
-<p>当然，如果你希望使用某个版本的 artifact，仍然可以指定。甚至完全不使用 BOM，而是逐个配置
+<p>当然，如果你希望使用某个版本的 artifact，仍然可以指定。甚至完全不使用 BOM，逐个配置
 artifact 的版本也是可以的。</p>
 </div>
 <div class="sect3">
@@ -2792,8 +2790,8 @@ repository 而不是 Maven Central 来发布。 需要添加到构建配置文�
 </div>
 </div>
 <div class="paragraph">
-<p><a href="https://github.com/reactor/reactor-core/edit/master/src/docs/asciidoc/gettingStarted.adoc" class="fa fa-edit" title="Suggest an edit to the above section via github">Suggest Edit</a>
-to "<a href="#getting-started">快速上手</a>"</p>
+<p><a href="https://github.com/get-set/reactor-core/edit/master-zh/src/docs/asciidoc/gettingStarted.adoc" class="fa fa-edit" title="通过Github的编辑功能对以上翻译内容提出建议">翻译建议</a>
+- "<a href="#getting-started">快速上手</a>"</p>
 </div>
 </div>
 </div>
@@ -3323,7 +3321,7 @@ assertThat(results).containsExactly( <i class="conum" data-value="8"></i><b>(8)<
 </div>
 </div>
 <div class="sect3">
-<h4 id="reactive.backpressure"><a class="anchor" href="#reactive.backpressure"></a>3.3.5. 背压（Backpressure）</h4>
+<h4 id="reactive.backpressure"><a class="anchor" href="#reactive.backpressure"></a>3.3.5. 背压（）</h4>
 <div class="paragraph">
 <p>向上游传递信号这一点也被用于实现 <strong>背压</strong> ，就像在装配线上，某个工位的处理速度如果慢于流水线
 速度，会对上游发送反馈信号一样。</p>
@@ -3367,8 +3365,8 @@ assertThat(results).containsExactly( <i class="conum" data-value="8"></i><b>(8)<
 <p>更多关于 Reactor 中“热”vs“冷”的内容，请参考 <a href="#reactor.hotCold">this reactor-specific section</a>。</p>
 </div>
 <div class="paragraph">
-<p><a href="https://github.com/reactor/reactor-core/edit/master/src/docs/asciidoc/reactiveProgramming.adoc" class="fa fa-edit" title="Suggest an edit to the above section via github">Suggest Edit</a>
-to "<a href="#intro-reactive">响应式编程</a>"</p>
+<p><a href="https://github.com/get-set/reactor-core/edit/master-zh/src/docs/asciidoc/reactiveProgramming.adoc" class="fa fa-edit" title="通过Github的编辑功能对以上翻译内容提出建议">翻译建议</a>
+- "<a href="#intro-reactive">响应式编程</a>"</p>
 </div>
 </div>
 </div>
@@ -3397,7 +3395,7 @@ to "<a href="#intro-reactive">响应式编程</a>"</p>
 返回的结果是 <code>Mono&lt;Long&gt;</code>。</p>
 </div>
 <div class="sect2">
-<h3 id="flux"><a class="anchor" href="#flux"></a>4.1. <code>Flux</code>, 一个包含 0-N 个元素的异步序列</h3>
+<h3 id="flux"><a class="anchor" href="#flux"></a>4.1. <code>Flux</code>, 包含 0-N 个元素的异步序列</h3>
 <div class="imageblock">
 <div class="content">
 <img src="https://raw.githubusercontent.com/reactor/reactor-core/v3.0.7.RELEASE/src/docs/marble/flux.png" alt="Flux">
@@ -3417,7 +3415,7 @@ to "<a href="#intro-reactive">响应式编程</a>"</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="mono"><a class="anchor" href="#mono"></a>4.2. <code>Mono</code>, 一种异步的 0-1 结果</h3>
+<h3 id="mono"><a class="anchor" href="#mono"></a>4.2. <code>Mono</code>, 异步的 0-1 结果</h3>
 <div class="imageblock">
 <div class="content">
 <img src="https://raw.githubusercontent.com/reactor/reactor-core/v3.0.7.RELEASE/src/docs/marble/mono.png" alt="Mono">
@@ -4362,7 +4360,7 @@ T</pre>
 <li>
 <p>弹性线程池（<code>Schedulers.elastic()</code>。它根据需要创建一个线程池，重用空闲线程。线程池如果空闲时间过长
 （默认为 60s）就会被废弃。对于 I/O 阻塞的场景比较适用。 <code>Schedulers.elastic()</code> 能够方便地给一个阻塞
-的任务分配它自己的线程，从而不会妨碍其他任务和资源，见 <a href="#faq.wrap-blocking">How do I wrap a synchronous, blocking call?</a>。</p>
+的任务分配它自己的线程，从而不会妨碍其他任务和资源，见 <a href="#faq.wrap-blocking">如何包装一个同步阻塞的调用？</a>。</p>
 </li>
 <li>
 <p>固定大小线程池（<code>Schedulers.parallel()</code>）。所创建线程池的大小与 CPU 个数等同。</p>
@@ -4417,25 +4415,18 @@ subscriber 上处理的。</p>
 <div class="ulist">
 <ul>
 <li>
-<p><code>publishOn</code> 的用法和其他操作符一样，处于订阅链（subscriber chain）中。它将下游
-信号传给上游同时将上游的数据递给下游，同时执行指定的调度器 <code>Scheduler</code> 的某个工作
-线程上的回调。它会 <strong>改变后续的操作符的执行所在线程</strong> （知道下一个 <code>publishOn</code> 加到
-这个链上。</p>
+<p><code>publishOn</code> 的用法和处于订阅链（subscriber chain）中的其他操作符一样。它将上游
+信号传给下游，同时执行指定的调度器 <code>Scheduler</code> 的某个工作线程上的回调。
+它会 <strong>改变后续的操作符的执行所在线程</strong> （直到下一个 <code>publishOn</code>
+出现在这个链上）。</p>
 </li>
 <li>
-<p><code>subscribeOn</code> 用于订阅（subscription）过程，作用于那个向上的 subscriber 链（subscribe
-的是才被激活，方向是向上游的）。所以，无论你把 <code>subscribeOn</code> 至于操作链（译者注：这里是
-指代码表示的操作链）的什么位置， <strong>它都会影响到源头的线程执行环境（context）</strong>。
-但是，它不会影响到后续的 <code>publishOn</code>，后者仍能够切换后续操作符的线程执行环境。</p>
+<p><code>subscribeOn</code> 用于订阅（subscription）过程，作用于那个向上的订阅链（发布者在被订阅
+时才激活，订阅的传递方向是向上游的）。所以，无论你把 <code>subscribeOn</code> 至于操作链的什么位置，
+<strong>它都会影响到源头的线程执行环境（context）</strong>。
+但是，它不会影响到后续的 <code>publishOn</code>，后者仍能够切换其后操作符的线程执行环境。</p>
 </li>
 </ul>
-</div>
-<div class="paragraph">
-<p>（译者加：关于 <code>publishOn</code> 和 <code>subscribeOn</code>，由于能力所限，直译的文字总是感觉不够明白，
-这里补充说一下我的理解： 对于一个操作链， <code>publishOn</code> 从字面上看是 publish 嘛，
-所以影响的是“向下的”后续的操作符的线程执行环境，会被以后的 <code>publishOn</code> 覆盖；
-而 <code>subscribeOn</code> 相反，影响的是“向上的”直到源头的各个操作符的线程执行环境，所以
-会被前边的 <code>subscribeOn</code> 覆盖。）</p>
 </div>
 <div class="admonitionblock note">
 <table>
@@ -4498,7 +4489,7 @@ subscriber 上处理的。</p>
 </div>
 <div class="paragraph">
 <p><code>Scheduler.elastic()</code> 也能创建线程，它能够很方便地创建专门的线程（以便跑一些可能会阻塞资源的任务，
-比如一个同步服务），请见 <a href="#faq.wrap-blocking">How do I wrap a synchronous, blocking call?</a>。</p>
+比如一个同步服务），请见 <a href="#faq.wrap-blocking">如何包装一个同步阻塞的调用？</a>。</p>
 </div>
 <div class="paragraph">
 <p>内部机制保证了这些操作符能够借助自增计数器（incremental counters）和警戒条件（guard conditions）
@@ -5145,7 +5136,7 @@ Flux.&lt;<span class="predefined-type">String</span>&gt;error(<span class="keywo
 </tr>
 <tr>
 <td><i class="conum" data-value="4"></i><b>4</b></td>
-<td>（译者加：技巧二：）为了使序列以错误结束。我们将原始异常在三次重试之后抛出。</td>
+<td>为了使序列以错误结束。我们将原始异常在三次重试之后抛出。</td>
 </tr>
 </table>
 </div>
@@ -5327,7 +5318,7 @@ Flux.&lt;<span class="predefined-type">String</span>&gt;error(<span class="keywo
 <div class="olist arabic">
 <ol class="arabic">
 <li>
-<p>是否有一个或多个操作符的组合能够满足需求？（见 <a href="#which-operator">Which operator do I need?</a>）</p>
+<p>是否有一个或多个操作符的组合能够满足需求？（见 <a href="#which-operator">我需要哪个操作符？</a>）</p>
 </li>
 <li>
 <p><a href="#producing">"generator"</a> 操作符是否能解决问题？（通常这些操作符
@@ -5561,8 +5552,8 @@ processor 能够检测到（线程池）容量并在订阅者过多时抛出异�
 </table>
 </div>
 <div class="paragraph">
-<p><a href="https://github.com/reactor/reactor-core/edit/master/src/docs/asciidoc/coreFeatures.adoc" class="fa fa-edit" title="Suggest an edit to the above section via github">Suggest Edit</a>
-to "<a href="#core-features">Reactor 核心特性</a>"</p>
+<p><a href="https://github.com/get-set/reactor-core/edit/master-zh/src/docs/asciidoc/coreFeatures.adoc" class="fa fa-edit" title="通过Github的编辑功能对以上翻译内容提出建议">翻译建议</a>
+- "<a href="#core-features">Reactor 核心特性</a>"</p>
 </div>
 </div>
 </div>
@@ -5707,8 +5698,8 @@ provides null-safety</a> 对所有 Reactor API 通过工具友好的（tooling-f
 </table>
 </div>
 <div class="paragraph">
-<p><a href="https://github.com/reactor/reactor-core/edit/master/src/docs/asciidoc/kotlin.adoc" class="fa fa-edit" title="Suggest an edit to the above section via github">Suggest Edit</a>
-to "<a href="#kotlin">对 Kotlin 的支持</a>"</p>
+<p><a href="https://github.com/get-set/reactor-core/edit/master-zh/src/docs/asciidoc/kotlin.adoc" class="fa fa-edit" title="通过Github的编辑功能对以上翻译内容提出建议">翻译建议</a>
+- "<a href="#kotlin">对 Kotlin 的支持</a>"</p>
 </div>
 </div>
 </div>
@@ -5751,7 +5742,7 @@ to "<a href="#kotlin">对 Kotlin 的支持</a>"</p>
 <div class="title">reactor-test 用 Gradle 配置 <code>dependencies</code></div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="groovy">dependencies {
-   testcompile <span class="string"><span class="delimiter">'</span><span class="content">io.projectreactor:reactor-test</span><span class="delimiter">'</span></span>
+   testCompile <span class="string"><span class="delimiter">'</span><span class="content">io.projectreactor:reactor-test</span><span class="delimiter">'</span></span>
 }</code></pre>
 </div>
 </div>
@@ -6293,8 +6284,8 @@ to "<a href="#kotlin">对 Kotlin 的支持</a>"</p>
 还需要它能够发出数据，你可以用 <code>PublisherProbe.of(Publisher)</code> 方法包装一个 <code>Publisher&lt;T&gt;</code> 来搞定。</p>
 </div>
 <div class="paragraph">
-<p><a href="https://github.com/reactor/reactor-core/edit/master/src/docs/asciidoc/testing.adoc" class="fa fa-edit" title="Suggest an edit to the above section via github">Suggest Edit</a>
-to "<a href="#testing">测试</a>"</p>
+<p><a href="https://github.com/get-set/reactor-core/edit/master-zh/src/docs/asciidoc/testing.adoc" class="fa fa-edit" title="通过Github的编辑功能对以上翻译内容提出建议">翻译建议</a>
+- "<a href="#testing">测试</a>"</p>
 </div>
 </div>
 </div>
@@ -6749,8 +6740,8 @@ flux.subscribe();</code></pre>
 就将序列切断了。简单来说，<code>take()</code> 导致源在发出用户请求的数量后 <code>cancel()</code> 了。</p>
 </div>
 <div class="paragraph">
-<p><a href="https://github.com/reactor/reactor-core/edit/master/src/docs/asciidoc/debugging.adoc" class="fa fa-edit" title="Suggest an edit to the above section via github">Suggest Edit</a>
-to "<a href="#debugging">调试 Reactor</a>"</p>
+<p><a href="https://github.com/get-set/reactor-core/edit/master-zh/src/docs/asciidoc/debugging.adoc" class="fa fa-edit" title="通过Github的编辑功能对以上翻译内容提出建议">翻译建议</a>
+- "<a href="#debugging">调试 Reactor</a>"</p>
 </div>
 </div>
 </div>
@@ -8136,396 +8127,148 @@ JSR 305 元注解使得工具提供商可以以一种通用的方式提供对空
 </table>
 </div>
 <div class="paragraph">
-<p><a href="https://github.com/reactor/reactor-core/edit/master/src/docs/asciidoc/advancedFeatures.adoc" class="fa fa-edit" title="Suggest an edit to the above section via github">Suggest Edit</a>
-to "<a href="#advanced">高级特性与概念</a>"</p>
+<p><a href="https://github.com/get-set/reactor-core/edit/master-zh/src/docs/asciidoc/advancedFeatures.adoc" class="fa fa-edit" title="通过Github的编辑功能对以上翻译内容提出建议">翻译建议</a>
+- "<a href="#advanced">高级特性与概念</a>"</p>
 </div>
 </div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="which-operator"><a class="anchor" href="#which-operator"></a>Appendix A: Which operator do I need?</h2>
+<h2 id="which-operator"><a class="anchor" href="#which-operator"></a>Appendix A: 我需要哪个操作符？</h2>
 <div class="sectionbody">
-<div class="admonitionblock tip">
-<table>
-<tr>
-<td class="icon">
-<i class="fa icon-tip" title="Tip"></i>
-</td>
-<td class="content">
-In this section, if an operator is specific to <code>Flux</code> or <code>Mono</code> it is
-prefixed accordingly. Common operators have no prefix. When a specific use case
-is covered by a combination of operators, it is presented as a method call, with
-leading dot and parameters in parentheses, like this: <code>.methodCall(parameter)</code>.
-</td>
-</tr>
-</table>
+<div class="paragraph">
+<p>TIP：在这一节，如果一个操作符是专属于 <code>Flux</code> 或 <code>Mono</code> 的，那么会给它注明前缀。
+公共的操作符没有前缀。如果一个具体的用例涉及多个操作符的组合，这里以方法调用的方式展现，
+会以一个点（.）开头，并将参数置于圆括号内，比如： <code>.methodCall(parameter)</code>。</p>
 </div>
 <div class="paragraph">
-<p>I want to deal with:</p>
+<p>我想搞定：</p>
 </div>
 <div class="ulist">
 <ul>
 <li>
-<p><a href="#which.create">Creating a New Sequence&#8230;&#8203;</a></p>
+<p><a href="#which.create">创建一个新序列，它&#8230;&#8203;</a></p>
 </li>
 <li>
-<p><a href="#which.values">Transforming an Existing Sequence</a></p>
+<p><a href="#which.values">对序列进行转化</a></p>
 </li>
 <li>
-<p><a href="#which.peeking">Peeking into a Sequence</a></p>
+<p><a href="#which.filtering">过滤序列</a></p>
 </li>
 <li>
-<p><a href="#which.errors">Handling Errors</a></p>
+<p><a href="#which.peeking">“窥视”（只读）序列</a></p>
 </li>
 <li>
-<p><a href="#which.time">Working with Time</a></p>
+<p><a href="#which.errors">错误处理</a></p>
 </li>
 <li>
-<p><a href="#which.window">Splitting a <code>Flux</code></a></p>
+<p><a href="#which.time">基于时间的操作</a></p>
 </li>
 <li>
-<p><a href="#which.blocking">Going Back to the Synchronous World</a></p>
+<p><a href="#which.window">拆分 <code>Flux</code></a></p>
+</li>
+<li>
+<p><a href="#which.blocking">回到同步的世界</a></p>
 </li>
 </ul>
 </div>
 <div class="sect2">
-<h3 id="which.create"><a class="anchor" href="#which.create"></a>A.1. Creating a New Sequence&#8230;&#8203;</h3>
+<h3 id="which.create"><a class="anchor" href="#which.create"></a>A.1. 创建一个新序列，它&#8230;&#8203;</h3>
 <div class="ulist">
 <ul>
 <li>
-<p>that emits a <code>T</code>, and I already have: <code>just</code></p>
+<p>发出一个 <code>T</code>，我已经有了：<code>just</code></p>
 <div class="ulist">
 <ul>
 <li>
-<p>&#8230;&#8203;from an <code>Optional&lt;T&gt;</code>: <code>Mono#justOrEmpty(Optional&lt;T&gt;)</code></p>
+<p>&#8230;&#8203;基于一个 <code>Optional&lt;T&gt;</code>：<code>Mono#justOrEmpty(Optional&lt;T&gt;)</code></p>
 </li>
 <li>
-<p>&#8230;&#8203;from a potentially <code>null</code> T: <code>Mono#justOrEmpty(T)</code></p>
+<p>&#8230;&#8203;基于一个可能为 <code>null</code> 的 T：<code>Mono#justOrEmpty(T)</code></p>
 </li>
 </ul>
 </div>
 </li>
 <li>
-<p>that emits a <code>T</code> returned by a method: <code>just</code> as well</p>
+<p>发出一个 <code>T</code>，且还是由 <code>just</code> 方法返回</p>
 <div class="ulist">
 <ul>
 <li>
-<p>&#8230;&#8203;but lazily captured: use <code>Mono#fromSupplier</code> or wrap <code>just</code> inside <code>defer</code></p>
+<p>&#8230;&#8203;但是“懒”创建的：使用 <code>Mono#fromSupplier</code> 或用 <code>defer</code> 包装 <code>just</code></p>
 </li>
 </ul>
 </div>
 </li>
 <li>
-<p>that emits several <code>T</code> I can explicitly enumerate: <code>Flux#just(T...)</code></p>
+<p>发出许多 <code>T</code>，这些元素我可以明确列举出来：<code>Flux#just(T...)</code></p>
 </li>
 <li>
-<p>that iterates over:</p>
+<p>基于迭代数据结构:</p>
 <div class="ulist">
 <ul>
 <li>
-<p>an array: <code>Flux#fromArray</code></p>
+<p>一个数组：<code>Flux#fromArray</code></p>
 </li>
 <li>
-<p>a collection or iterable: <code>Flux#fromIterable</code></p>
+<p>一个集合或 iterable：<code>Flux#fromIterable</code></p>
 </li>
 <li>
-<p>a range of integers: <code>Flux#range</code></p>
+<p>一个 Integer 的 range：<code>Flux#range</code></p>
 </li>
 <li>
-<p>a <code>Stream</code> supplied for each Subscription: <code>Flux#fromStream(Supplier&lt;Stream&gt;)</code></p>
+<p>一个 <code>Stream</code> 提供给每一个订阅：<code>Flux#fromStream(Supplier&lt;Stream&gt;)</code></p>
 </li>
 </ul>
 </div>
 </li>
 <li>
-<p>that emits from various single-valued sources such as:</p>
+<p>基于一个参数值给出的源：</p>
 <div class="ulist">
 <ul>
 <li>
-<p>a <code>Supplier&lt;T&gt;</code>: <code>Mono#fromSupplier</code></p>
+<p>一个 <code>Supplier&lt;T&gt;</code>：<code>Mono#fromSupplier</code></p>
 </li>
 <li>
-<p>a task: <code>Mono#fromCallable</code>, <code>Mono#fromRunnable</code></p>
+<p>一个任务：<code>Mono#fromCallable</code>，<code>Mono#fromRunnable</code></p>
 </li>
 <li>
-<p>a <code>CompletableFuture&lt;T&gt;</code>: <code>Mono#fromFuture</code></p>
+<p>一个 <code>CompletableFuture&lt;T&gt;</code>：<code>Mono#fromFuture</code></p>
 </li>
 </ul>
 </div>
 </li>
 <li>
-<p>that completes: <code>empty</code></p>
+<p>直接完成：<code>empty</code></p>
 </li>
 <li>
-<p>that errors immediately: <code>error</code></p>
-</li>
-<li>
-<p>that never does anything: <code>never</code></p>
-</li>
-<li>
-<p>that is decided at subscription: <code>defer</code></p>
-</li>
-<li>
-<p>that depends on a disposable resource: <code>using</code></p>
-</li>
-<li>
-<p>that generates events programmatically (can use state):</p>
+<p>立即生成错误：<code>error</code></p>
 <div class="ulist">
 <ul>
 <li>
-<p>synchronously and one-by-one: <code>Flux#generate</code></p>
-</li>
-<li>
-<p>asynchronously (can also be sync), multiple emissions possible in one pass: <code>Flux#create</code>
-(<code>Mono#create</code> as well, without the multiple emission aspect)</p>
-</li>
-</ul>
-</div>
-</li>
-</ul>
-</div>
-</div>
-<div class="sect2">
-<h3 id="which.values"><a class="anchor" href="#which.values"></a>A.2. Transforming an Existing Sequence</h3>
-<div class="ulist">
-<ul>
-<li>
-<p>I want to transform existing data:</p>
-<div class="ulist">
-<ul>
-<li>
-<p>on a 1-to-1 basis (eg. strings to their length): <code>map</code></p>
-<div class="ulist">
-<ul>
-<li>
-<p>&#8230;&#8203;by just casting it: <code>cast</code></p>
-</li>
-<li>
-<p>&#8230;&#8203;in order to materialize each source value&#8217;s index: <code>Flux#indexed</code></p>
+<p>&#8230;&#8203;但是“懒”的方式生成 <code>Throwable</code>：<code>error(Supplier&lt;Throwable&gt;)</code></p>
 </li>
 </ul>
 </div>
 </li>
 <li>
-<p>on a 1-to-n basis (eg. strings to their characters): <code>flatMap</code> + use a factory method</p>
+<p>什么都不做：<code>never</code></p>
 </li>
 <li>
-<p>on a 1-to-n basis with programmatic behavior for each source element and/or state: <code>handle</code></p>
+<p>订阅时才决定：<code>defer</code></p>
 </li>
 <li>
-<p>running an asynchronous task for each source item (eg. urls to http request): <code>flatMap</code> + an async <code>Publisher</code>-returning method</p>
+<p>依赖一个可回收的资源：<code>using</code></p>
+</li>
+<li>
+<p>可编程地生成事件（可以使用状态）:</p>
 <div class="ulist">
 <ul>
 <li>
-<p>&#8230;&#8203;ignoring some data: conditionally return a <code>Mono.empty()</code> in the flatMap lambda</p>
+<p>同步且逐个的：<code>Flux#generate</code></p>
 </li>
 <li>
-<p>&#8230;&#8203;retaining the original sequence order: <code>Flux#flatMapSequential</code> (this triggers the async processes immediately but reorders the results)</p>
-</li>
-<li>
-<p>&#8230;&#8203;where the async task can return multiple values, from a <code>Mono</code> source: <code>Mono#flatMapMany</code></p>
-</li>
-</ul>
-</div>
-</li>
-</ul>
-</div>
-</li>
-<li>
-<p>I want to aggregate a <code>Flux</code>: (the <code>Flux#</code> prefix is assumed below)</p>
-<div class="ulist">
-<ul>
-<li>
-<p>into a List: <code>collectList</code>, <code>collectSortedList</code></p>
-</li>
-<li>
-<p>into a Map: <code>collectMap</code>, <code>collectMultiMap</code></p>
-</li>
-<li>
-<p>into an arbitrary container: <code>collect</code></p>
-</li>
-<li>
-<p>into the size of the sequence: <code>count</code></p>
-</li>
-<li>
-<p>by applying a function between each element (eg. running sum): <code>reduce</code></p>
-<div class="ulist">
-<ul>
-<li>
-<p>&#8230;&#8203;but emitting each intermediary value: <code>scan</code></p>
-</li>
-</ul>
-</div>
-</li>
-<li>
-<p>into a boolean value from a predicate:</p>
-<div class="ulist">
-<ul>
-<li>
-<p>applied to all values (AND): <code>all</code></p>
-</li>
-<li>
-<p>applied to at least one value (OR): <code>any</code></p>
-</li>
-<li>
-<p>testing the presence of any value: <code>hasElements</code></p>
-</li>
-<li>
-<p>testing the presence of a specific value: <code>hasElement</code></p>
-</li>
-</ul>
-</div>
-</li>
-</ul>
-</div>
-</li>
-<li>
-<p>I want to combine publishers&#8230;&#8203;</p>
-<div class="ulist">
-<ul>
-<li>
-<p>in sequential order: <code>Flux#concat</code> or <code>.concatWith(other)</code></p>
-<div class="ulist">
-<ul>
-<li>
-<p>&#8230;&#8203;but delaying any error until remaining publishers have been emitted: <code>Flux#concatDelayError</code></p>
-</li>
-<li>
-<p>&#8230;&#8203;but eagerly subscribing to subsequent publishers: <code>Flux#mergeSequential</code></p>
-</li>
-</ul>
-</div>
-</li>
-<li>
-<p>in emission order (combined items emitted as they come): <code>Flux#merge</code> / <code>.mergeWith(other)</code></p>
-<div class="ulist">
-<ul>
-<li>
-<p>&#8230;&#8203;with different types (transforming merge): <code>Flux#zip</code> / <code>Flux#zipWith</code></p>
-</li>
-</ul>
-</div>
-</li>
-<li>
-<p>by pairing values:</p>
-<div class="ulist">
-<ul>
-<li>
-<p>from 2 Monos into a <code>Tuple2</code>: <code>Mono#zipWith</code></p>
-</li>
-<li>
-<p>from n Monos when they all completed: <code>Mono#zip</code></p>
-</li>
-</ul>
-</div>
-</li>
-<li>
-<p>by coordinating their termination:</p>
-<div class="ulist">
-<ul>
-<li>
-<p>from 1 Mono and any source into a <code>Mono&lt;Void&gt;</code>: <code>Mono#and</code></p>
-</li>
-<li>
-<p>from n sources when they all completed: <code>Mono#when</code></p>
-</li>
-<li>
-<p>into an arbitrary container type:</p>
-<div class="ulist">
-<ul>
-<li>
-<p>each time all sides have emitted: <code>Flux#zip</code> (up to the smallest cardinality)</p>
-</li>
-<li>
-<p>each time a new value arrives at either side: <code>Flux#combineLatest</code></p>
-</li>
-</ul>
-</div>
-</li>
-</ul>
-</div>
-</li>
-<li>
-<p>only considering the sequence that emits first: <code>Flux#first</code>, <code>Mono#first</code>, <code>mono.or
-(otherMono).or(thirdMono)</code>, `flux.or(otherFlux).or(thirdFlux)</p>
-</li>
-<li>
-<p>triggered by the elements in a source sequence: <code>switchMap</code> (each source element is mapped to a Publisher)</p>
-</li>
-<li>
-<p>triggered by the start of the next publisher in a sequence of publishers: <code>switchOnNext</code></p>
-</li>
-</ul>
-</div>
-</li>
-<li>
-<p>I want to repeat an existing sequence: <code>repeat</code></p>
-<div class="ulist">
-<ul>
-<li>
-<p>&#8230;&#8203;but at time intervals: <code>Flux.interval(duration).flatMap(tick -&gt; myExistingPublisher)</code></p>
-</li>
-</ul>
-</div>
-</li>
-<li>
-<p>I have an empty sequence but&#8230;&#8203;</p>
-<div class="ulist">
-<ul>
-<li>
-<p>I want a value instead: <code>defaultIfEmpty</code></p>
-</li>
-<li>
-<p>I want another sequence instead: <code>switchIfEmpty</code></p>
-</li>
-</ul>
-</div>
-</li>
-<li>
-<p>I have a sequence but I am not interested in values: <code>ignoreElements</code></p>
-<div class="ulist">
-<ul>
-<li>
-<p>&#8230;&#8203;and I want the completion represented as a <code>Mono</code>: <code>then</code></p>
-</li>
-<li>
-<p>&#8230;&#8203;and I want to wait for another task to complete at the end: <code>thenEmpty</code></p>
-</li>
-<li>
-<p>&#8230;&#8203;and I want to switch to another <code>Mono</code> at the end: <code>Mono#then(mono)</code></p>
-</li>
-<li>
-<p>&#8230;&#8203;and I want to switch to a <code>Flux</code> at the end: <code>thenMany</code></p>
-</li>
-</ul>
-</div>
-</li>
-<li>
-<p>I have a Mono for which I want to defer completion&#8230;&#8203;</p>
-<div class="ulist">
-<ul>
-<li>
-<p>&#8230;&#8203;only when 1-N other publishers have all emitted (or completed): <code>Mono#delayUntilOther</code></p>
-<div class="ulist">
-<ul>
-<li>
-<p>&#8230;&#8203;and deriving these publishers from the Mono value: <code>Mono#delayUntil(Function)</code></p>
-</li>
-</ul>
-</div>
-</li>
-</ul>
-</div>
-</li>
-<li>
-<p>I want to expand elements recursively into a graph of sequences and emit the combination&#8230;&#8203;</p>
-<div class="ulist">
-<ul>
-<li>
-<p>&#8230;&#8203;expanding the graph breadth first: <code>expand(Function)</code></p>
-</li>
-<li>
-<p>&#8230;&#8203;expanding the graph depth first: <code>expandDeep(Function)</code></p>
+<p>异步（也可同步）的，每次尽可能多发出元素：<code>Flux#create</code>
+（<code>Mono#create</code> 也是异步的，只不过只能发一个）</p>
 </li>
 </ul>
 </div>
@@ -8534,77 +8277,44 @@ leading dot and parameters in parentheses, like this: <code>.methodCall(paramete
 </div>
 </div>
 <div class="sect2">
-<h3 id="which.peeking"><a class="anchor" href="#which.peeking"></a>A.3. Peeking into a Sequence</h3>
+<h3 id="which.values"><a class="anchor" href="#which.values"></a>A.2. 对序列进行转化</h3>
 <div class="ulist">
 <ul>
 <li>
-<p>Without modifying the final sequence, I want to:</p>
+<p>我想转化一个序列：</p>
 <div class="ulist">
 <ul>
 <li>
-<p>get notified of / execute additional behavior <sup class="footnote">[<a id="_footnoteref_1" class="footnote" href="#_footnote_1" title="View footnote.">1</a>]</sup> on:</p>
+<p>1对1地转化（比如字符串转化为它的长度）：<code>map</code></p>
 <div class="ulist">
 <ul>
 <li>
-<p>emissions: <code>doOnNext</code></p>
+<p>&#8230;&#8203;类型转化：<code>cast</code></p>
 </li>
 <li>
-<p>completion: <code>Flux#doOnComplete</code>, <code>Mono#doOnSuccess</code> (includes the result if any)</p>
-</li>
-<li>
-<p>error termination: <code>doOnError</code></p>
-</li>
-<li>
-<p>cancellation: <code>doOnCancel</code></p>
-</li>
-<li>
-<p>subscription: <code>doOnSubscribe</code></p>
-</li>
-<li>
-<p>request: <code>doOnRequest</code></p>
-</li>
-<li>
-<p>completion or error: <code>doOnTerminate</code> (Mono version includes the result if any)</p>
-<div class="ulist">
-<ul>
-<li>
-<p>but <strong>after</strong> it has been propagated downstream: <code>doAfterTerminate</code></p>
+<p>&#8230;&#8203;为了获得每个元素的序号：<code>Flux#index</code></p>
 </li>
 </ul>
 </div>
 </li>
 <li>
-<p>any type of signal, represented as a <code>Signal</code>: <code>Flux#doOnEach</code></p>
+<p>1对n地转化（如字符串转化为一串字符）：<code>flatMap</code> + 使用一个工厂方法</p>
 </li>
 <li>
-<p>any terminating condition (complete, error, cancel): <code>doFinally</code></p>
-</li>
-</ul>
-</div>
+<p>1对n地转化可自定义转化方法和/或状态：<code>handle</code></p>
 </li>
 <li>
-<p>log what happens internally: <code>log</code></p>
-</li>
-</ul>
-</div>
-</li>
-<li>
-<p>I want to know of all events:</p>
+<p>对每一个元素执行一个异步操作（如对 url 执行 http 请求）：<code>flatMap</code> + 一个异步的返回类型为 <code>Publisher</code> 的方法</p>
 <div class="ulist">
 <ul>
 <li>
-<p>each represented as <code>Signal</code> object:</p>
-<div class="ulist">
-<ul>
-<li>
-<p>in a callback outside the sequence: <code>doOnEach</code></p>
+<p>&#8230;&#8203;忽略一些数据：在 flatMap lambda 中根据条件返回一个 <code>Mono.empty()</code></p>
 </li>
 <li>
-<p>instead of the original onNext emissions: <code>materialize</code></p>
-<div class="ulist">
-<ul>
+<p>&#8230;&#8203;保留原来的序列顺序：<code>Flux#flatMapSequential</code>（对每个元素的异步任务会立即执行，但会将结果按照原序列顺序排序）</p>
+</li>
 <li>
-<p>&#8230;&#8203;and get back to the onNexts: <code>dematerialize</code></p>
+<p>&#8230;&#8203;当 Mono 元素的异步任务会返回多个元素的序列时：<code>Mono#flatMapMany</code></p>
 </li>
 </ul>
 </div>
@@ -8613,106 +8323,59 @@ leading dot and parameters in parentheses, like this: <code>.methodCall(paramete
 </div>
 </li>
 <li>
-<p>as a line in a log: <code>log</code></p>
+<p>我想添加一些数据元素到一个现有的序列：</p>
+<div class="ulist">
+<ul>
+<li>
+<p>在开头添加：<code>Flux#startWith(T...)</code></p>
 </li>
-</ul>
-</div>
-</li>
-</ul>
-</div>
-</div>
-<div class="sect2">
-<h3 id="which.filtering"><a class="anchor" href="#which.filtering"></a>A.4. Filtering a Sequence</h3>
-<div class="ulist">
-<ul>
 <li>
-<p>I want to filter a sequence:</p>
-<div class="ulist">
-<ul>
-<li>
-<p>based on an arbitrary criteria: <code>filter</code></p>
-<div class="ulist">
-<ul>
-<li>
-<p>&#8230;&#8203;that is asynchronously computed: <code>filterWhen</code></p>
+<p>在最后添加：<code>Flux#concatWith(T...)</code></p>
 </li>
 </ul>
 </div>
 </li>
 <li>
-<p>restricting on the type of the emitted objects: <code>ofType</code></p>
-</li>
-<li>
-<p>by ignoring the values altogether: <code>ignoreElements</code></p>
-</li>
-<li>
-<p>by ignoring duplicates:</p>
+<p>我想将 <code>Flux</code> 转化为集合（一下都是针对 <code>Flux</code> 的）</p>
 <div class="ulist">
 <ul>
 <li>
-<p>in the whole sequence (logical set): <code>Flux#distinct</code></p>
+<p>转化为 List：<code>collectList</code>，<code>collectSortedList</code></p>
 </li>
 <li>
-<p>between subsequently emitted items (deduplication): <code>Flux#distinctUntilChanged</code></p>
-</li>
-</ul>
-</div>
-</li>
-</ul>
-</div>
+<p>转化为 Map：<code>collectMap</code>，<code>collectMultiMap</code></p>
 </li>
 <li>
-<p>I want to keep only a subset of the sequence:</p>
+<p>转化为自定义集合：<code>collect</code></p>
+</li>
+<li>
+<p>计数：<code>count</code></p>
+</li>
+<li>
+<p>reduce 算法（将上个元素的reduce结果与当前元素值作为输入执行reduce方法，如sum） <code>reduce</code></p>
 <div class="ulist">
 <ul>
 <li>
-<p>by taking N elements:</p>
-<div class="ulist">
-<ul>
-<li>
-<p>at the beginning of the sequence: <code>Flux#take(long)</code></p>
-<div class="ulist">
-<ul>
-<li>
-<p>&#8230;&#8203;based on a duration: <code>Flux#take(Duration)</code></p>
-</li>
-<li>
-<p>&#8230;&#8203;only the first element, as a <code>Mono</code>: <code>Flux#next()</code></p>
-</li>
-<li>
-<p>&#8230;&#8203;using <code>request(N)</code> rather than cancellation: <code>Flux#limitRequest(long)</code></p>
+<p>&#8230;&#8203;将每次 reduce 的结果立即发出：<code>scan</code></p>
 </li>
 </ul>
 </div>
 </li>
 <li>
-<p>at the end of the sequence: <code>Flux#takeLast</code></p>
-</li>
-<li>
-<p>until a criteria is met (inclusive): <code>Flux#takeUntil</code> (predicate-based), <code>Flux#takeUntilOther</code> (companion publisher-based)</p>
-</li>
-<li>
-<p>while a criteria is met (exclusive): <code>Flux#takeWhile</code></p>
-</li>
-</ul>
-</div>
-</li>
-<li>
-<p>by taking at most 1 element:</p>
+<p>转化为一个 boolean 值：</p>
 <div class="ulist">
 <ul>
 <li>
-<p>at a specific position: <code>Flux#elementAt</code></p>
+<p>对所有元素判断都为true：<code>all</code></p>
 </li>
 <li>
-<p>at the end: <code>.takeLast(1)</code></p>
-<div class="ulist">
-<ul>
-<li>
-<p>&#8230;&#8203;and emit an error if empty: <code>Flux#last()</code></p>
+<p>对至少一个元素判断为true：<code>any</code></p>
 </li>
 <li>
-<p>&#8230;&#8203;and emit a default value if empty: <code>Flux#last(T)</code></p>
+<p>判断序列是否有元素（不为空）：<code>hasElements</code></p>
+</li>
+<li>
+<p>判断序列中是否有匹配的元素：<code>hasElement</code></p>
 </li>
 </ul>
 </div>
@@ -8721,151 +8384,64 @@ leading dot and parameters in parentheses, like this: <code>.methodCall(paramete
 </div>
 </li>
 <li>
-<p>by skipping elements:</p>
+<p>我想合并 publishers&#8230;&#8203;</p>
 <div class="ulist">
 <ul>
 <li>
-<p>at the beginning of the sequence: <code>Flux#skip(long)</code></p>
+<p>按序连接：<code>Flux#concat</code> 或 <code>.concatWith(other)</code></p>
 <div class="ulist">
 <ul>
 <li>
-<p>&#8230;&#8203;based on a duration: <code>Flux#skip(Duration)</code></p>
+<p>&#8230;&#8203;即使有错误，也会等所有的 publishers 连接完成：<code>Flux#concatDelayError</code></p>
+</li>
+<li>
+<p>&#8230;&#8203;按订阅顺序连接（这里的合并仍然可以理解成序列的连接）：<code>Flux#mergeSequential</code></p>
 </li>
 </ul>
 </div>
 </li>
 <li>
-<p>at the end of the sequence: <code>Flux#skipLast</code></p>
-</li>
+<p>按元素发出的顺序合并（无论哪个序列的，元素先到先合并）：<code>Flux#merge</code> / <code>.mergeWith(other)</code></p>
+<div class="ulist">
+<ul>
 <li>
-<p>until a criteria is met (inclusive): <code>Flux#skipUntil</code> (predicate-based), <code>Flux#skipUntilOther</code> (companion publisher-based)</p>
-</li>
-<li>
-<p>while a criteria is met (exclusive): <code>Flux#skipWhile</code></p>
+<p>&#8230;&#8203;元素类型会发生变化：<code>Flux#zip</code> / <code>Flux#zipWith</code></p>
 </li>
 </ul>
 </div>
 </li>
 <li>
-<p>by sampling items:</p>
+<p>将元素组合：</p>
 <div class="ulist">
 <ul>
 <li>
-<p>by duration: <code>Flux#sample(Duration)</code></p>
-<div class="ulist">
-<ul>
+<p>2个 Monos 组成1个 <code>Tuple2</code>：<code>Mono#zipWith</code></p>
+</li>
 <li>
-<p>but keeping the first element in the sampling window instead of the last: <code>sampleFirst</code></p>
+<p>n个 Monos 的元素都发出来后组成一个 Tuple：<code>Mono#zip</code></p>
 </li>
 </ul>
 </div>
 </li>
 <li>
-<p>by a publisher-based window: <code>Flux#sample(Publisher)</code></p>
-</li>
-<li>
-<p>based on a publisher "timing out": <code>Flux#sampleTimeout</code> (each element triggers a publisher, and is emitted if that publisher does not overlap with the next)</p>
-</li>
-</ul>
-</div>
-</li>
-</ul>
-</div>
-</li>
-<li>
-<p>I expect at most 1 element (error if more than one)&#8230;&#8203;</p>
+<p>在终止信号出现时“采取行动”：</p>
 <div class="ulist">
 <ul>
 <li>
-<p>and I want an error if the sequence is empty: <code>Flux#single()</code></p>
+<p>在 Mono 终止时转换为一个 <code>Mono&lt;Void&gt;</code>：<code>Mono#and</code></p>
 </li>
 <li>
-<p>and I want a default value if the sequence is empty: <code>Flux#single(T)</code></p>
+<p>当 n 个 Mono 都终止时返回 <code>Mono&lt;Void&gt;</code>：<code>Mono#when</code></p>
 </li>
 <li>
-<p>and I accept an empty sequence as well: <code>Flux#singleOrEmpty</code></p>
-</li>
-</ul>
-</div>
-</li>
-</ul>
-</div>
-</div>
-<div class="sect2">
-<h3 id="which.errors"><a class="anchor" href="#which.errors"></a>A.5. Handling Errors</h3>
+<p>返回一个存放组合数据的类型，对于被合并的多个序列：</p>
 <div class="ulist">
 <ul>
 <li>
-<p>I want to create an erroring sequence: <code>error</code>&#8230;&#8203;</p>
-<div class="ulist">
-<ul>
-<li>
-<p>&#8230;&#8203;to replace the completion of a successful <code>Flux</code>: <code>.concat(Flux.error(e))</code></p>
+<p>每个序列都发出一个元素时：<code>Flux#zip</code></p>
 </li>
 <li>
-<p>&#8230;&#8203;to replace the <strong>emission</strong> of a successful <code>Mono</code>: <code>.then(Mono.error(e))</code></p>
-</li>
-<li>
-<p>&#8230;&#8203;if too much time elapses between onNexts: <code>timeout</code></p>
-</li>
-</ul>
-</div>
-</li>
-<li>
-<p>I want the try/catch equivalent of:</p>
-<div class="ulist">
-<ul>
-<li>
-<p>throwing: <code>error</code></p>
-</li>
-<li>
-<p>catching an exception:</p>
-<div class="ulist">
-<ul>
-<li>
-<p>and falling back to a default value: <code>onErrorReturn</code></p>
-</li>
-<li>
-<p>and falling back to another <code>Flux</code> or <code>Mono</code>: <code>onErrorResume</code></p>
-</li>
-<li>
-<p>and wrapping and re-throwing: <code>.onErrorMap(t -&gt; new RuntimeException(t))</code></p>
-</li>
-</ul>
-</div>
-</li>
-<li>
-<p>the finally block: <code>doFinally</code></p>
-</li>
-<li>
-<p>the using pattern from Java 7: <code>using</code> factory method</p>
-</li>
-</ul>
-</div>
-</li>
-<li>
-<p>I want to recover from errors&#8230;&#8203;</p>
-<div class="ulist">
-<ul>
-<li>
-<p>by falling back:</p>
-<div class="ulist">
-<ul>
-<li>
-<p>to a value: <code>onErrorReturn</code></p>
-</li>
-<li>
-<p>to a <code>Publisher</code> or <code>Mono</code>, possibly different ones depending on the error: <code>Flux#onErrorResume</code> and <code>Mono#onErrorResume</code></p>
-</li>
-</ul>
-</div>
-</li>
-<li>
-<p>by retrying: <code>retry</code></p>
-<div class="ulist">
-<ul>
-<li>
-<p>&#8230;&#8203;triggered by a companion control Flux: <code>retryWhen</code></p>
+<p>任何一个序列发出元素时：<code>Flux#combineLatest</code></p>
 </li>
 </ul>
 </div>
@@ -8874,31 +8450,89 @@ leading dot and parameters in parentheses, like this: <code>.methodCall(paramete
 </div>
 </li>
 <li>
-<p>I want to deal with backpressure "errors"<sup class="footnote">[<a id="_footnoteref_2" class="footnote" href="#_footnote_2" title="View footnote.">2</a>]</sup>&#8230;&#8203;</p>
-<div class="ulist">
-<ul>
-<li>
-<p>by throwing a special <code>IllegalStateException</code>: <code>Flux#onBackpressureError</code></p>
+<p>只取各个序列的第一个元素：<code>Flux#first</code>，<code>Mono#first</code>，<code>mono.or
+(otherMono).or(thirdMono)</code>，`flux.or(otherFlux).or(thirdFlux)</p>
 </li>
 <li>
-<p>by dropping excess values: <code>Flux#onBackpressureDrop</code></p>
-<div class="ulist">
-<ul>
+<p>由一个序列触发（类似于 <code>flatMap</code>，不过“喜新厌旧”）：<code>switchMap</code></p>
+</li>
 <li>
-<p>&#8230;&#8203;except the last one seen: <code>Flux#onBackpressureLatest</code></p>
+<p>由每个新序列开始时触发（也是“喜新厌旧”风格）：<code>switchOnNext</code></p>
 </li>
 </ul>
 </div>
 </li>
 <li>
-<p>by buffering excess values (bounded or unbounded): <code>Flux#onBackpressureBuffer</code></p>
+<p>我想重复一个序列：<code>repeat</code></p>
 <div class="ulist">
 <ul>
 <li>
-<p>&#8230;&#8203;and applying a strategy when bounded buffer also overflows: <code>Flux#onBackpressureBuffer</code> with a <code>BufferOverflowStrategy</code></p>
+<p>&#8230;&#8203;但是以一定的间隔重复：<code>Flux.interval(duration).flatMap(tick -&gt; myExistingPublisher)</code></p>
 </li>
 </ul>
 </div>
+</li>
+<li>
+<p>我有一个空序列，但是&#8230;&#8203;</p>
+<div class="ulist">
+<ul>
+<li>
+<p>我想要一个缺省值来代替：<code>defaultIfEmpty</code></p>
+</li>
+<li>
+<p>我想要一个缺省的序列来代替：<code>switchIfEmpty</code></p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>我有一个序列，但是我对序列的元素值不感兴趣：<code>ignoreElements</code></p>
+<div class="ulist">
+<ul>
+<li>
+<p>&#8230;&#8203;并且我希望用 <code>Mono</code> 来表示序列已经结束：<code>then</code></p>
+</li>
+<li>
+<p>&#8230;&#8203;并且我想在序列结束后等待另一个任务完成：<code>thenEmpty</code></p>
+</li>
+<li>
+<p>&#8230;&#8203;并且我想在序列结束之后返回一个 <code>Mono</code>：<code>Mono#then(mono)</code></p>
+</li>
+<li>
+<p>&#8230;&#8203;并且我想在序列结束之后返回一个值：<code>Mono#thenReturn(T)</code></p>
+</li>
+<li>
+<p>&#8230;&#8203;并且我想在序列结束之后返回一个 <code>Flux</code>：<code>thenMany</code></p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>我有一个 Mono 但我想延迟完成&#8230;&#8203;</p>
+<div class="ulist">
+<ul>
+<li>
+<p>&#8230;&#8203;当有1个或N个其他 publishers 都发出（或结束）时才完成：<code>Mono#delayUntilOther</code></p>
+<div class="ulist">
+<ul>
+<li>
+<p>&#8230;&#8203;使用一个函数式来定义如何获取“其他 publisher”：<code>Mono#delayUntil(Function)</code></p>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>我想基于一个递归的生成序列的规则扩展每一个元素，然后合并为一个序列发出：</p>
+<div class="ulist">
+<ul>
+<li>
+<p>&#8230;&#8203;广度优先：<code>expand(Function)</code></p>
+</li>
+<li>
+<p>&#8230;&#8203;深度优先：<code>expandDeep(Function)</code></p>
 </li>
 </ul>
 </div>
@@ -8907,40 +8541,256 @@ leading dot and parameters in parentheses, like this: <code>.methodCall(paramete
 </div>
 </div>
 <div class="sect2">
-<h3 id="which.time"><a class="anchor" href="#which.time"></a>A.6. Working with Time</h3>
+<h3 id="which.peeking"><a class="anchor" href="#which.peeking"></a>A.3. “窥视”（只读）序列</h3>
 <div class="ulist">
 <ul>
 <li>
-<p>I want to associate emissions with a timing (<code>Tuple2&lt;Long, T&gt;</code>) measured&#8230;&#8203;</p>
+<p>再不对序列造成改变的情况下，我想：</p>
 <div class="ulist">
 <ul>
 <li>
-<p>since subscription: <code>elapsed</code></p>
+<p>得到通知或执行一些操作：</p>
+<div class="ulist">
+<ul>
+<li>
+<p>发出元素：<code>doOnNext</code></p>
 </li>
 <li>
-<p>since the dawn of time (well, computer time): <code>timestamp</code></p>
+<p>序列完成：<code>Flux#doOnComplete</code>，<code>Mono#doOnSuccess</code></p>
+</li>
+<li>
+<p>因错误终止：<code>doOnError</code></p>
+</li>
+<li>
+<p>取消：<code>doOnCancel</code></p>
+</li>
+<li>
+<p>订阅时：<code>doOnSubscribe</code></p>
+</li>
+<li>
+<p>请求时：<code>doOnRequest</code></p>
+</li>
+<li>
+<p>完成或错误终止：<code>doOnTerminate</code>（Mono的方法可能包含有结果）</p>
+<div class="ulist">
+<ul>
+<li>
+<p>但是在终止信号向下游传递 <strong>之后</strong> ：<code>doAfterTerminate</code></p>
 </li>
 </ul>
 </div>
 </li>
 <li>
-<p>I want my sequence to be interrupted if there is too much delay between emissions: <code>timeout</code></p>
+<p>所有类型的信号（<code>Signal</code>）：<code>Flux#doOnEach</code></p>
 </li>
 <li>
-<p>I want to get ticks from a clock, regular time intervals: <code>Flux#interval</code></p>
+<p>所有结束的情况（完成complete、错误error、取消cancel）：<code>doFinally</code></p>
+</li>
+</ul>
+</div>
 </li>
 <li>
-<p>I want to emit a single <code>0</code> after an initial delay: static <code>Mono.delay</code>.</p>
+<p>记录日志：<code>log</code></p>
+</li>
+</ul>
+</div>
 </li>
 <li>
-<p>I want to introduce a delay:</p>
+<p>我想知道所有的事件:</p>
 <div class="ulist">
 <ul>
 <li>
-<p>between each onNext signal: <code>Mono#delayElement</code>, <code>Flux#delayElements</code></p>
+<p>每一个事件都体现为一个 <code>single</code> 对象：</p>
+<div class="ulist">
+<ul>
+<li>
+<p>执行 callback：<code>doOnEach</code></p>
 </li>
 <li>
-<p>before the subscription happens: <code>delaySubscription</code></p>
+<p>每个元素转化为 <code>single</code> 对象：<code>materialize</code></p>
+<div class="ulist">
+<ul>
+<li>
+<p>&#8230;&#8203;在转化回元素：<code>dematerialize</code></p>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>转化为一行日志：<code>log</code></p>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="which.filtering"><a class="anchor" href="#which.filtering"></a>A.4. 过滤序列</h3>
+<div class="ulist">
+<ul>
+<li>
+<p>我想过滤一个序列</p>
+<div class="ulist">
+<ul>
+<li>
+<p>基于给定的判断条件：<code>filter</code></p>
+<div class="ulist">
+<ul>
+<li>
+<p>&#8230;&#8203;异步地进行判断：<code>filterWhen</code></p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>仅限于指定类型的对象：<code>ofType</code></p>
+</li>
+<li>
+<p>忽略所有元素：<code>ignoreElements</code></p>
+</li>
+<li>
+<p>去重:</p>
+<div class="ulist">
+<ul>
+<li>
+<p>对于整个序列：<code>Flux#distinct</code></p>
+</li>
+<li>
+<p>去掉连续重复的元素：<code>Flux#distinctUntilChanged</code></p>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>我只想要一部分序列：</p>
+<div class="ulist">
+<ul>
+<li>
+<p>只要 N 个元素：</p>
+<div class="ulist">
+<ul>
+<li>
+<p>从序列的第一个元素开始算：<code>Flux#take(long)</code></p>
+<div class="ulist">
+<ul>
+<li>
+<p>&#8230;&#8203;取一段时间内发出的元素：<code>Flux#take(Duration)</code></p>
+</li>
+<li>
+<p>&#8230;&#8203;只取第一个元素放到 <code>Mono</code> 中返回：<code>Flux#next()</code></p>
+</li>
+<li>
+<p>&#8230;&#8203;使用 <code>request(N)</code> 而不是取消：<code>Flux#limitRequest(long)</code></p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>从序列的最后一个元素倒数：<code>Flux#takeLast</code></p>
+</li>
+<li>
+<p>直到满足某个条件（包含）：<code>Flux#takeUntil</code>（基于判断条件），<code>Flux#takeUntilOther</code>（基于对 publisher 的比较）</p>
+</li>
+<li>
+<p>直到满足某个条件（不包含）：<code>Flux#takeWhile</code></p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>最多只取 1 个元素：</p>
+<div class="ulist">
+<ul>
+<li>
+<p>给定序号：<code>Flux#elementAt</code></p>
+</li>
+<li>
+<p>最后一个：<code>.takeLast(1)</code></p>
+<div class="ulist">
+<ul>
+<li>
+<p>&#8230;&#8203;如果为序列空则发出错误信号：<code>Flux#last()</code></p>
+</li>
+<li>
+<p>&#8230;&#8203;如果序列为空则返回默认值：<code>Flux#last(T)</code></p>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>跳过一些元素：</p>
+<div class="ulist">
+<ul>
+<li>
+<p>从序列的第一个元素开始跳过：<code>Flux#skip(long)</code></p>
+<div class="ulist">
+<ul>
+<li>
+<p>&#8230;&#8203;跳过一段时间内发出的元素：<code>Flux#skip(Duration)</code></p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>跳过最后的 n 个元素：<code>Flux#skipLast</code></p>
+</li>
+<li>
+<p>直到满足某个条件（包含）：<code>Flux#skipUntil</code>（基于判断条件），<code>Flux#skipUntilOther</code> （基于对 publisher 的比较）</p>
+</li>
+<li>
+<p>直到满足某个条件（不包含）：<code>Flux#skipWhile</code></p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>采样：</p>
+<div class="ulist">
+<ul>
+<li>
+<p>给定采样周期：<code>Flux#sample(Duration)</code></p>
+<div class="ulist">
+<ul>
+<li>
+<p>取采样周期里的第一个元素而不是最后一个：<code>sampleFirst</code></p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>基于另一个 publisher：<code>Flux#sample(Publisher)</code></p>
+</li>
+<li>
+<p>基于 publisher“超时”：<code>Flux#sampleTimeout</code> （每一个元素会触发一个 publisher，如果这个 publisher 不被下一个元素触发的 publisher 覆盖就发出这个元素）</p>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>我只想要一个元素（如果多于一个就返回错误）&#8230;&#8203;</p>
+<div class="ulist">
+<ul>
+<li>
+<p>如果序列为空，发出错误信号：<code>Flux#single()</code></p>
+</li>
+<li>
+<p>如果序列为空，发出一个缺省值：<code>Flux#single(T)</code></p>
+</li>
+<li>
+<p>如果序列为空就返回一个空序列：<code>Flux#singleOrEmpty</code></p>
 </li>
 </ul>
 </div>
@@ -8949,171 +8799,331 @@ leading dot and parameters in parentheses, like this: <code>.methodCall(paramete
 </div>
 </div>
 <div class="sect2">
-<h3 id="which.window"><a class="anchor" href="#which.window"></a>A.7. Splitting a <code>Flux</code></h3>
+<h3 id="which.errors"><a class="anchor" href="#which.errors"></a>A.5. 错误处理</h3>
 <div class="ulist">
 <ul>
 <li>
-<p>I want to split a <code>Flux&lt;T&gt;</code> into a <code>Flux&lt;Flux&lt;T&gt;&gt;</code>, by a boundary criteria:</p>
+<p>我想创建一个错误序列：<code>error</code>&#8230;&#8203;</p>
 <div class="ulist">
 <ul>
 <li>
-<p>of size: <code>window(int)</code></p>
-<div class="ulist">
-<ul>
+<p>&#8230;&#8203;替换一个完成的 <code>Flux</code>：<code>.concat(Flux.error(e))</code></p>
+</li>
 <li>
-<p>&#8230;&#8203;with overlapping or dropping windows: <code>window(int, int)</code></p>
+<p>&#8230;&#8203;替换一个完成的 <code>Mono</code>：<code>.then(Mono.error(e))</code></p>
+</li>
+<li>
+<p>&#8230;&#8203;如果元素超时未发出：<code>timeout</code></p>
+</li>
+<li>
+<p>&#8230;&#8203;“懒”创建：<code>error(Supplier&lt;Throwable&gt;)</code></p>
 </li>
 </ul>
 </div>
 </li>
 <li>
-<p>of time <code>window(Duration)</code></p>
+<p>我想要类似 try/catch 的表达方式：</p>
 <div class="ulist">
 <ul>
 <li>
-<p>&#8230;&#8203;with overlapping or dropping windows: <code>window(Duration, Duration)</code></p>
-</li>
-</ul>
-</div>
+<p>抛出异常：<code>error</code></p>
 </li>
 <li>
-<p>of size OR time (window closes when count is reached or timeout elapsed): <code>windowTimeout(int, Duration)</code></p>
-</li>
-<li>
-<p>based on a predicate on elements: <code>windowUntil</code></p>
+<p>捕获异常：</p>
 <div class="ulist">
 <ul>
 <li>
-<p>&#8230;&#8203;…emitting the element that triggered the boundary in the next window (<code>cutBefore</code> variant): <code>.windowUntil(predicate, true)</code></p>
+<p>然后返回缺省值：<code>onErrorReturn</code></p>
 </li>
 <li>
-<p>&#8230;&#8203;keeping the window open while elements match a predicate: <code>windowWhile</code> (non-matching elements are not emitted)</p>
+<p>然后返回一个 <code>Flux</code> 或 <code>Mono</code>：<code>onErrorResume</code></p>
+</li>
+<li>
+<p>包装异常后再抛出：<code>.onErrorMap(t -&gt; new RuntimeException(t))</code></p>
 </li>
 </ul>
 </div>
 </li>
 <li>
-<p>driven by an arbitrary boundary represented by onNexts in a control Publisher: <code>window(Publisher)</code>, <code>windowWhen</code></p>
+<p>finally 代码块：<code>doFinally</code></p>
+</li>
+<li>
+<p>Java 7 之后的 try-with-resources 写法：<code>using</code> 工厂方法</p>
 </li>
 </ul>
 </div>
 </li>
 <li>
-<p>I want to split a <code>Flux&lt;T&gt;</code> and buffer elements within boundaries together&#8230;&#8203;</p>
+<p>我想从错误中恢复&#8230;&#8203;</p>
 <div class="ulist">
 <ul>
 <li>
-<p>into <code>List</code>:</p>
+<p>返回一个缺省的：</p>
 <div class="ulist">
 <ul>
 <li>
-<p>by a size boundary: <code>buffer(int)</code></p>
+<p>的值：<code>onErrorReturn</code></p>
+</li>
+<li>
+<p><code>Publisher</code>：<code>Flux#onErrorResume</code> 和 <code>Mono#onErrorResume</code></p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>重试：<code>retry</code></p>
 <div class="ulist">
 <ul>
 <li>
-<p>&#8230;&#8203;with overlapping or dropping buffers: <code>buffer(int, int)</code></p>
+<p>&#8230;&#8203;由一个用于伴随 Flux 触发：<code>retryWhen</code></p>
+</li>
+</ul>
+</div>
 </li>
 </ul>
 </div>
 </li>
 <li>
-<p>by a duration boundary: <code>buffer(Duration)</code></p>
+<p>我想处理回压错误（向上游发出“MAX”的 request，如果下游的 request 比较少，则应用策略）&#8230;&#8203;</p>
 <div class="ulist">
 <ul>
 <li>
-<p>&#8230;&#8203;with overlapping or dropping buffers: <code>buffer(Duration, Duration)</code></p>
-</li>
-</ul>
-</div>
+<p>抛出 <code>IllegalStateException</code>：<code>Flux#onBackpressureError</code></p>
 </li>
 <li>
-<p>by a size OR duration boundary: <code>bufferTimeout(int, Duration)</code></p>
-</li>
-<li>
-<p>by an arbitrary criteria boundary: <code>bufferUntil(Predicate)</code></p>
+<p>丢弃策略：<code>Flux#onBackpressureDrop</code></p>
 <div class="ulist">
 <ul>
 <li>
-<p>&#8230;&#8203;putting the element that triggered the boundary in the next buffer: <code>.bufferUntil(predicate, true)</code></p>
-</li>
-<li>
-<p>&#8230;&#8203;buffering while predicate matches and dropping the element that triggered the boundary: <code>bufferWhile(Predicate)</code></p>
+<p>&#8230;&#8203;但是不丢弃最后一个元素：<code>Flux#onBackpressureLatest</code></p>
 </li>
 </ul>
 </div>
 </li>
 <li>
-<p>driven by an arbitrary boundary represented by onNexts in a control Publisher: <code>buffer(Publisher)</code>, <code>bufferWhen</code></p>
+<p>缓存策略（有限或无限）：<code>Flux#onBackpressureBuffer</code></p>
+<div class="ulist">
+<ul>
+<li>
+<p>&#8230;&#8203;当有限的缓存空间用满则应用给定策略：<code>Flux#onBackpressureBuffer</code> 带有策略 <code>BufferOverflowStrategy</code></p>
 </li>
 </ul>
 </div>
 </li>
-<li>
-<p>into an arbitrary "collection" type <code>C</code>: use variants like <code>buffer(int, Supplier&lt;C&gt;)</code></p>
-</li>
 </ul>
 </div>
-</li>
-<li>
-<p>I want to split a <code>Flux&lt;T&gt;</code> so that element that share a characteristic end up in the same sub-flux: <code>groupBy(Function&lt;T,K&gt;)</code>
-TIP: Note that this returns a <code>Flux&lt;GroupedFlux&lt;K, T&gt;&gt;</code>, each inner <code>GroupedFlux</code> shares the same <code>K</code> key accessible through <code>key()</code>.</p>
 </li>
 </ul>
 </div>
 </div>
 <div class="sect2">
-<h3 id="which.blocking"><a class="anchor" href="#which.blocking"></a>A.8. Going Back to the Synchronous World</h3>
+<h3 id="which.time"><a class="anchor" href="#which.time"></a>A.6. 基于时间的操作</h3>
 <div class="ulist">
 <ul>
 <li>
-<p>I have a <code>Flux&lt;T&gt;</code> and I want to:</p>
+<p>我想将元素转换为带有时间信息的 <code>Tuple2&lt;Long, T&gt;</code>&#8230;&#8203;</p>
 <div class="ulist">
 <ul>
 <li>
-<p>block until I can get the first element: <code>Flux#blockFirst</code></p>
-<div class="ulist">
-<ul>
+<p>从订阅时开始：<code>elapsed</code></p>
+</li>
 <li>
-<p>&#8230;&#8203;with a timeout: <code>Flux#blockFirst(Duration)</code></p>
+<p>记录时间戳：<code>timestamp</code></p>
 </li>
 </ul>
 </div>
 </li>
 <li>
-<p>block until I can get the last element (or null if empty): <code>Flux#blockLast</code></p>
+<p>如果元素间延迟过长则中止序列：<code>timeout</code></p>
+</li>
+<li>
+<p>以固定的周期发出元素：<code>Flux#interval</code></p>
+</li>
+<li>
+<p>在一个给定的延迟后发出 <code>0</code>：static <code>Mono.delay</code>.</p>
+</li>
+<li>
+<p>我想引入延迟：</p>
 <div class="ulist">
 <ul>
 <li>
-<p>&#8230;&#8203;with a timeout: <code>Flux#blockLast(Duration)</code></p>
+<p>对每一个元素：<code>Mono#delayElement</code>，<code>Flux#delayElements</code></p>
+</li>
+<li>
+<p>延迟订阅：<code>delaySubscription</code></p>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="which.window"><a class="anchor" href="#which.window"></a>A.7. 拆分 <code>Flux</code></h3>
+<div class="ulist">
+<ul>
+<li>
+<p>我想将一个 <code>Flux&lt;T&gt;</code> 拆分为一个 <code>Flux&lt;Flux&lt;T&gt;&gt;</code>：</p>
+<div class="ulist">
+<ul>
+<li>
+<p>以个数为界：<code>window(int)</code></p>
+<div class="ulist">
+<ul>
+<li>
+<p>&#8230;&#8203;会出现重叠或丢弃的情况：<code>window(int, int)</code></p>
 </li>
 </ul>
 </div>
 </li>
 <li>
-<p>synchronously switch to an <code>Iterable&lt;T&gt;</code>: <code>Flux#toIterable</code></p>
-</li>
+<p>以时间为界：<code>window(Duration)</code></p>
+<div class="ulist">
+<ul>
 <li>
-<p>synchronously switch to a Java 8 <code>Stream&lt;T&gt;</code>: <code>Flux#toStream</code></p>
+<p>&#8230;&#8203;会出现重叠或丢弃的情况：<code>window(Duration, Duration)</code></p>
 </li>
 </ul>
 </div>
 </li>
 <li>
-<p>I have a <code>Mono&lt;T&gt;</code> and I want:</p>
+<p>以个数或时间为界：<code>windowTimeout(int, Duration)</code></p>
+</li>
+<li>
+<p>基于对元素的判断条件：<code>windowUntil</code></p>
 <div class="ulist">
 <ul>
 <li>
-<p>to block until I can get the value: <code>Mono#block</code></p>
-<div class="ulist">
-<ul>
+<p>&#8230;&#8203;触发判断条件的元素会分到下一波（<code>cutBefore</code> 变量）：<code>.windowUntil(predicate, true)</code></p>
+</li>
 <li>
-<p>&#8230;&#8203;with a timeout: <code>Mono#block(Duration)</code></p>
+<p>&#8230;&#8203;满足条件的元素在一波，直到不满足条件的元素发出开始下一波：<code>windowWhile</code> （不满足条件的元素会被丢弃）</p>
 </li>
 </ul>
 </div>
 </li>
 <li>
-<p>a <code>CompletableFuture&lt;T&gt;</code>: <code>Mono#toFuture</code></p>
+<p>通过另一个 Publisher 的每一个 onNext 信号来拆分序列：<code>window(Publisher)</code>，<code>windowWhen</code></p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>我想将一个 <code>Flux&lt;T&gt;</code> 的元素拆分到集合&#8230;&#8203;</p>
+<div class="ulist">
+<ul>
+<li>
+<p>拆分为一个一个的 <code>List</code>:</p>
+<div class="ulist">
+<ul>
+<li>
+<p>以个数为界：<code>buffer(int)</code></p>
+<div class="ulist">
+<ul>
+<li>
+<p>&#8230;&#8203;会出现重叠或丢弃的情况：<code>buffer(int, int)</code></p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>以时间为界：<code>buffer(Duration)</code></p>
+<div class="ulist">
+<ul>
+<li>
+<p>&#8230;&#8203;会出现重叠或丢弃的情况：<code>buffer(Duration, Duration)</code></p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>以个数或时间为界：<code>bufferTimeout(int, Duration)</code></p>
+</li>
+<li>
+<p>基于对元素的判断条件：<code>bufferUntil(Predicate)</code></p>
+<div class="ulist">
+<ul>
+<li>
+<p>&#8230;&#8203;触发判断条件的元素会分到下一个buffer：<code>.bufferUntil(predicate, true)</code></p>
+</li>
+<li>
+<p>&#8230;&#8203;满足条件的元素在一个buffer，直到不满足条件的元素发出开始下一buffer：<code>bufferWhile(Predicate)</code></p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>通过另一个 Publisher 的每一个 onNext 信号来拆分序列：<code>buffer(Publisher)</code>，<code>bufferWhen</code></p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>拆分到指定类型的 "collection"：<code>buffer(int, Supplier&lt;C&gt;)</code></p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>我想将 <code>Flux&lt;T&gt;</code> 中具有共同特征的元素分组到子 Flux：<code>groupBy(Function&lt;T,K&gt;)</code>
+TIP：注意返回值是 <code>Flux&lt;GroupedFlux&lt;K, T&gt;&gt;</code>，每一个 <code>GroupedFlux</code> 具有相同的 key 值 <code>K</code>，可以通过 <code>key()</code> 方法获取。</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="which.blocking"><a class="anchor" href="#which.blocking"></a>A.8. 回到同步的世界</h3>
+<div class="ulist">
+<ul>
+<li>
+<p>我有一个 <code>Flux&lt;T&gt;</code>，我想：</p>
+<div class="ulist">
+<ul>
+<li>
+<p>在拿到第一个元素前阻塞：<code>Flux#blockFirst</code></p>
+<div class="ulist">
+<ul>
+<li>
+<p>&#8230;&#8203;并给出超时时限：<code>Flux#blockFirst(Duration)</code></p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>在拿到最后一个元素前阻塞（如果序列为空则返回 null）：<code>Flux#blockLast</code></p>
+<div class="ulist">
+<ul>
+<li>
+<p>&#8230;&#8203;并给出超时时限：<code>Flux#blockLast(Duration)</code></p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>同步地转换为 <code>Iterable&lt;T&gt;</code>：<code>Flux#toIterable</code></p>
+</li>
+<li>
+<p>同步地转换为 Java 8 <code>Stream&lt;T&gt;</code>：<code>Flux#toStream</code></p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>我有一个 <code>Mono&lt;T&gt;</code>，我想：</p>
+<div class="ulist">
+<ul>
+<li>
+<p>在拿到元素前阻塞：<code>Mono#block</code></p>
+<div class="ulist">
+<ul>
+<li>
+<p>&#8230;&#8203;并给出超时时限：<code>Mono#block(Duration)</code></p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>转换为 <code>CompletableFuture&lt;T&gt;</code>：<code>Mono#toFuture</code></p>
 </li>
 </ul>
 </div>
@@ -9121,21 +9131,19 @@ TIP: Note that this returns a <code>Flux&lt;GroupedFlux&lt;K, T&gt;&gt;</code>, 
 </ul>
 </div>
 <div class="paragraph">
-<p><a href="https://github.com/reactor/reactor-core/edit/master/src/docs/asciidoc/operatorChoice.adoc" class="fa fa-edit" title="Suggest an edit to the above section via github">Suggest Edit</a>
-to "<a href="#which-operator">Which operator do I need?</a>"</p>
+<p><a href="https://github.com/get-set/reactor-core/edit/master-zh/src/docs/asciidoc/apdx-operatorChoice.adoc" class="fa fa-edit" title="通过Github的编辑功能对以上翻译内容提出建议">翻译建议</a>
+- "<a href="#which-operator">我需要哪个操作符？</a>"</p>
 </div>
 </div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="faq"><a class="anchor" href="#faq"></a>Appendix B: FAQ, Best Practices, and "How do I&#8230;&#8203;?"</h2>
+<h2 id="faq"><a class="anchor" href="#faq"></a>Appendix B: FAQ，最佳实践，以及“我如何&#8230;&#8203;?”</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="faq.wrap-blocking"><a class="anchor" href="#faq.wrap-blocking"></a>B.1. How do I wrap a synchronous, blocking call?</h3>
+<h3 id="faq.wrap-blocking"><a class="anchor" href="#faq.wrap-blocking"></a>B.1. 如何包装一个同步阻塞的调用？</h3>
 <div class="paragraph">
-<p>It&#8217;s often the case that a source of information is synchronous and blocking.
-To deal with such sources in your Reactor applications, apply the following
-pattern:</p>
+<p>很多时候，信息源是同步和阻塞的。在 Reactor 中，我们用以下方式处理这种信息源：</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -9149,45 +9157,40 @@ blockingWrapper = blockingWrapper.subscribeOn(Schedulers.elastic()); <i class="c
 <table>
 <tr>
 <td><i class="conum" data-value="1"></i><b>1</b></td>
-<td>Create a new <code>Mono</code> by using <code>fromCallable</code>.</td>
+<td>使用 <code>fromCallable</code> 方法生成一个 Mono；</td>
 </tr>
 <tr>
 <td><i class="conum" data-value="2"></i><b>2</b></td>
-<td>Return the asynchronous, blocking resource.</td>
+<td>返回同步、阻塞的资源；</td>
 </tr>
 <tr>
 <td><i class="conum" data-value="3"></i><b>3</b></td>
-<td>Ensure each subscription will happen on a dedicated single-threaded worker
-from <code>Schedulers.elastic()</code>.</td>
+<td>使用 <code>Schedulers.elastic()</code> 确保对每一个订阅来说运行在一个专门的线程上。</td>
 </tr>
 </table>
 </div>
 <div class="paragraph">
-<p>You should use a Mono because the source returns one value. You should use
-<code>Schedulers.elastic</code> because it creates a dedicated thread to wait for the
-blocking resource without tying up some other resource.</p>
+<p>因为调用返回一个值，所以你应该使用 Mono。你应该使用 <code>Schedulers.elastic</code>
+因为它会创建一个专门的线程来等待阻塞的调用返回。</p>
 </div>
 <div class="paragraph">
-<p>Note that <code>subscribeOn</code> does not subscribe to the <code>Mono</code>. It specifies what
-kind of <code>Scheduler</code> to use when a subscribe call happens.</p>
+<p>注意 <code>subscribeOn</code> 方法并不会“订阅”这个 <code>Mono</code>。它只是指定了订阅操作使用哪个 <code>Scheduler</code>。</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="faq.chain"><a class="anchor" href="#faq.chain"></a>B.2. I used an operator on my <code>Flux</code> but it doesn&#8217;t seem to apply. What gives?</h3>
+<h3 id="faq.chain"><a class="anchor" href="#faq.chain"></a>B.2. 用在 <code>Flux</code> 上的操作符好像没起作用，为啥？</h3>
 <div class="paragraph">
-<p>Make sure that the variable you <code>.subscribe()</code> to has been affected by the
-operators you think should have been applied to it.</p>
+<p>请确认你确实对调用 <code>.subscribe()</code> 的发布者应用了这个操作符。</p>
 </div>
 <div class="paragraph">
-<p>Reactor operators are decorators. They return a different instance that wraps
-the source sequence and add behavior. That is why the preferred way of using
-operators is to <strong>chain</strong> the calls.</p>
+<p>Reactor 的操作符是装饰器（decorators）。它们会返回一个不同的（发布者）实例，
+这个实例对上游序列进行了包装并增加了一些的处理行为。所以，最推荐的方式是将操作符“串”起来。</p>
 </div>
 <div class="paragraph">
-<p>Compare the following two examples:</p>
+<p>对比下边的两个例子：</p>
 </div>
 <div class="listingblock">
-<div class="title">without chaining (incorrect)</div>
+<div class="title">没有串起来（不正确的）</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="java">Flux&lt;<span class="predefined-type">String</span>&gt; flux = Flux.just(<span class="string"><span class="delimiter">&quot;</span><span class="content">foo</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">chain</span><span class="delimiter">&quot;</span></span>);
 flux.map(secret -&gt; secret.replaceAll(<span class="string"><span class="delimiter">&quot;</span><span class="content">.</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">*</span><span class="delimiter">&quot;</span></span>)); <i class="conum" data-value="1"></i><b>(1)</b>
@@ -9198,12 +9201,12 @@ flux.subscribe(next -&gt; <span class="predefined-type">System</span>.out.printl
 <table>
 <tr>
 <td><i class="conum" data-value="1"></i><b>1</b></td>
-<td>The mistake is here. The result isn&#8217;t attached to the <code>flux</code> variable.</td>
+<td>问题在这， <code>flux</code> 变量并没有改变。</td>
 </tr>
 </table>
 </div>
 <div class="listingblock">
-<div class="title">without chaining (correct)</div>
+<div class="title">串起来（正确的）</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="java">Flux&lt;<span class="predefined-type">String</span>&gt; flux = Flux.just(<span class="string"><span class="delimiter">&quot;</span><span class="content">foo</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">chain</span><span class="delimiter">&quot;</span></span>);
 flux = flux.map(secret -&gt; secret.replaceAll(<span class="string"><span class="delimiter">&quot;</span><span class="content">.</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">*</span><span class="delimiter">&quot;</span></span>));
@@ -9211,10 +9214,10 @@ flux.subscribe(next -&gt; <span class="predefined-type">System</span>.out.printl
 </div>
 </div>
 <div class="paragraph">
-<p>This sample is even better (because it&#8217;s simpler):</p>
+<p>下边的例子更好（因为更简洁）：</p>
 </div>
 <div class="listingblock">
-<div class="title">with chaining (best)</div>
+<div class="title">串起来（最好的）</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="java">Flux&lt;<span class="predefined-type">String</span>&gt; secrets = Flux
   .just(<span class="string"><span class="delimiter">&quot;</span><span class="content">foo</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">chain</span><span class="delimiter">&quot;</span></span>)
@@ -9223,7 +9226,7 @@ flux.subscribe(next -&gt; <span class="predefined-type">System</span>.out.printl
 </div>
 </div>
 <div class="paragraph">
-<p>The first version will output:</p>
+<p>第一个例子的输出：</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -9232,7 +9235,7 @@ Received: chain</code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>Whereas the two other versions will output the expected:</p>
+<p>后两个例子的输出：</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -9242,52 +9245,47 @@ Received: *****</code></pre>
 </div>
 </div>
 <div class="sect2">
-<h3 id="faq.monoThen"><a class="anchor" href="#faq.monoThen"></a>B.3. My <code>Mono</code> <code>zipWith</code>/<code>zipWhen</code> is never called</h3>
+<h3 id="faq.monoThen"><a class="anchor" href="#faq.monoThen"></a>B.3. <code>Mono</code> <code>zipWith</code>/<code>zipWhen</code> 没有被调用</h3>
 <div class="listingblock">
-<div class="title">example</div>
+<div class="title">例子</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="java">myMethod.process(<span class="string"><span class="delimiter">&quot;</span><span class="content">a</span><span class="delimiter">&quot;</span></span>) <span class="comment">// this method returns Mono&lt;Void&gt;</span>
-        .zipWith(myMethod.process(<span class="string"><span class="delimiter">&quot;</span><span class="content">b</span><span class="delimiter">&quot;</span></span>), combinator) <span class="comment">//this is never called</span>
+<pre class="CodeRay highlight"><code data-lang="java">myMethod.process(<span class="string"><span class="delimiter">&quot;</span><span class="content">a</span><span class="delimiter">&quot;</span></span>) <span class="comment">// 这个方法返回 Mono&lt;Void&gt;</span>
+        .zipWith(myMethod.process(<span class="string"><span class="delimiter">&quot;</span><span class="content">b</span><span class="delimiter">&quot;</span></span>), combinator) <span class="comment">//没有被调用</span>
         .subscribe();</code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>If the source <code>Mono</code> is either <code>empty</code> or a <code>Mono&lt;Void&gt;</code> (a <code>Mono&lt;Void&gt;</code> is
-empty for all intents and purposes), some combinations will never be called.</p>
+<p>如果源 <code>Mono</code> 为空或是一个 <code>Mono&lt;Void&gt;</code>（<code>Mono&lt;Void&gt;</code> 通常用于“空”的场景），
+下边的组合操作就不会被调用。</p>
 </div>
 <div class="paragraph">
-<p>This is the typical case for any transformer like the <code>zipWith</code> operator, which by
-definition needs an
-element from each source to produce its output. If any of the sources are
-empty, <code>and</code> produces an empty sequence as well, so be careful of its usage.
-For example, using <code>zipWith()</code> after a <code>then()</code> may cause this problem.</p>
+<p>对于类似 <code>zipWith</code> 的用于转换的操作符来说，这是比较典型的场景。
+这些操作符依赖于数据元素来转换为输出的元素。
+如果任何一个序列是空的，则返回的就是一个空序列，所以请谨慎使用。
+例如在 <code>then()</code> 之后使用 <code>zipWith()</code> 就会导致这一问题。</p>
 </div>
 <div class="paragraph">
-<p>This is even more true of the variants of <code>and</code> that take a <code>Function</code>, meaning
-that the associated Mono is chosen lazily depending on the incoming value
-(which never comes in the cases of empty or <code>Void</code> sequences).</p>
+<p>对于以 <code>Function</code> 作为参数的 <code>and</code> 更是如此，因为返回的 Mono
+是依赖于收到的数据懒加载的（而对于空序列或 <code>Void</code> 的序列来说是没有数据发出来的）。</p>
 </div>
 <div class="paragraph">
-<p>You can use <code>.defaultIfEmpty(T)</code> to replace an <strong>empty</strong> sequence of <code>T</code> (not a
-<code>Void</code> sequence) with a default value, which could help avoid some of these
-situations. Here&#8217;s an example this:</p>
+<p>你可以使用 <code>.defaultIfEmpty(T)</code> 将空序列替换为包含 <code>T</code> 类型缺省值的序列（而不是 <code>Void</code> 序列），
+从而可以避免类似的情况出现。举例如下：</p>
 </div>
 <div class="listingblock">
-<div class="title">use <code>defaultIfEmpty</code> before <code>zipWhen</code></div>
+<div class="title">在 <code>zipWhen</code> 前使用 <code>defaultIfEmpty</code></div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="java">myMethod.emptySequenceForKey(<span class="string"><span class="delimiter">&quot;</span><span class="content">a</span><span class="delimiter">&quot;</span></span>) <span class="comment">// this method returns empty Mono&lt;String&gt;</span>
-        .defaultIfEmpty(<span class="string"><span class="delimiter">&quot;</span><span class="delimiter">&quot;</span></span>) <span class="comment">// this converts empty sequence to just the empty String</span>
-        .zipWhen(aString -&gt; myMethod.process(<span class="string"><span class="delimiter">&quot;</span><span class="content">b</span><span class="delimiter">&quot;</span></span>)) <span class="comment">//this is called with the empty String</span>
+<pre class="CodeRay highlight"><code data-lang="java">myMethod.emptySequenceForKey(<span class="string"><span class="delimiter">&quot;</span><span class="content">a</span><span class="delimiter">&quot;</span></span>) <span class="comment">// 这个方法返回一个空的 Mono&lt;String&gt;</span>
+        .defaultIfEmpty(<span class="string"><span class="delimiter">&quot;</span><span class="delimiter">&quot;</span></span>) <span class="comment">// 将空序列转换为包含字符串 &quot;&quot; 的序列</span>
+        .zipWhen(aString -&gt; myMethod.process(<span class="string"><span class="delimiter">&quot;</span><span class="content">b</span><span class="delimiter">&quot;</span></span>)) <span class="comment">// 当 &quot;&quot; 发出时被调用</span>
         .subscribe();</code></pre>
 </div>
 </div>
 </div>
 <div class="sect2">
-<h3 id="faq.retryWhen"><a class="anchor" href="#faq.retryWhen"></a>B.4. How to use <code>retryWhen</code> to emulate <code>retry(3)</code>?</h3>
+<h3 id="faq.retryWhen"><a class="anchor" href="#faq.retryWhen"></a>B.4. 如何用 <code>retryWhen</code> 来实现 <code>retry(3)</code> 的效果？</h3>
 <div class="paragraph">
-<p>The <code>retryWhen</code> operator can be quite complex. Hopefully this snippet of code
-can help you understand how it works by attempting to emulate a simpler
-<code>retry(3)</code>:</p>
+<p><code>retryWhen</code> 方法比较复杂，希望下边的一段模拟 <code>retry(3)</code> 的代码能够帮你更好地理解它的工作方式：</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -9318,24 +9316,22 @@ Flux.&lt;<span class="predefined-type">String</span>&gt;error(<span class="keywo
 </tr>
 <tr>
 <td><i class="conum" data-value="4"></i><b>4</b></td>
-<td>（译者加：技巧二：）为了使序列以错误结束。我们将原始异常在三次重试之后抛出。</td>
+<td>为了使序列以错误结束。我们将原始异常在三次重试之后抛出。</td>
 </tr>
 </table>
 </div>
 </div>
 <div class="sect2">
-<h3 id="faq.exponentialBackoff"><a class="anchor" href="#faq.exponentialBackoff"></a>B.5. How to use <code>retryWhen</code> for exponential backoff?</h3>
+<h3 id="faq.exponentialBackoff"><a class="anchor" href="#faq.exponentialBackoff"></a>B.5. 如何使用 <code>retryWhen</code> 进行 exponential backoff？</h3>
 <div class="paragraph">
-<p>Exponential backoff produces retry attempts with a growing delay between each
-of the attempts, so as not to overload the source systems and risk an all out
-crash. The rationale is that if the source produces an error, it is already in
-an unstable state and not likely to immediately recover from it. So blindly
-retrying immediately is likely to produce yet another error and add to the
-instability.</p>
+<p>Exponential backoff 的意思是进行的多次重试之间的间隔越来越长，
+从而避免对源系统造成过载，甚至宕机。基本原理是，如果源产生了一个错误，
+那么已经是处于不稳定状态，可能不会立刻复原。所以，如果立刻就重试可能会产生另一个错误，
+导致源更加不稳定。</p>
 </div>
 <div class="paragraph">
-<p>Here is how to implement an exponential backoff that delays retries and increase
-the delay between each attempt (pseudocode: delay = attempt number * 100 milliseconds):</p>
+<p>下面是一段实现 exponential backoff 效果的例子，每次重试的间隔都会递增
+（伪代码： delay = attempt number * 100 milliseconds）：</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -9356,25 +9352,24 @@ Flux.&lt;<span class="predefined-type">String</span>&gt;error(<span class="keywo
 <table>
 <tr>
 <td><i class="conum" data-value="1"></i><b>1</b></td>
-<td>We log the time of errors.</td>
+<td>记录错误出现的时间；</td>
 </tr>
 <tr>
 <td><i class="conum" data-value="2"></i><b>2</b></td>
-<td>We use the <code>retryWhen</code> + <code>zipWith</code> trick to propagate the error after 3
-retries.</td>
+<td>使用 <code>retryWhen</code> + <code>zipWith</code> 的技巧实现重试3次的效果；</td>
 </tr>
 <tr>
 <td><i class="conum" data-value="3"></i><b>3</b></td>
-<td>Through <code>flatMap</code>, we cause a delay that depends on the attempt&#8217;s index.</td>
+<td>通过 <code>flatMap</code> 来实现延迟时间递增的效果；</td>
 </tr>
 <tr>
 <td><i class="conum" data-value="4"></i><b>4</b></td>
-<td>We also log the time at which the retry happens.</td>
+<td>同样记录重试的时间。</td>
 </tr>
 </table>
 </div>
 <div class="paragraph">
-<p>When subscribed to, this fails and terminates after printing out:</p>
+<p>订阅它，输出如下：</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -9391,15 +9386,15 @@ java.lang.IllegalArgumentException at 18:02:29.964</pre>
 <table>
 <tr>
 <td><i class="conum" data-value="1"></i><b>1</b></td>
-<td>first retry after about 100ms</td>
+<td>第一次重试延迟大约 100ms</td>
 </tr>
 <tr>
 <td><i class="conum" data-value="2"></i><b>2</b></td>
-<td>second retry after about 200ms</td>
+<td>第二次重试延迟大约 200ms</td>
 </tr>
 <tr>
 <td><i class="conum" data-value="3"></i><b>3</b></td>
-<td>third retry after about 300ms</td>
+<td>第三次重试延迟大约 300ms</td>
 </tr>
 </table>
 </div>
@@ -9407,17 +9402,14 @@ java.lang.IllegalArgumentException at 18:02:29.964</pre>
 <div class="sect2">
 <h3 id="_how_do_i_ensure_thread_affinity_using_code_publishon_code"><a class="anchor" href="#_how_do_i_ensure_thread_affinity_using_code_publishon_code"></a>B.6. How do I ensure thread affinity using <code>publishOn()</code>?</h3>
 <div class="paragraph">
-<p>As described in <a href="#schedulers">Schedulers</a>, <code>publishOn()</code> can be used to switch
-execution contexts. The <code>publishOn</code> operator influences the threading context
-where the rest of the operators in the chain below it will execute, up to a new
-occurrence of <code>publishOn</code>. So the placement of <code>publishOn</code> is significant.</p>
+<p>如 <a href="#schedulers">Schedulers</a> 所述，<code>publishOn()</code> 可以用来切换执行线程。
+<code>publishOn</code> 能够影响到其之后的操作符的执行线程，直到有新的 <code>publishOn</code> 出现。
+所以 <code>publishOn</code> 的位置很重要。</p>
 </div>
 <div class="paragraph">
-<p>For instance, in the example below, the <code>transform</code> function in <code>map()</code> is
-executed on a worker of <code>scheduler1</code> and the <code>processNext</code> method in
-<code>doOnNext()</code> is executed on a worker of <code>scheduler2</code>. Single threaded
-schedulers may be used to ensure thread affinity for different stages in the
-chain or for different subscribers.</p>
+<p>比如下边的例子， <code>map()</code> 中的 <code>transform</code> 方法是在 <code>scheduler1</code> 的一个工作线程上执行的，
+而 <code>doOnNext()</code> 中的 <code>processNext</code> 方法是在 <code>scheduler2</code> 的一个工作线程上执行的。
+单线程的调度器可能用于对不同阶段的任务或不同的订阅者确保线程关联性。</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -9430,8 +9422,8 @@ processor.publishOn(scheduler1)
 </div>
 </div>
 <div class="paragraph">
-<p><a href="https://github.com/reactor/reactor-core/edit/master/src/docs/asciidoc/faq.adoc" class="fa fa-edit" title="Suggest an edit to the above section via github">Suggest Edit</a>
-to "<a href="#faq">FAQ, Best Practices, and "How do I&#8230;&#8203;?"</a>"</p>
+<p><a href="https://github.com/get-set/reactor-core/edit/master-zh/src/docs/asciidoc/faq.adoc" class="fa fa-edit" title="通过Github的编辑功能对以上翻译内容提出建议">翻译建议</a>
+- "<a href="#faq">FAQ，最佳实践，以及“我如何&#8230;&#8203;?”</a>"</p>
 </div>
 </div>
 </div>
@@ -9440,11 +9432,10 @@ to "<a href="#faq">FAQ, Best Practices, and "How do I&#8230;&#8203;?"</a>"</p>
 <h2 id="reactor-extra"><a class="anchor" href="#reactor-extra"></a>Appendix C: Reactor-Extra</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>The <code>reactor-extra</code> artifact contains additional operators and utilities that are for
-users of <code>reactor-core</code> with advanced needs.</p>
+<p><code>reactor-extra</code> 为满足 <code>reactor-core</code> 用户的更高级需求，提供了一些额外的操作符和工具。</p>
 </div>
 <div class="paragraph">
-<p>As this is a separate artifact, you need to explicitly add it to your build:</p>
+<p>由于这是一个单独的包，使用时需要明确它的依赖：</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -9458,23 +9449,21 @@ users of <code>reactor-core</code> with advanced needs.</p>
 <table>
 <tr>
 <td><i class="conum" data-value="1"></i><b>1</b></td>
-<td>Add the reactor extra artifact in addition to core. See <a href="#getting">获取 Reactor</a> for details
-about why you don&#8217;t need to specify a version if you use the BOM, usage in Maven, etc&#8230;&#8203;</td>
+<td>添加 reactor-extra 的依赖。参考 <a href="#getting">获取 Reactor</a> 了解为什么使用BOM的情况下不需要指定 version。</td>
 </tr>
 </table>
 </div>
 <div class="sect2">
-<h3 id="extra-tuples"><a class="anchor" href="#extra-tuples"></a>C.1. <code>TupleUtils</code> and Functional Interfaces</h3>
+<h3 id="extra-tuples"><a class="anchor" href="#extra-tuples"></a>C.1. <code>TupleUtils</code> 以及函数式接口</h3>
 <div class="paragraph">
-<p>The <code>reactor.function</code> package contains functional interfaces that complement the Java 8
-<code>Function</code>, <code>Predicate</code> and <code>Consumer</code> interfaces, for 3 to 8 values.</p>
+<p>在 Java 8 提供的函数式接口基础上，<code>reactor.function</code>
+包又提供了一些支持 3 到 8 个值的 <code>Function</code>、<code>Predicate</code> 和 <code>Consumer</code>。</p>
 </div>
 <div class="paragraph">
-<p><code>TupleUtils</code> offers static methods that act as a bridge between lambdas of these functional
-interfaces to a similar interface on the corresponding <code>Tuple</code>.</p>
+<p><code>TupleUtils</code> 提供的静态方法可以方便地用于将相应的 <code>Tuple</code> 函数式接口的 lambda 转换为更简单的接口。</p>
 </div>
 <div class="paragraph">
-<p>This allows to easily work with independent parts of any <code>Tuple</code>, for instance:</p>
+<p>这使得我们在使用 <code>Tuple</code> 中各成员的时候更加容易，比如：</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -9488,7 +9477,7 @@ interfaces to a similar interface on the corresponding <code>Tuple</code>.</p>
 </div>
 </div>
 <div class="paragraph">
-<p>Can be instead written as</p>
+<p>可以用下面的方式代替：</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -9499,58 +9488,49 @@ interfaces to a similar interface on the corresponding <code>Tuple</code>.</p>
 <table>
 <tr>
 <td><i class="conum" data-value="1"></i><b>1</b></td>
-<td>(as <code>Customer</code> constructor conforms to <code>Consumer3</code> functional interface signature)</td>
+<td>（因为 <code>Customer</code> 的构造方法符合 <code>Consumer3</code> 的函数式接口标签）</td>
 </tr>
 </table>
 </div>
 </div>
 <div class="sect2">
-<h3 id="extra-math"><a class="anchor" href="#extra-math"></a>C.2. Math Operators With <code>MathFlux</code></h3>
+<h3 id="extra-math"><a class="anchor" href="#extra-math"></a>C.2. <code>MathFlux</code> 的数学操作符</h3>
 <div class="paragraph">
-<p>The <code>reactor.math</code> package contains a <code>MathFlux</code> specialized version of <code>Flux</code> that offers
-mathematical operators, like <code>max</code>, <code>min</code>, <code>sumInt</code>, <code>averageDouble</code>&#8230;&#8203;</p>
+<p>T`reactor.math` 包的 <code>MathFlux</code> 提供了一些用于数学计算的操作符，如
+<code>max</code>、<code>min</code>、<code>sumInt</code>、<code>averageDouble</code>&#8230;&#8203;</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="extra-repeat-retry"><a class="anchor" href="#extra-repeat-retry"></a>C.3. Repeat and Retry Utilities</h3>
+<h3 id="extra-repeat-retry"><a class="anchor" href="#extra-repeat-retry"></a>C.3. 重复与重试工具</h3>
 <div class="paragraph">
-<p>The <code>reactor.retry</code> package contains utilities to help in writing <code>Flux#repeatWhen</code> and
-<code>Flux#retryWhen</code> functions. The entry points are factory methods in respectively <code>Repeat</code>
-and <code>Retry</code> interfaces.</p>
+<p><code>reactor.retry</code> 包中有一些能够帮助实现 <code>Flux#repeatWhen</code> 和
+<code>Flux#retryWhen</code> 的工具。入口点（entry points）就是 <code>Repeat</code> 和 <code>Retry</code>
+接口的工厂方法。</p>
 </div>
 <div class="paragraph">
-<p>Both interfaces can be used as a mutative builder AND are implementing the correct
-<code>Function</code> signature to be used in their counterpart operators.</p>
+<p>两个接口都可用作可变的构建器（mutative builder），并且相应的实现（implementing）
+都可作为 <code>Function</code> 用于对应的操作符。</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="extra-schedulers"><a class="anchor" href="#extra-schedulers"></a>C.4. Schedulers</h3>
+<h3 id="extra-schedulers"><a class="anchor" href="#extra-schedulers"></a>C.4. 调度器</h3>
 <div class="paragraph">
-<p>Reactor-extra comes with several specialized schedulers:
- - <code>ForkJoinPoolScheduler</code> in package <code>reactor.scheduler.forkjoin</code>
- - <code>SwingScheduler</code> in package <code>reactor.swing</code>
- - <code>SwtScheduler</code> in package <code>reactor.swing</code></p>
+<p>Reactor-extra 提供了若干专用的调度器：
+ - <code>ForkJoinPoolScheduler</code>，位于 <code>reactor.scheduler.forkjoin</code> 包；
+ - <code>SwingScheduler</code>，位于 <code>reactor.swing</code> 包；
+ - <code>SwtScheduler</code>，位于 <code>reactor.swing</code> 包。</p>
 </div>
 <div class="paragraph">
-<p><a href="https://github.com/reactor/reactor-core/edit/master/src/docs/asciidoc/apdx-reactorExtra.adoc" class="fa fa-edit" title="Suggest an edit to the above section via github">Suggest Edit</a>
-to "<a href="#reactor-extra">Reactor-Extra</a>"</p>
+<p><a href="https://github.com/get-set/reactor-core/edit/master-zh/src/docs/asciidoc/apdx-reactorExtra.adoc" class="fa fa-edit" title="通过Github的编辑功能对以上翻译内容提出建议">翻译建议</a>
+- "<a href="#reactor-extra">Reactor-Extra</a>"</p>
 </div>
 </div>
 </div>
-</div>
-</div>
-<div id="footnotes">
-<hr>
-<div class="footnote" id="_footnote_1">
-<a href="#_footnoteref_1">1</a>. sometimes referred to as "side-effects"
-</div>
-<div class="footnote" id="_footnote_2">
-<a href="#_footnoteref_2">2</a>. request max from upstream and apply the strategy when downstream does not produce enough request
 </div>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2018-01-19 18:46:12 +08:00
+Last updated 2018-03-07 21:33:53 +08:00
 </div>
 </div>
 </body>
