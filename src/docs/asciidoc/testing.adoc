@@ -26,7 +26,7 @@ Reactor 内置一些专门用于测试的元素，放在一个专门的 artifact
 [source,groovy]
 ----
 dependencies {
-   testcompile 'io.projectreactor:reactor-test'
+   testCompile 'io.projectreactor:reactor-test'
 }
 ----
 

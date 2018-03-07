@@ -16,7 +16,7 @@ Reactor 引入了实现 `Publisher` 的响应式类  `Flux` 和 `Mono`，以及�
 返回的结果是 `Mono<Long>`。
 
 [[flux]]
-== `Flux`, 一个包含 0-N 个元素的异步序列
+== `Flux`, 包含 0-N 个元素的异步序列
 
 image::https://raw.githubusercontent.com/reactor/reactor-core/v3.0.7.RELEASE/src/docs/marble/flux.png[Flux]
 
@@ -31,7 +31,7 @@ image::https://raw.githubusercontent.com/reactor/reactor-core/v3.0.7.RELEASE/src
 这就是一个无限地周期性发出规律 tick 的时钟序列。
 
 [[mono]]
-== `Mono`, 一种异步的 0-1 结果
+== `Mono`, 异步的 0-1 结果
 image::https://raw.githubusercontent.com/reactor/reactor-core/v3.0.7.RELEASE/src/docs/marble/mono.png[Mono]
 
 `Mono<T>` 是一种特殊的 `Publisher<T>`， 它最多发出一个元素，然后终止于一个 `onComplete`
@@ -211,20 +211,14 @@ subscriber 上处理的。
 
 基于此，我们仔细研究一下 `publishOn` 和 `subscribeOn` 这两个操作符：
 
-* `publishOn` 的用法和其他操作符一样，处于订阅链（subscriber chain）中。它将下游
-信号传给上游同时将上游的数据递给下游，同时执行指定的调度器 `Scheduler` 的某个工作
-线程上的回调。它会 *改变后续的操作符的执行所在线程* （知道下一个 `publishOn` 加到
-这个链上。
-* `subscribeOn` 用于订阅（subscription）过程，作用于那个向上的 subscriber 链（subscribe
-的是才被激活，方向是向上游的）。所以，无论你把 `subscribeOn` 至于操作链（译者注：这里是
-指代码表示的操作链）的什么位置， *它都会影响到源头的线程执行环境（context）*。
-但是，它不会影响到后续的 `publishOn`，后者仍能够切换后续操作符的线程执行环境。
-
-（译者加：关于 `publishOn` 和 `subscribeOn`，由于能力所限，直译的文字总是感觉不够明白，
-这里补充说一下我的理解： 对于一个操作链， `publishOn` 从字面上看是 publish 嘛，
-所以影响的是“向下的”后续的操作符的线程执行环境，会被以后的 `publishOn` 覆盖；
-而 `subscribeOn` 相反，影响的是“向上的”直到源头的各个操作符的线程执行环境，所以
-会被前边的 `subscribeOn` 覆盖。）
+* `publishOn` 的用法和处于订阅链（subscriber chain）中的其他操作符一样。它将上游
+信号传给下游，同时执行指定的调度器 `Scheduler` 的某个工作线程上的回调。
+它会 *改变后续的操作符的执行所在线程* （直到下一个 `publishOn` 
+出现在这个链上）。
+* `subscribeOn` 用于订阅（subscription）过程，作用于那个向上的订阅链（发布者在被订阅
+时才激活，订阅的传递方向是向上游的）。所以，无论你把 `subscribeOn` 至于操作链的什么位置，
+*它都会影响到源头的线程执行环境（context）*。
+但是，它不会影响到后续的 `publishOn`，后者仍能够切换其后操作符的线程执行环境。
 
 NOTE: 只有操作链中最早的 `subscribeOn` 调用才算数。
 

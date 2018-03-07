@@ -1,6 +1,6 @@
 = Reactor 3 参考文档
 Stephane Maldini <https://twitter.com/smaldini[@smaldini]>; Simon Baslé <https://twitter.com/simonbasle[@simonbasle]>
-:appversion: 3.1.2.RELEASE
+:appversion: 3.1.4.RELEASE
 ifndef::host-github[:ext-relative: {outfilesuffix}]
 {appversion}
 :doctype: book
@@ -15,14 +15,14 @@ ifndef::host-github[:ext-relative: {outfilesuffix}]
 （译者加）本文档的一些典型的名词如下：
 
 * `Publisher`（发布者）、`Subscriber`（订阅者）、`Subscription`（订阅 n.）、`subscribe`（订阅 v.）。
-* `event`/`signal`（事件/信号，不爽的是原文经常甚至在一个句子将两个词来回用，但表示的意思是相同的，
-因此如果你看到本文翻译有时候用事件，有时候用信号，在本文档内可以认为一个意思）。
+* `event`/`signal`（事件/信号，原文常甚至在一个句子将两个词来回用，但表示的意思是基本相同的，
+因此如果你看到本文翻译有时候用事件，有时候用信号，在本文档内基本可以认为一个意思）。
 * `sequence`/`stream`（序列/流，两个词意思相似，本文介绍的是响应式流的内容，但是出现比较多的是
 sequence这个词，主要翻译为“序列”，有些地方为了更加契合且方便理解翻译为“流序列”）。
 * `element`/`item`（主要指序列中的元素，文中两个词基本翻译为“元素”）。
-* `emit`/`produce`/`generate`（发出/生产/生成，文中这三个英文词也有相似之处，对于 emit 多翻译为
-“发出”，对于后两个多翻译为“生成”，因为感觉用“生产”比较奇怪）、`consume`（消费）。
-* `Processor`（未做翻译，保留英文，一种 `Publisher` 和 `Subscriber` 的综合体）。
+* `emit`/`produce`/`generate`（发出/产生/生成，文中这三个英文词也有相似之处，对于 emit 多翻译为
+“发出”，对于后两个多翻译为“生成”）、`consume`（消费）。
+* `Processor`（未做翻译，保留英文）。
 * `operator`（译作操作符，声明式的可组装的响应式方法，其组装成的链译作“操作链”）。
 ====
 
@@ -80,7 +80,7 @@ endif::[]
 [appendix]
 include::operatorChoice.adoc[leveloffset=1]
 ifeval::["{backend}" == "html5"]
-https://github.com/reactor/reactor-core/edit/master/src/docs/asciidoc/operatorChoice.adoc[Suggest Edit, title="Suggest an edit to the above section via github", role="fa fa-edit"]
+https://github.com/reactor/reactor-core/edit/master/src/docs/asciidoc/apdx-operatorChoice.adoc[Suggest Edit, title="Suggest an edit to the above section via github", role="fa fa-edit"]
 to "<<which-operator>>"
 endif::[]
 
