@@ -479,7 +479,7 @@ flux.subscribe(System.out::println);
 Thread.sleep(2100); // <1>
 ----
 <1> 注意 `interval` 默认基于一个 *timer* `Scheduler` 来执行。 如果我们想在 main 方法中运行，
-我们需要调用 `sleep`，这样程序就可以在还没有产生任何值的时候就退出了。
+我们需要调用 `sleep`，这样程序就可以避免在还没有产生任何值的时候就退出了。
 
 每 250ms 打印出一行信息，如下：
 ----
@@ -608,7 +608,7 @@ NOTE: 还有些情况下不受检异常仍然无法传递下去（多数处于su
 1. 捕获异常，并修复它，流序列正常继续。
 2. 捕获异常，并把它包装（wrap）到一个 _不受检异常_ 中，然后抛出（中断序列）。工具类 `Exceptions`
 可用于这种方式（我们马上会讲到）。
-3. 如果你气我返回一个 `Flux` （例如在 `flatMap` 中），将异常包装在一个产生错误的 `Flux`中：
+3. 如果你期望返回一个 `Flux` （例如在 `flatMap` 中），将异常包装在一个产生错误的 `Flux`中：
 `return Flux.error(checkedException)`（流序列也会终止）。
 
 Reactor 有一个工具类 `Exceptions`，可以确保在收到受检异常的时候将其包装（wrap）起来。
