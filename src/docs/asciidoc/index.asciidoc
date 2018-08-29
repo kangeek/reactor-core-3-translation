@@ -15,7 +15,7 @@ ifndef::host-github[:ext-relative: {outfilesuffix}]
 （译者加）本文档的一些典型的名词如下：
 
 * `Publisher`（发布者）、`Subscriber`（订阅者）、`Subscription`（订阅 n.）、`subscribe`（订阅 v.）。
-* `event`/`signal`（事件/信号，原文常甚至在一个句子将两个词来回用，但表示的意思是基本相同的，
+* `event`/`signal`（事件/信号，原文常常在一个句子将两个词来回用，但表示的意思是基本相同的，
 因此如果你看到本文翻译有时候用事件，有时候用信号，在本文档内基本可以认为一个意思）。
 * `sequence`/`stream`（序列/流，两个词意思相似，本文介绍的是响应式流的内容，但是出现比较多的是
 sequence这个词，主要翻译为“序列”，有些地方为了更加契合且方便理解翻译为“流序列”）。
