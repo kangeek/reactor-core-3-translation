@@ -210,7 +210,7 @@ assertThat(results).contains(
 <8> 将这个数组传递给 `CompletableFuture.allOf`，返回一个 `Future` ，当所以任务都完成了，那么这个 `Future`
 也就完成了。
 <9> 有点麻烦的地方在于 `allOf` 返回的是 `CompletableFuture<Void>`，所以我们遍历这个 Future 的`List`，
-，然后使用 `join()` 来手机它们的结果（不会导致阻塞，因为 `AllOf` 确保这些 Future 全部完成）
+，然后使用 `join()` 来收集它们的结果（不会导致阻塞，因为 `AllOf` 确保这些 Future 全部完成）
 <10> 一旦整个异步流水线被触发，我们等它完成处理，然后返回结果列表。
 
 由于 Reactor 内置许多组合操作，因此以上例子可以简单地实现：
