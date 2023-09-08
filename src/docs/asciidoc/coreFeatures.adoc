@@ -505,8 +505,8 @@ Flux.interval(Duration.ofMillis(250))
         if (input < 3) return "tick " + input;
         throw new RuntimeException("boom");
     })
-    .elapsed() // <1>
     .retry(1)
+    .elapsed() // <1>
     .subscribe(System.out::println, System.err::println); // <2>
 
 Thread.sleep(2100); // <3>
@@ -527,8 +527,7 @@ Thread.sleep(2100); // <3>
 java.lang.RuntimeException: boom
 ----
 <1> 一个新的 `interval` 从 tick 0 开始。多出来的 250ms 间隔来自于第 4 次 tick，
-就是导致出现异常并执行 retry 的那次（译者加：我在机器上测试的时候 `elapsed`
-“显示”的时间间隔没有加倍，但是确实有第 4 次的间隔）。
+就是导致出现异常并执行 retry 的那次
 
 可见， `retry(1)` 不过是再一次从新订阅了原始的 `interval`，从 tick 0 开始。第二次，
 由于异常再次出现，便将异常传递到下游了。
